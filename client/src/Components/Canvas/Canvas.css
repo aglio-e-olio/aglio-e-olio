@@ -1,0 +1,12 @@
+.canvas-wrapper {
+    width: 100%;
+    height: auto;
+    float: left;
+    position: relative;
+}
+
+.canvas {
+    position: absolute;
+    background-color: none;
+    width: 100%;
+}
