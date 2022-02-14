@@ -4,6 +4,7 @@ import Peer from "simple-peer";
 
 import Canvas from "../Components/Canvas/Canvas";
 import "./Room.css"
+import { useParams } from "react-router-dom";
 var canvas;
 var context;
 
@@ -14,8 +15,8 @@ const Room = (props) => {
     const peerRef = useRef([]);
     const socketRef = useRef();
     const userStream = useRef();
+    const {roomID} = useParams();
 
-    const roomID = props.match.params.roomID;
 
 
     const [muted, setMute] = useState("Mute");
