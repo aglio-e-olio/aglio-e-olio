@@ -5,7 +5,7 @@ import { yCollab, yUndoManagerKeymap } from "y-codemirror.next";
 import { WebrtcProvider } from "y-webrtc";
 
 import { EditorState, EditorView, basicSetup } from "@codemirror/basic-setup";
-import { keymap } from "@codemirror/view";
+import { keymap, ViewUpdate } from "@codemirror/view";
 import { javascript } from "@codemirror/lang-javascript";
 import React, { useEffect } from "react";
 import * as random from "lib0/random";
@@ -54,6 +54,13 @@ const CodeEditor = ({roomID}) => {
         basicSetup,
         javascript(),
         yCollab(ytext, provider.awareness),
+        EditorView.updateListener.of((editorUpdate) => {
+            if (editorUpdate.docChanged) {
+                const doc = editorUpdate.state.doc;
+                const value = doc.toString();
+                console.log(value);
+            }
+        })
         // oneDark
       ],
     });
@@ -62,6 +69,7 @@ const CodeEditor = ({roomID}) => {
     const view = new EditorView({
       state,
       parent: /** @type {HTMLElement} */ (document.querySelector("#editor")),
+
     });
 
   },[]);
