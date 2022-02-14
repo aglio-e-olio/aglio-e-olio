@@ -4,6 +4,10 @@
   "private": true,
   "proxy": "http://localhost:8000",
   "dependencies": {
+    "@codemirror/basic-setup": "^0.19.1",
+    "@codemirror/lang-javascript": "^0.19.7",
+    "@codemirror/text": "^0.19.6",
+    "@codemirror/view": "^0.19.42",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -13,7 +17,9 @@
     "react-scripts": "3.4.1",
     "simple-peer": "^9.11.0",
     "socket.io-client": "^2.3.0",
-    "uuid": "^8.2.0"
+    "uuid": "^8.2.0",
+    "y-codemirror.next": "^0.1.1",
+    "y-webrtc": "^10.2.2"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -40,7 +40,7 @@ const Room = (props) => {
 
         navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
             
-            userVideo.current.srcObject = stream;
+            // userVideo.current.srcObject = stream;
             userStream.current = stream;
 
             socketRef.current = io.connect("/");
@@ -107,6 +107,7 @@ const Room = (props) => {
         context.lineJoin = "round";
         context.lineWidth = 2;
         context.stroke();
+        context.closePath();
     }
 
     /* Local Draw to Peer */
@@ -169,17 +170,17 @@ const Room = (props) => {
     /* Render */
     return (
         <div>
-            <div>
-                <video autoPlay ref={userVideo} />
+            
+                {/* <video autoPlay ref={userVideo} />
                 <video autoPlay ref={partnerVideo} />
                 <button onClick = {handleMuteClick}>{muted}</button>
-                
-            </div>
+                 */}
+            
             <Canvas
                 BroadCastDraw = {BroadCastDraw}
             />
 
-            <button onClick={BroadCastDraw}>broadcast</button>
+            {/* <button onClick={BroadCastDraw}>broadcast</button> */}
 
 
         </div>

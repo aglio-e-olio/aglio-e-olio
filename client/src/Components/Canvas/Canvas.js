@@ -49,6 +49,7 @@ const Canvas = ({BroadCastDraw, ref})=>{
             context.lineJoin = "round";
             context.lineWidth = 2;
             context.stroke();
+            context.closePath();
         }
         
         
