@@ -10,7 +10,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import React, { useEffect } from "react";
 import * as random from "lib0/random";
 import { useParams } from "react-router-dom";
-import "./CodeEditor.css"
+import "./Editor.css"
 import { Line } from '@codemirror/text';
 
 export const usercolors = [
@@ -65,7 +65,9 @@ const CodeEditor = ({roomID}) => {
     });
 
   },[]);
-  return <div className="code-editor" id="editor" />;
+  return (
+          <div className="code-editor" id="editor" />
+  );
 };
 
 export default CodeEditor;

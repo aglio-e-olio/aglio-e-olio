@@ -5,6 +5,7 @@ import Peer from "simple-peer";
 import Canvas from "../Components/Canvas/Canvas";
 import "./Room.css"
 import { useParams } from "react-router-dom";
+import CodeEditor from "../Components/CodeEditor/Editor";
 var canvas;
 var context;
 
@@ -179,6 +180,7 @@ const Room = (props) => {
             <Canvas
                 BroadCastDraw = {BroadCastDraw}
             />
+            <CodeEditor roomID={roomID} />
 
             {/* <button onClick={BroadCastDraw}>broadcast</button> */}
 

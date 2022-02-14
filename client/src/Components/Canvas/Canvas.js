@@ -80,6 +80,7 @@ const Canvas = ({BroadCastDraw, ref})=>{
     /* Render */
     return (
         <div>
+            <button onClick={changeZofCanvas}>{zIndex === 1?"Canvas Mode":"Editor Mode"}</button>
             <div className="color-picker-wrapper">
             <input
                 className="color-picker"
