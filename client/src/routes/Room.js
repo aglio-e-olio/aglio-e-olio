@@ -7,8 +7,30 @@ import "./Room.css"
 import { useParams } from "react-router-dom";
 import CodeEditor from "../Components/CodeEditor/Editor";
 import { codeContext } from "../Context/ContextProvider";
+import styled from "styled-components";
+
 var canvas;
 var context;
+
+const StyledVideo = styled.video`
+    height: 40%;
+    width: 50%;
+`;
+
+const Video = (props) => {
+    const ref = useRef();
+
+    useEffect(() => {
+        props.peer.on("stream", stream => {
+            ref.current.srcObject = stream;
+        })
+    }, []);
+
+    return (
+        <StyledVideo playsInline autoPlay ref={ref} />
+    );
+}
+
 
 const Room = (props) => {
     const [peers, setPeers] = useState([]);
@@ -43,7 +65,7 @@ const Room = (props) => {
 
     useEffect(() => {
 
-        navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
             
             // userVideo.current.srcObject = stream;
             userStream.current = stream;
@@ -63,10 +85,7 @@ const Room = (props) => {
                             peerID:userID,
                             peer_
                         })
-                        peers_.push({
-                            peerID:userID, 
-                            peer_,
-                        })
+                        peers_.push(peer_)
 
 
                     })
@@ -80,11 +99,7 @@ const Room = (props) => {
                     peerID:payload.callerID,
                     peer_
                 })
-                const peerObj = {
-                    peerID:payload.callerID,
-                    peer_
-                }
-                setPeers((users)=>[...users, peerObj])
+                setPeers((users)=>[...users, peer_])
             });
 
             socketRef.current.on("code response", code => {
@@ -161,6 +176,13 @@ const Room = (props) => {
             <Canvas />
             <textarea value={compileResult} />
             <CodeEditor roomID={roomID} />
+            
+            <StyledVideo muted ref={userVideo} autoPlay playsInline />
+            {peers.map((peer, index) => {
+                return (
+                    <Video key={index} peer={peer} />
+                );
+            })}
             
 
             {/* <button onClick={BroadCastDraw}>broadcast</button> */}

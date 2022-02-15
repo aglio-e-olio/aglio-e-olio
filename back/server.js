@@ -5,6 +5,12 @@ const server = http.createServer(app);
 const socket = require("socket.io");
 const io = socket(server);
 const axios = require("axios");
+const path = require('path');
+
+app.use(express.static(path.join(__dirname, '../client/build')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+})
 
 const rooms = {};
 
@@ -69,4 +75,4 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(8000, () => console.log("server is running on port 8000"));
+server.listen(process.env.PORT || 8000, () => console.log("server is running on port 8000"));
