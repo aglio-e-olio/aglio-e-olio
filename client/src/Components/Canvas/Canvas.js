@@ -108,7 +108,7 @@ export default function Canvas() {
           onPointerUp={handlePointerUp}
           onPointerEnter={activateUser}
           onPointerLeave={deactivateUser}
-          opacity={isSynced ? 1 : 0.2}
+          opacity={isSynced ? 1 : 0.8}
         >
           <g transform={`translate(0, -${getYOffset()})`}>
             {/* Lines */}
@@ -133,7 +133,7 @@ export default function Canvas() {
           ))}
         </svg>
         <div className="canvas-controls">
-          <button onClick={undoLine}>Undo</button>
+          <button onClick={clearAllLines}>Clear All</button>
         </div>
         <div className="author">by steveruizok</div>
       </div>

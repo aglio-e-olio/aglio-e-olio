@@ -5,7 +5,9 @@
   "proxy": "http://localhost:8000",
   "dependencies": {
     "@codemirror/basic-setup": "^0.19.1",
+    "@codemirror/commands": "^0.19.8",
     "@codemirror/lang-javascript": "^0.19.7",
+    "@codemirror/lang-python": "^0.19.4",
     "@codemirror/text": "^0.19.6",
     "@codemirror/view": "^0.19.42",
     "@testing-library/jest-dom": "^4.2.4",

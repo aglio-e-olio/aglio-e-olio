@@ -84,10 +84,10 @@ export function useLines() {
 
   // Clear all of the lines in the line
   const clearAllLines = React.useCallback(() => {
-    const now = Date.now();
-    const lastTime = rLastClear.current || 0;
-    if (now - lastTime < 60000) return;
-    rLastClear.current = now;
+    // const now = Date.now();
+    // const lastTime = rLastClear.current || 0;
+    // if (now - lastTime < 60000) return;
+    // rLastClear.current = now;
     yLines.delete(0, yLines.length);
   }, []);
 

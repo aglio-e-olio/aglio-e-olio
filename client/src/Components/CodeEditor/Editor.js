@@ -7,6 +7,8 @@ import { WebrtcProvider } from "y-webrtc";
 import { EditorState, EditorView, basicSetup } from "@codemirror/basic-setup";
 import { keymap, ViewUpdate } from "@codemirror/view";
 import { javascript } from "@codemirror/lang-javascript";
+import { indentWithTab } from "@codemirror/commands";
+import { python } from "@codemirror/lang-python"
 import React, { useContext, useEffect } from "react";
 import * as random from "lib0/random";
 import { useParams } from "react-router-dom";
@@ -55,7 +57,8 @@ const CodeEditor = ({roomID}) => {
       extensions: [
         keymap.of([...yUndoManagerKeymap]),
         basicSetup,
-        javascript(),
+        python(),
+        keymap.of([indentWithTab]),
         yCollab(ytext, provider.awareness),
         EditorView.updateListener.of((editorUpdate) => {
             if (editorUpdate.docChanged) {

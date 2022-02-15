@@ -2,7 +2,7 @@
     position: absolute;
     width: 50%;
     right: 0px;
-    background-color: #f3f9ff;
+    background: rgba(243, 249, 255, .7);
     height: 100%;
     text-align: left;
 }

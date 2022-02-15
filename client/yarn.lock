@@ -988,7 +988,7 @@
     "@codemirror/text" "^0.19.0"
     "@codemirror/view" "^0.19.0"
 
-"@codemirror/commands@^0.19.0":
+"@codemirror/commands@^0.19.0", "@codemirror/commands@^0.19.8":
   "integrity" "sha512-65LIMSGUGGpY3oH6mzV46YWRrgao6NmfJ+AuC7jNz3K5NPnH6GCV1H5I6SwOFyVbkiygGyd0EFwrWqywTBD1aw=="
   "resolved" "https://registry.npmjs.org/@codemirror/commands/-/commands-0.19.8.tgz"
   "version" "0.19.8"
@@ -1061,6 +1061,15 @@
     "@codemirror/state" "^0.19.0"
     "@codemirror/view" "^0.19.0"
     "@lezer/javascript" "^0.15.1"
+
+"@codemirror/lang-python@^0.19.4":
+  "integrity" "sha512-eSH1JXbf0D30y+f3nWy/+bTLAIV8RmcQbbVD8DsBxkxOHMVKcILgxFRHCovba8YEMtmq45I1DoWcNt1CeKnrYQ=="
+  "resolved" "https://registry.npmjs.org/@codemirror/lang-python/-/lang-python-0.19.4.tgz"
+  "version" "0.19.4"
+  dependencies:
+    "@codemirror/highlight" "^0.19.7"
+    "@codemirror/language" "^0.19.0"
+    "@lezer/python" "^0.15.0"
 
 "@codemirror/language@^0.19.0":
   "integrity" "sha512-pNNUtYWMIMG0lUSKyUXJr8U0rFiCKsKFXbA2Oj17PC+S1FY99hV0z1vcntW67ekAIZw9DMEUQnLsKBuIbAUX7Q=="
@@ -1381,6 +1390,13 @@
   "version" "0.15.8"
   dependencies:
     "@lezer/common" "^0.15.0"
+
+"@lezer/python@^0.15.0":
+  "integrity" "sha512-KkbNfjLZCs/Ibx+3mekGu31qz+zCVkXHL+oNftRxB/lsINlz25SURR5z6wb94JpJt0yDFCEtn/2siAUybLOXiA=="
+  "resolved" "https://registry.npmjs.org/@lezer/python/-/python-0.15.0.tgz"
+  "version" "0.15.0"
+  dependencies:
+    "@lezer/lr" "^0.15.0"
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   "integrity" "sha512-bPHp6Ji8b41szTOcaP63VlnbbO5Ny6dwAATtY6JTjh5N2OLrb5Qk/Th5cRkRQhkWCt+EJsYrNB0MiL+Gpn6e3g=="
