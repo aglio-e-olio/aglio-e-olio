@@ -135,7 +135,6 @@ export default function Canvas() {
         <div className="canvas-controls">
           <button onClick={clearAllLines}>Clear All</button>
         </div>
-        <div className="author">by steveruizok</div>
       </div>
     </div>
   );
