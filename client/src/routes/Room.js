@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useContext } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 
@@ -6,6 +6,7 @@ import Canvas from "../Components/Canvas/Canvas";
 import "./Room.css"
 import { useParams } from "react-router-dom";
 import CodeEditor from "../Components/CodeEditor/Editor";
+import { codeContext } from "../Context/ContextProvider";
 var canvas;
 var context;
 
@@ -17,17 +18,20 @@ const Room = (props) => {
     const socketRef = useRef();
     const userStream = useRef();
     const {roomID} = useParams();
+    const { codes, compileResult, getCompileResult } = useContext(codeContext);
 
 
 
     const [muted, setMute] = useState("Mute");
 
+    function sendCode() {
+        socketRef.current.emit("code compile", {codes, roomID});
+    }
 
     function handleMuteClick(){
         userStream.current
             .getAudioTracks()
             .forEach(track=>track.enabled = !track.enabled);
-        // console.log(userStream.current.getAudioTracks());
 
         if(muted ==="Mute"){
             setMute("UnMute");
@@ -39,7 +43,7 @@ const Room = (props) => {
 
     useEffect(() => {
 
-        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
+        navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
             
             // userVideo.current.srcObject = stream;
             userStream.current = stream;
@@ -81,6 +85,10 @@ const Room = (props) => {
                 }
                 setPeers((users)=>[...users, peerObj])
             });
+
+            socketRef.current.on("code response", code => {
+                handleCompileResult(code);
+            })
 
             socketRef.current.on("receiving returned signal", (payload) => {
                 const item = peerRef.current.find((p) => p.peerID === payload.id);
@@ -166,21 +174,29 @@ const Room = (props) => {
         return peer;
     }
 
+    function handleCompileResult(code) {
+        getCompileResult(code);
+
+    }
+
 
 
     /* Render */
     return (
         <div>
+            <button onClick={sendCode} >Run</button>
             
                 {/* <video autoPlay ref={userVideo} />
                 <video autoPlay ref={partnerVideo} />
-                <button onClick = {handleMuteClick}>{muted}</button>
-                 */}
+                <button onClick = {handleMuteClick}>{muted}</button> */}
+                
             
             <Canvas
                 BroadCastDraw = {BroadCastDraw}
             />
+            <textarea value={compileResult} />
             <CodeEditor roomID={roomID} />
+            
 
             {/* <button onClick={BroadCastDraw}>broadcast</button> */}
 

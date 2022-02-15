@@ -7,11 +7,12 @@ import { WebrtcProvider } from "y-webrtc";
 import { EditorState, EditorView, basicSetup } from "@codemirror/basic-setup";
 import { keymap, ViewUpdate } from "@codemirror/view";
 import { javascript } from "@codemirror/lang-javascript";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import * as random from "lib0/random";
 import { useParams } from "react-router-dom";
 import "./Editor.css"
 import { Line } from '@codemirror/text';
+import { codeContext } from "../../Context/ContextProvider";
 
 export const usercolors = [
   { color: "#30bced", light: "#30bced33" },
@@ -28,6 +29,9 @@ export const userColor = usercolors[random.uint32() % usercolors.length];
 
 
 const CodeEditor = ({roomID}) => {
+    let codesGate;
+
+    const { codes, extractCode } = useContext(codeContext);
   useEffect(() => {
     const ydoc = new Y.Doc();
     // const provider = new WebrtcProvider('codemirror6-demo-room', ydoc)
@@ -58,7 +62,7 @@ const CodeEditor = ({roomID}) => {
             if (editorUpdate.docChanged) {
                 const doc = editorUpdate.state.doc;
                 const value = doc.toString();
-                console.log(value);
+                extractCode(value);
             }
         })
         // oneDark
@@ -72,9 +76,14 @@ const CodeEditor = ({roomID}) => {
 
     });
 
+    
+
   },[]);
+
   return (
-          <div className="code-editor" id="editor" />
+          <div className="code-editor" id="editor">
+              
+          </div>
   );
 };
 
