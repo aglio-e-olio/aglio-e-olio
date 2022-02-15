@@ -18,7 +18,7 @@ const Room = (props) => {
     const socketRef = useRef();
     const userStream = useRef();
     const {roomID} = useParams();
-    const { codes, compileResult, getCompileResult } = useContext(codeContext);
+    const { codes, compileResult, getCompileResult, getRoomInfo } = useContext(codeContext);
 
 
 
@@ -49,6 +49,7 @@ const Room = (props) => {
             userStream.current = stream;
 
             socketRef.current = io.connect("/");
+            getRoomInfo(roomID);
             
             socketRef.current.emit("join room", roomID);
             
