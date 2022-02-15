@@ -13,8 +13,8 @@ var canvas;
 var context;
 
 const StyledVideo = styled.video`
-    height: 40%;
-    width: 50%;
+    height: 0;
+    width: 0;
 `;
 
 const Video = (props) => {
@@ -166,7 +166,7 @@ const Room = (props) => {
     /* Render */
     return (
         <div>
-            <button onClick={sendCode} >Run</button>
+            <button className="run-button" onClick={sendCode} >Run</button>
             
                 {/* <video autoPlay ref={userVideo} />
                 <video autoPlay ref={partnerVideo} />
@@ -174,7 +174,7 @@ const Room = (props) => {
                 
             
             <Canvas />
-            <textarea value={compileResult} />
+            <textarea className="code-result" value={compileResult} placeholder={"코드 결과 출력 창입니다."}/>
             <CodeEditor roomID={roomID} />
             
             <StyledVideo muted ref={userVideo} autoPlay playsInline />

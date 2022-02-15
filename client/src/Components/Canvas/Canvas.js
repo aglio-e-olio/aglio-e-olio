@@ -18,7 +18,7 @@ const START_TIME = date.getTime();
 
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
-  return -50;
+  return -60;
 }
 
 function getPoint(x, y) {
@@ -53,7 +53,7 @@ export default function Canvas() {
     (e) => {
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      startLine(getPoint(e.clientX, e.clientY));
+      startLine(getPoint(e.clientX, e.clientY + window.scrollY));
     },
     [startLine]
   );
@@ -61,7 +61,7 @@ export default function Canvas() {
   // On pointer move, update awareness and (if down) update the current line
   const handlePointerMove = React.useCallback(
     (e) => {
-      const point = getPoint(e.clientX, e.clientY);
+      const point = getPoint(e.clientX, e.clientY + window.scrollY);
 
       updateUserPoint(point);
 
@@ -98,7 +98,8 @@ export default function Canvas() {
   return (
     <div>
       <div>
-        <button onClick={changeZofCanvas}>switch function</button>
+        <button className="switch-function" onClick={changeZofCanvas}>{zIndex === 10? "Code Editor Mode": "White Board Mode"}</button>
+        <button className="clear-button" onClick={clearAllLines}>Clear All</button>
       </div>
       <div className="canvas-container" style={{zIndex: zIndex}}>
         <svg
@@ -116,11 +117,7 @@ export default function Canvas() {
               <Line key={line.get("id")} line={line} />
             ))}
             {/* Live Cursors */}
-            {users
-              .filter((user) => user.id !== self.id)
-              .map((other) => (
-                <UserCursor key={other.id} user={other} />
-              ))}
+            
           </g>
           {/* User Tokens */}
           {users.map((user, i) => (
@@ -132,9 +129,7 @@ export default function Canvas() {
             />
           ))}
         </svg>
-        <div className="canvas-controls">
-          <button onClick={clearAllLines}>Clear All</button>
-        </div>
+        
       </div>
     </div>
   );
