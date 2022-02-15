@@ -58,13 +58,25 @@
   
   .switch-function {
     position: absolute;
+    cursor: pointer;
+    margin-top: 5px;
     right: 55%;
+    width: 80px;
     height: 50px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
   }
 
   .clear-button {
     position: absolute;
-    right: 65%;
+    cursor: pointer;
+    margin-top: 5px;
+    width: 80px;
+    right: 60%;
     height: 50px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
   }
   

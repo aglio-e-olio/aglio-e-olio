@@ -174,7 +174,7 @@ const Room = (props) => {
                 
             
             <Canvas />
-            <textarea className="code-result" value={compileResult} placeholder={"코드 결과 출력 창입니다."}/>
+            <textarea className="code-result" value={compileResult} placeholder={"코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다."}/>
             <CodeEditor roomID={roomID} />
             
             <StyledVideo muted ref={userVideo} autoPlay playsInline />

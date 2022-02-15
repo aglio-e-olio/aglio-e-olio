@@ -57,7 +57,7 @@ const CodeEditor = ({roomID}) => {
       extensions: [
         keymap.of([...yUndoManagerKeymap]),
         basicSetup,
-        python(),
+        javascript(),
         keymap.of([indentWithTab]),
         yCollab(ytext, provider.awareness),
         EditorView.updateListener.of((editorUpdate) => {
