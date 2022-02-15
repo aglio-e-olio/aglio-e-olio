@@ -7,6 +7,7 @@ import { useUser } from "../../hooks/useUser";
 import { useUsers } from "../../hooks/useUsers";
 import { useKeyboardEvents } from "../../hooks/useKeyboardEvents";
 import "./Canvas.css";
+import { useState } from "react";
 
 const date = new Date();
 
@@ -15,8 +16,8 @@ date.setUTCHours(0, 0, 0, 0);
 const START_TIME = date.getTime();
 
 function getYOffset() {
-//   return (Date.now() - START_TIME) / 80;
-    return 0;
+  //   return (Date.now() - START_TIME) / 80;
+  return -50;
 }
 
 function getPoint(x, y) {
@@ -28,7 +29,7 @@ export default function Canvas() {
     user: self,
     updateUserPoint,
     activateUser,
-    deactivateUser
+    deactivateUser,
   } = useUser();
 
   const { users } = useUsers();
@@ -41,7 +42,7 @@ export default function Canvas() {
     completeLine,
     clearAllLines,
     undoLine,
-    redoLine
+    redoLine,
   } = useLines();
 
   useKeyboardEvents();
@@ -87,45 +88,54 @@ export default function Canvas() {
     return () => clearInterval(timeout);
   }, []);
 
+  const [zIndex, setZindex] = useState(0);
+  const changeZofCanvas = () => {
+    // console.log(changeZ.current.style);
+    setZindex((index) => (index === 10 ? 0 : 10));
+  };
+
   return (
-    <div className="canvas-container">
-      <svg
-        className="canvas-layer"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerEnter={activateUser}
-        onPointerLeave={deactivateUser}
-        opacity={isSynced ? 1 : 0.2}
-      >
-        <g transform={`translate(0, -${getYOffset()})`}>
-          {/* Lines */}
-          {lines.map((line, i) => (
-            <Line key={line.get("id")} line={line} />
-          ))}
-          {/* Live Cursors */}
-          {users
-            .filter((user) => user.id !== self.id)
-            .map((other) => (
-              <UserCursor key={other.id} user={other} />
-            ))}
-        </g>
-        {/* User Tokens */}
-        {users.map((user, i) => (
-          <UserToken
-            key={user.id}
-            user={user}
-            index={i}
-            isSelf={user.id === self.id}
-          />
-        ))}
-      </svg>
-      <div className="canvas-controls">
-        <button onClick={undoLine}>Undo</button>
-        <button onClick={redoLine}>Redo</button>
-        <button onClick={clearAllLines}>Clear</button>
+    <div>
+      <div>
+        <button onClick={changeZofCanvas}>switch function</button>
       </div>
-      <div className="author">by steveruizok</div>
+      <div className="canvas-container" style={{zIndex: zIndex}}>
+        <svg
+          className="canvas-layer"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerEnter={activateUser}
+          onPointerLeave={deactivateUser}
+          opacity={isSynced ? 1 : 0.2}
+        >
+          <g transform={`translate(0, -${getYOffset()})`}>
+            {/* Lines */}
+            {lines.map((line, i) => (
+              <Line key={line.get("id")} line={line} />
+            ))}
+            {/* Live Cursors */}
+            {users
+              .filter((user) => user.id !== self.id)
+              .map((other) => (
+                <UserCursor key={other.id} user={other} />
+              ))}
+          </g>
+          {/* User Tokens */}
+          {users.map((user, i) => (
+            <UserToken
+              key={user.id}
+              user={user}
+              index={i}
+              isSelf={user.id === self.id}
+            />
+          ))}
+        </svg>
+        <div className="canvas-controls">
+          <button onClick={undoLine}>Undo</button>
+        </div>
+        <div className="author">by steveruizok</div>
+      </div>
     </div>
   );
 }

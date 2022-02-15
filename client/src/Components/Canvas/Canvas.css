@@ -14,9 +14,9 @@
   
   .canvas-container {
     position: fixed;
-    top: 0px;
+    top: 80px;
     left: 0px;
-    width: 50%;
+    width: 100%;
     height: 100%;
   }
   
@@ -38,9 +38,11 @@
     position: absolute;
     top: 0px;
     right: 0px;
+    float: left;
   }
   
   .canvas-controls > button {
+      position: fixed;
     background: none;
     border: none;
     padding: 24px 20px;
@@ -49,6 +51,7 @@
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     color: dodgerblue;
     cursor: pointer;
+    left: 60px;
   }
   
   .author {
