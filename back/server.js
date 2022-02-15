@@ -39,8 +39,8 @@ io.on("connection", (socket) => {
 
     const sendData = {
         // put your own client id and client secret of jdoodle
-      clientId: "",
-      clientSecret: "",
+      clientId: "29c0d13db4b041ca805305faac6c9155",
+      clientSecret: "73a9ee5ae33448935b7736ef5c9bdcbdf8365da265cdbc036842db09edad5372",
       script: payload.codes,
       stdin: "",
       language: "python3",

@@ -97,35 +97,8 @@ const Room = (props) => {
             });
         });
 
-        /* Get Canvas Element */
-        canvas = document.getElementById("canvas");
-        canvas.height = window.innerHeight - 30;
-        canvas.width = window.innerWidth;
-        context = canvas.getContext("2d");
-
 
     }, []); 
-
-    /* Peer Data Draw */
-    const draw = (data) => {
-        context.beginPath();
-        context.moveTo(data.lastPoint.x, data.lastPoint.y);
-        context.lineTo(data.x, data.y);
-        context.strokeStyle = data.color;
-        context.lineCap = "round";
-        context.lineJoin = "round";
-        context.lineWidth = 2;
-        context.stroke();
-        context.closePath();
-    }
-
-    /* Local Draw to Peer */
-    function BroadCastDraw(data){
-        peerRef.current.forEach(object=>{
-            const p = object.peer_;
-            p.send(data);
-        })
-    }
 
 
     /* Below are Simple Peer Library Function */
@@ -145,10 +118,6 @@ const Room = (props) => {
             })
         })
 
-        // Data Chanel : Recieve data
-        peer.on("data", data => {
-            draw(JSON.parse(data));
-        })
 
         return peer;
     }
@@ -164,10 +133,7 @@ const Room = (props) => {
             socketRef.current.emit("returning signal", { signal, callerID })
         })
 
-        // Data Chanel : Recieve data
-        peer.on("data", data => {
-            draw(JSON.parse(data));
-        })
+        
     
         peer.signal(incomingSignal);
     
@@ -191,9 +157,7 @@ const Room = (props) => {
                 <button onClick = {handleMuteClick}>{muted}</button> */}
                 
             
-            <Canvas
-                BroadCastDraw = {BroadCastDraw}
-            />
+            <Canvas />
             <textarea value={compileResult} />
             <CodeEditor roomID={roomID} />
             

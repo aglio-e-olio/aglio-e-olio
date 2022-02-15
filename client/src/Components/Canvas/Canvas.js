@@ -1,98 +1,130 @@
-import React, {useContext, useEffect, useState, useRef } from "react"
-import './Canvas.css'
+import * as React from "react";
+import { Line } from "./Line";
+import { UserToken } from "./UserToken";
+import { UserCursor } from "./UserCursor";
+import { useLines } from "../../hooks/useLines";
+import { useUser } from "../../hooks/useUser";
+import { useUsers } from "../../hooks/useUsers";
+import { useKeyboardEvents } from "../../hooks/useKeyboardEvents";
+import "./Canvas.css";
 
-var lastPoint;
-const Canvas = ({BroadCastDraw, ref})=>{
+const date = new Date();
 
-    useEffect(()=>{
-        /* Get HTML Element and Set Canvas */
-        const canvas = document.getElementById("canvas");
-        canvas.height = window.innerHeight - 30;
-        canvas.width = window.innerWidth;
-        const context = canvas.getContext("2d");
-        
-        
-        function move(e){
-            if(e.buttons){
-                if(!lastPoint){
-                    lastPoint = {x : e.offsetX, y:e.offsetY }
-                    return;
-                }
+date.setUTCHours(0, 0, 0, 0);
 
-                draw({
-                    lastPoint, 
-                    x : e.offsetX,
-                    y : e.offsetY,
-                    color : "green"
-                })
+const START_TIME = date.getTime();
 
-                BroadCastDraw(JSON.stringify({
-                    lastPoint,
-                    x : e.offsetX,
-                    y : e.offsetY,
-                    color : "green"
-                }))
-
-                lastPoint = { x:e.offsetX, y:e.offsetY }
-            }
-        }
-
-
-
-        /* Local Draw Function */
-        const draw = (data) => {
-            context.beginPath();
-            context.moveTo(data.lastPoint.x, data.lastPoint.y);
-            context.lineTo(data.x, data.y);
-            context.strokeStyle = data.color;
-            context.lineCap = "round";
-            context.lineJoin = "round";
-            context.lineWidth = 2;
-            context.stroke();
-            context.closePath();
-        }
-        
-        
-        
-        /* Move 등록 */        
-        window.onmousemove = move;
-
-        // Clean Up
-        return ()=>{
-        }
-
-    },[])
-
-
-    /* Extra 지금은 안씀 */
-    const { current: canvasDetails } = useRef({ color: "green"});
-    const changeColor = (newColor) => {
-        canvasDetails.color = newColor;
-    };
-
-    const [zIndex, setZindex] = useState(0);
-    const changeZofCanvas = () => {
-        // console.log(changeZ.current.style);
-        setZindex((index) => (index === 1)?0:1);
-    }
-
-
-    /* Render */
-    return (
-        <div>
-            <button onClick={changeZofCanvas}>{zIndex === 1?"Canvas Mode":"Editor Mode"}</button>
-            <div className="color-picker-wrapper">
-            <input
-                className="color-picker"
-                type="color"
-                defaultValue="#00FF00"
-                onChange={(e) => changeColor(e.target.value)}
-            />
-            </div>
-            <canvas className="canvas" id="canvas" style={{zIndex:zIndex}}></canvas>
-        </div>
-    );
+function getYOffset() {
+  return (Date.now() - START_TIME) / 80;
 }
 
+function getPoint(x, y) {
+  return [x, y + getYOffset()];
+}
 
-export default Canvas;
+export default function Canvas() {
+  const {
+    user: self,
+    updateUserPoint,
+    activateUser,
+    deactivateUser
+  } = useUser();
+
+  const { users } = useUsers();
+
+  const {
+    lines,
+    isSynced,
+    startLine,
+    addPointToLine,
+    completeLine,
+    clearAllLines,
+    undoLine,
+    redoLine
+  } = useLines();
+
+  useKeyboardEvents();
+
+  // On pointer down, start a new current line
+  const handlePointerDown = React.useCallback(
+    (e) => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+
+      startLine(getPoint(e.clientX, e.clientY));
+    },
+    [startLine]
+  );
+
+  // On pointer move, update awareness and (if down) update the current line
+  const handlePointerMove = React.useCallback(
+    (e) => {
+      const point = getPoint(e.clientX, e.clientY);
+
+      updateUserPoint(point);
+
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        addPointToLine(point);
+      }
+    },
+    [addPointToLine, updateUserPoint]
+  );
+
+  // On pointer up, complete the current line
+  const handlePointerUp = React.useCallback(
+    (e) => {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+
+      completeLine();
+    },
+    [completeLine]
+  );
+
+  const [_, forceUpdate] = React.useReducer((s) => !s, false);
+
+  React.useEffect(() => {
+    const timeout = setInterval(forceUpdate, 30);
+    return () => clearInterval(timeout);
+  }, []);
+
+  return (
+    <div className="canvas-container">
+      <svg
+        className="canvas-layer"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerEnter={activateUser}
+        onPointerLeave={deactivateUser}
+        opacity={isSynced ? 1 : 0.2}
+      >
+        <g transform={`translate(0, -${getYOffset()})`}>
+          {/* Lines */}
+          {lines.map((line, i) => (
+            <Line key={line.get("id")} line={line} />
+          ))}
+          {/* Live Cursors */}
+          {users
+            .filter((user) => user.id !== self.id)
+            .map((other) => (
+              <UserCursor key={other.id} user={other} />
+            ))}
+        </g>
+        {/* User Tokens */}
+        {users.map((user, i) => (
+          <UserToken
+            key={user.id}
+            user={user}
+            index={i}
+            isSelf={user.id === self.id}
+          />
+        ))}
+      </svg>
+      <div className="canvas-controls">
+        <button onClick={undoLine}>Undo</button>
+        <button onClick={redoLine}>Redo</button>
+        <button onClick={clearAllLines}>Clear</button>
+      </div>
+      <div className="author">by steveruizok</div>
+    </div>
+  );
+}

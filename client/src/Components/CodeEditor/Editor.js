@@ -29,7 +29,6 @@ export const userColor = usercolors[random.uint32() % usercolors.length];
 
 
 const CodeEditor = ({roomID}) => {
-    let codesGate;
 
     const { codes, extractCode } = useContext(codeContext);
   useEffect(() => {
