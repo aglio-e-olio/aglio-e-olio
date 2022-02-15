@@ -15,7 +15,8 @@ date.setUTCHours(0, 0, 0, 0);
 const START_TIME = date.getTime();
 
 function getYOffset() {
-  return (Date.now() - START_TIME) / 80;
+//   return (Date.now() - START_TIME) / 80;
+    return 0;
 }
 
 function getPoint(x, y) {
