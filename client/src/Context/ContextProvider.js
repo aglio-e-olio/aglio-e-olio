@@ -6,7 +6,8 @@ export const codeContext = React.createContext();
 // state의 초기 값을 설정한다
 const initialState = {
   codes: "",
-  compileResult: ""
+  compileResult: "",
+  roomInfo: ""
 };
 
 
@@ -23,6 +24,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         compileResult: action.payload,
+      };
+    
+    case "MATCHING_ROOM" :
+      return {
+        ...state,
+        roomInfo: action.payload,
       };
     
     default:
@@ -48,11 +55,18 @@ const ContextProvider = ({ children }) => {
     })
   }
 
+  function getRoomInfo(roomInfo) {
+    dispatch({
+      type: "MATCHING_ROOM",
+      payload: roomInfo,
+    })
+  }
+
   
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
-      value={{ codes: state.codes, extractCode, compileResult: state.compileResult, getCompileResult }}
+      value={{ codes: state.codes, extractCode, compileResult: state.compileResult, getCompileResult, roomInfo: state.roomInfo, getRoomInfo }}
     >
       {children}
     </codeContext.Provider>

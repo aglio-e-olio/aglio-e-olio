@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { v1 as uuid } from "uuid";
+import "./CreateRoom.css";
 
 const CreateRoom = (props) => {
     const navigate = useNavigate();
@@ -10,7 +11,7 @@ const CreateRoom = (props) => {
     }
 
     return (
-        <button onClick={create}>Create Room</button>
+        <button className="create-room-button" onClick={create}>Create Room</button>
     );
 }
 

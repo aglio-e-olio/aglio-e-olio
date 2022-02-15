@@ -7,8 +7,30 @@ import "./Room.css"
 import { useParams } from "react-router-dom";
 import CodeEditor from "../Components/CodeEditor/Editor";
 import { codeContext } from "../Context/ContextProvider";
+import styled from "styled-components";
+
 var canvas;
 var context;
+
+const StyledVideo = styled.video`
+    height: 0;
+    width: 0;
+`;
+
+const Video = (props) => {
+    const ref = useRef();
+
+    useEffect(() => {
+        props.peer.on("stream", stream => {
+            ref.current.srcObject = stream;
+        })
+    }, []);
+
+    return (
+        <StyledVideo playsInline autoPlay ref={ref} />
+    );
+}
+
 
 const Room = (props) => {
     const [peers, setPeers] = useState([]);
@@ -18,7 +40,7 @@ const Room = (props) => {
     const socketRef = useRef();
     const userStream = useRef();
     const {roomID} = useParams();
-    const { codes, compileResult, getCompileResult } = useContext(codeContext);
+    const { codes, compileResult, getCompileResult, getRoomInfo } = useContext(codeContext);
 
 
 
@@ -43,12 +65,13 @@ const Room = (props) => {
 
     useEffect(() => {
 
-        navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
             
             // userVideo.current.srcObject = stream;
             userStream.current = stream;
 
             socketRef.current = io.connect("/");
+            getRoomInfo(roomID);
             
             socketRef.current.emit("join room", roomID);
             
@@ -62,10 +85,7 @@ const Room = (props) => {
                             peerID:userID,
                             peer_
                         })
-                        peers_.push({
-                            peerID:userID, 
-                            peer_,
-                        })
+                        peers_.push(peer_)
 
 
                     })
@@ -79,11 +99,7 @@ const Room = (props) => {
                     peerID:payload.callerID,
                     peer_
                 })
-                const peerObj = {
-                    peerID:payload.callerID,
-                    peer_
-                }
-                setPeers((users)=>[...users, peerObj])
+                setPeers((users)=>[...users, peer_])
             });
 
             socketRef.current.on("code response", code => {
@@ -97,35 +113,8 @@ const Room = (props) => {
             });
         });
 
-        /* Get Canvas Element */
-        canvas = document.getElementById("canvas");
-        canvas.height = window.innerHeight - 30;
-        canvas.width = window.innerWidth;
-        context = canvas.getContext("2d");
-
 
     }, []); 
-
-    /* Peer Data Draw */
-    const draw = (data) => {
-        context.beginPath();
-        context.moveTo(data.lastPoint.x, data.lastPoint.y);
-        context.lineTo(data.x, data.y);
-        context.strokeStyle = data.color;
-        context.lineCap = "round";
-        context.lineJoin = "round";
-        context.lineWidth = 2;
-        context.stroke();
-        context.closePath();
-    }
-
-    /* Local Draw to Peer */
-    function BroadCastDraw(data){
-        peerRef.current.forEach(object=>{
-            const p = object.peer_;
-            p.send(data);
-        })
-    }
 
 
     /* Below are Simple Peer Library Function */
@@ -145,10 +134,6 @@ const Room = (props) => {
             })
         })
 
-        // Data Chanel : Recieve data
-        peer.on("data", data => {
-            draw(JSON.parse(data));
-        })
 
         return peer;
     }
@@ -164,10 +149,7 @@ const Room = (props) => {
             socketRef.current.emit("returning signal", { signal, callerID })
         })
 
-        // Data Chanel : Recieve data
-        peer.on("data", data => {
-            draw(JSON.parse(data));
-        })
+        
     
         peer.signal(incomingSignal);
     
@@ -184,18 +166,23 @@ const Room = (props) => {
     /* Render */
     return (
         <div>
-            <button onClick={sendCode} >Run</button>
+            <button className="run-button" onClick={sendCode} >Run</button>
             
                 {/* <video autoPlay ref={userVideo} />
                 <video autoPlay ref={partnerVideo} />
                 <button onClick = {handleMuteClick}>{muted}</button> */}
                 
             
-            <Canvas
-                BroadCastDraw = {BroadCastDraw}
-            />
-            <textarea value={compileResult} />
+            <Canvas />
+            <textarea className="code-result" value={compileResult} placeholder={"코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다."}/>
             <CodeEditor roomID={roomID} />
+            
+            <StyledVideo muted ref={userVideo} autoPlay playsInline />
+            {peers.map((peer, index) => {
+                return (
+                    <Video key={index} peer={peer} />
+                );
+            })}
             
 
             {/* <button onClick={BroadCastDraw}>broadcast</button> */}
