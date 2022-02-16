@@ -1,6 +1,6 @@
 export function getSvgPathFromStroke(stroke) {
     if (!stroke.length) return "";
-  
+
     const d = stroke.reduce(
       (acc, [x0, y0], i, arr) => {
         const [x1, y1] = arr[(i + 1) % arr.length];
@@ -8,9 +8,10 @@ export function getSvgPathFromStroke(stroke) {
         return acc;
       },
       ["M", ...stroke[0], "Q"]
-    );
-  
-    d.push("Z");
+      );
+      
+      d.push("Z");
+      // console.log(d)
     return d.join(" ");
   }
   

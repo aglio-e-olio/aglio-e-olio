@@ -8,9 +8,19 @@ import { getSvgPathFromStroke } from "../../utils/utils";
 export const Line = React.memo(function Line({ line }) {
   const { points, color, isComplete } = useLine(line);
 
+  let new_points = []
+
+  points.map((point) => {
+    const x = point[0] * window.innerWidth
+    const y = point[1]
+    new_points.push([x, y])
+  })
+
+  
+
   const pathData = getSvgPathFromStroke(
-    getStroke(points, {
-      size: 12,
+    getStroke(new_points, {
+      size: 5,
       thinning: 0.5,
       streamline: 0.6,
       smoothing: 0.7,
@@ -23,7 +33,6 @@ export const Line = React.memo(function Line({ line }) {
       <path
         className="canvas-line"
         d={pathData}
-        fill={isComplete ? "black" : color}
       />
     </g>
   );

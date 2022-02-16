@@ -55,6 +55,7 @@ export function useUser() {
   // Update the user's cursor point
   const updateUserPoint = React.useCallback((point) => {
     awareness.setLocalStateField("point", point);
+    // console.log(awareness)
     setUser(awareness.getLocalState());
   }, []);
 

@@ -9,7 +9,6 @@ import { useKeyboardEvents } from "../../hooks/useKeyboardEvents";
 import "./Canvas.css";
 import { useState } from "react";
 
-
 const date = new Date();
 
 date.setUTCHours(0, 0, 0, 0);
@@ -53,7 +52,7 @@ export default function Canvas() {
     (e) => {
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      startLine(getPoint(e.clientX, e.clientY + window.scrollY));
+      startLine(getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)); // window 없앰
     },
     [startLine]
   );
@@ -61,7 +60,7 @@ export default function Canvas() {
   // On pointer move, update awareness and (if down) update the current line
   const handlePointerMove = React.useCallback(
     (e) => {
-      const point = getPoint(e.clientX, e.clientY + window.scrollY);
+      const point = getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY); // window 없앰
 
       updateUserPoint(point);
 
@@ -91,18 +90,23 @@ export default function Canvas() {
 
   const [zIndex, setZindex] = useState(0);
   const changeZofCanvas = () => {
-    // console.log(changeZ.current.style);
     setZindex((index) => (index === 10 ? 0 : 10));
   };
 
   return (
     <div>
       <div>
-        <button className="switch-function" onClick={changeZofCanvas}>{zIndex === 10? "Code Editor Mode": "White Board Mode"}</button>
-        <button className="clear-button" onClick={clearAllLines}>Clear All</button>
+        <button className="switch-function" onClick={changeZofCanvas}>
+          {zIndex === 10 ? "Code Editor Mode" : "White Board Mode"}
+        </button>
+        <button className="clear-button" onClick={clearAllLines}>
+          Clear All
+        </button>
       </div>
-      <div className="canvas-container" style={{zIndex: zIndex}}>
+      <div className="canvas-container" style={{ zIndex: zIndex }}>
         <svg
+        width={window.innerWidth}
+        height={window.innerHeight}
           className="canvas-layer"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -117,7 +121,6 @@ export default function Canvas() {
               <Line key={line.get("id")} line={line} />
             ))}
             {/* Live Cursors */}
-            
           </g>
           {/* User Tokens */}
           {users.map((user, i) => (
@@ -129,7 +132,6 @@ export default function Canvas() {
             />
           ))}
         </svg>
-        
       </div>
     </div>
   );

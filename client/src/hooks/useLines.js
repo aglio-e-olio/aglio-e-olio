@@ -9,7 +9,7 @@ import { yLines, provider, undoManager, doc, awareness } from "../utils/y";
 export function useLines() {
   const rLastClear = React.useRef(Date.now());
   const [isSynced, setIsSynced] = React.useState(false);
-  const [lines, setLines] = React.useState([]);
+  const [lines, setLines] = React.useState([]);  // yLines -> array로 바꾸면 lines
   const rCurrentLine = React.useRef();
 
   // Observe changes to the yLines shared array; and when
@@ -21,7 +21,7 @@ export function useLines() {
       setLines(lines);
     }
 
-    yLines.observe(handleChange);
+    yLines.observe(handleChange);  // yLines가 바뀔 때마다 handleChange 호출
 
     return () => yLines.unobserve(handleChange);
   }, []);
@@ -33,6 +33,7 @@ export function useLines() {
     const id = Date.now().toString();
     const yPoints = new Y.Array();
     yPoints.push([...point]);
+    console.log(yPoints)
 
     const yLine = new Y.Map();
 
@@ -50,8 +51,10 @@ export function useLines() {
     });
 
     rCurrentLine.current = yLine;
+    // console.log(yLine);
 
     yLines.push([yLine]);
+    // console.log(yLines);
   }, []);
 
   // When the user draws, add the new point to the current
@@ -68,6 +71,7 @@ export function useLines() {
     if (!points) return;
 
     points.push([...point]);
+    // console.log(points)
   }, []);
 
   // When the user finishes, update the `isComplete` property
@@ -135,6 +139,6 @@ export function useLines() {
     completeLine,
     clearAllLines,
     undoLine,
-    redoLine
+    redoLine,
   };
 }

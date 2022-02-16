@@ -25,6 +25,7 @@ export const awareness = provider.awareness
 /**
  * @param {yLines} Y.Array<Y.Map<any>>
  */
+
 export const yLines = doc.getArray(`lines~${VERSION}`)
 
 /* Create an undo manager for the line maps */
