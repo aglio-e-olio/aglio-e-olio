@@ -52,7 +52,9 @@ export default function Canvas() {
     (e) => {
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      startLine(getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)); // window 없앰
+      startLine(
+        getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)
+      ); // window 없앰
     },
     [startLine]
   );
@@ -60,7 +62,10 @@ export default function Canvas() {
   // On pointer move, update awareness and (if down) update the current line
   const handlePointerMove = React.useCallback(
     (e) => {
-      const point = getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY); // window 없앰
+      const point = getPoint(
+        e.clientX / window.innerWidth,
+        e.clientY + window.scrollY
+      ); // window 없앰
 
       updateUserPoint(point);
 
@@ -93,6 +98,8 @@ export default function Canvas() {
     setZindex((index) => (index === 10 ? 0 : 10));
   };
 
+
+
   return (
     <div>
       <div>
@@ -105,8 +112,8 @@ export default function Canvas() {
       </div>
       <div className="canvas-container" style={{ zIndex: zIndex }}>
         <svg
-        width={window.innerWidth}
-        height={window.innerHeight}
+          width={window.innerWidth}
+          height={window.innerHeight}
           className="canvas-layer"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

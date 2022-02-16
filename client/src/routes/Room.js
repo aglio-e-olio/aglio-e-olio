@@ -3,7 +3,7 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 
 import Canvas from "../Components/Canvas/Canvas";
-import "./Room.css"
+import "./Room.css";
 import { useParams } from "react-router-dom";
 import CodeEditor from "../Components/CodeEditor/Editor";
 import { codeContext } from "../Context/ContextProvider";
@@ -13,183 +13,168 @@ var canvas;
 var context;
 
 const StyledVideo = styled.video`
-    height: 0;
-    width: 0;
+  height: 0;
+  width: 0;
 `;
 
 const Video = (props) => {
-    const ref = useRef();
+  const ref = useRef();
 
-    useEffect(() => {
-        props.peer.on("stream", stream => {
-            ref.current.srcObject = stream;
-        })
-    }, []);
+  useEffect(() => {
+    props.peer.on("stream", (stream) => {
+      ref.current.srcObject = stream;
+    });
+  }, []);
 
-    return (
-        <StyledVideo playsInline autoPlay ref={ref} />
-    );
-}
-
+  return <StyledVideo playsInline autoPlay ref={ref} />;
+};
 
 const Room = (props) => {
-    const [peers, setPeers] = useState([]);
-    const userVideo = useRef();
-    const partnerVideo = useRef([]);
-    const peerRef = useRef([]);
-    const socketRef = useRef();
-    const userStream = useRef();
-    const {roomID} = useParams();
-    const { codes, compileResult, getCompileResult, getRoomInfo } = useContext(codeContext);
+  const [peers, setPeers] = useState([]);
+  const userVideo = useRef();
+  const partnerVideo = useRef([]);
+  const peerRef = useRef([]);
+  const socketRef = useRef();
+  const userStream = useRef();
+  const { roomID } = useParams();
+  const { codes, compileResult, getCompileResult, getRoomInfo } =
+    useContext(codeContext);
 
+  const [muted, setMute] = useState("Mute");
 
+  function sendCode() {
+    socketRef.current.emit("code compile", { codes, roomID });
+  }
 
-    const [muted, setMute] = useState("Mute");
+  function handleMuteClick() {
+    userStream.current
+      .getAudioTracks()
+      .forEach((track) => (track.enabled = !track.enabled));
 
-    function sendCode() {
-        socketRef.current.emit("code compile", {codes, roomID});
+    if (muted === "Mute") {
+      setMute("UnMute");
+    } else {
+      setMute("Mute");
     }
+  }
 
-    function handleMuteClick(){
-        userStream.current
-            .getAudioTracks()
-            .forEach(track=>track.enabled = !track.enabled);
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: false })
+      .then((stream) => {
+        // userVideo.current.srcObject = stream;
+        userStream.current = stream;
 
-        if(muted ==="Mute"){
-            setMute("UnMute");
-        }
-        else{
-            setMute("Mute");
-        }
-    }
+        socketRef.current = io.connect("/");
+        getRoomInfo(roomID);
 
-    useEffect(() => {
+        socketRef.current.emit("join room", roomID);
 
-        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
-            
-            // userVideo.current.srcObject = stream;
-            userStream.current = stream;
+        socketRef.current.on("other user", (userIDs) => {
+          if (userIDs) {
+            const peers_ = [];
+            userIDs.forEach((userID) => {
+              const peer_ = createPeer(userID, socketRef.current.id, stream);
 
-            socketRef.current = io.connect("/");
-            getRoomInfo(roomID);
-            
-            socketRef.current.emit("join room", roomID);
-            
-            socketRef.current.on('other user', userIDs => {
-                if(userIDs){
-                    const peers_ = [];
-                    userIDs.forEach((userID)=>{
-                        const peer_ = createPeer(userID, socketRef.current.id, stream);
-
-                        peerRef.current.push({
-                            peerID:userID,
-                            peer_
-                        })
-                        peers_.push(peer_)
-
-
-                    })
-                    setPeers(peers_)
-                }
+              peerRef.current.push({
+                peerID: userID,
+                peer_,
+              });
+              peers_.push(peer_);
             });
-
-            socketRef.current.on("user joined", payload => {
-                const peer_ = addPeer(payload.signal, payload.callerID, stream);
-                peerRef.current.push({
-                    peerID:payload.callerID,
-                    peer_
-                })
-                setPeers((users)=>[...users, peer_])
-            });
-
-            socketRef.current.on("code response", code => {
-                handleCompileResult(code);
-            })
-
-            socketRef.current.on("receiving returned signal", (payload) => {
-                const item = peerRef.current.find((p) => p.peerID === payload.id);
-                item.peer_.signal(payload.signal);
-                
-            });
+            setPeers(peers_);
+          }
         });
 
-
-    }, []); 
-
-
-    /* Below are Simple Peer Library Function */
-    function createPeer(userToSignal, callerID, stream) {
-        const peer = new Peer({
-            initiator:true, 
-            trickle:false, 
-            stream,
-        })
-
-        // RTC Connection
-        peer.on("signal", (signal)=>{
-            socketRef.current.emit("sending signal", {
-                userToSignal, 
-                callerID, 
-                signal,
-            })
-        })
-
-
-        return peer;
-    }
-
-    function addPeer(incomingSignal, callerID, stream) {
-        const peer = new Peer({
-            initiator: false,
-            trickle: false,
-            stream,
+        socketRef.current.on("user joined", (payload) => {
+          const peer_ = addPeer(payload.signal, payload.callerID, stream);
+          peerRef.current.push({
+            peerID: payload.callerID,
+            peer_,
+          });
+          setPeers((users) => [...users, peer_]);
         });
-    
-        peer.on("signal", (signal) => {
-            socketRef.current.emit("returning signal", { signal, callerID })
-        })
 
-        
-    
-        peer.signal(incomingSignal);
-    
-        return peer;
-    }
+        socketRef.current.on("code response", (code) => {
+          handleCompileResult(code);
+        });
 
-    function handleCompileResult(code) {
-        getCompileResult(code);
+        socketRef.current.on("receiving returned signal", (payload) => {
+          const item = peerRef.current.find((p) => p.peerID === payload.id);
+          item.peer_.signal(payload.signal);
+        });
+      });
+  }, []);
 
-    }
+  /* Below are Simple Peer Library Function */
+  function createPeer(userToSignal, callerID, stream) {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream,
+    });
 
+    // RTC Connection
+    peer.on("signal", (signal) => {
+      socketRef.current.emit("sending signal", {
+        userToSignal,
+        callerID,
+        signal,
+      });
+    });
 
+    return peer;
+  }
 
-    /* Render */
-    return (
-        <div>
-            <button className="run-button" onClick={sendCode} >Run</button>
-            
-                {/* <video autoPlay ref={userVideo} />
+  function addPeer(incomingSignal, callerID, stream) {
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream,
+    });
+
+    peer.on("signal", (signal) => {
+      socketRef.current.emit("returning signal", { signal, callerID });
+    });
+
+    peer.signal(incomingSignal);
+
+    return peer;
+  }
+
+  function handleCompileResult(code) {
+    getCompileResult(code);
+  }
+
+  /* Render */
+  return (
+    <div>
+      <button className="run-button" onClick={sendCode}>
+        Run
+      </button>
+
+      {/* <video autoPlay ref={userVideo} />
                 <video autoPlay ref={partnerVideo} />
                 <button onClick = {handleMuteClick}>{muted}</button> */}
-                
-            
-            <Canvas />
-            <textarea className="code-result" value={compileResult} placeholder={"코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다."}/>
-            <CodeEditor roomID={roomID} />
-            
-            <StyledVideo muted ref={userVideo} autoPlay playsInline />
-            {peers.map((peer, index) => {
-                return (
-                    <Video key={index} peer={peer} />
-                );
-            })}
-            
 
-            {/* <button onClick={BroadCastDraw}>broadcast</button> */}
+      <Canvas />
+      <textarea
+        className="code-result"
+        value={compileResult}
+        placeholder={
+          "코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다."
+        }
+      />
+      <CodeEditor roomID={roomID} />
 
+      <StyledVideo muted ref={userVideo} autoPlay playsInline />
+      {peers.map((peer, index) => {
+        return <Video key={index} peer={peer} />;
+      })}
 
-        </div>
-    );
+      {/* <button onClick={BroadCastDraw}>broadcast</button> */}
+    </div>
+  );
 };
 
 export default Room;
