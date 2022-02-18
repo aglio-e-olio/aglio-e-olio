@@ -24,15 +24,15 @@ function getPoint(x, y) {
   return [x, y + getYOffset()];
 }
 
-export default function Canvas() {
+export default function Canvas({doc, provider, awareness, yLines, undoManager}) {
   const {
     user: self,
     updateUserPoint,
     activateUser,
     deactivateUser,
-  } = useUser();
+  } = useUser(awareness);
 
-  const { users } = useUsers();
+  const { users } = useUsers(awareness);
 
   const {
     lines,
@@ -43,7 +43,7 @@ export default function Canvas() {
     clearAllLines,
     undoLine,
     redoLine,
-  } = useLines();
+  } = useLines({doc, provider, awareness, yLines, undoManager});
 
   useKeyboardEvents();
 

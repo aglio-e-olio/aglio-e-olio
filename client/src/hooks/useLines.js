@@ -1,12 +1,12 @@
 import * as Y from 'yjs';
 import * as React from 'react';
-import { yLines, provider, undoManager, doc, awareness } from '../utils/y';
+// import { yLines, provider, undoManager, doc, awareness } from '../utils/y';
 
 /**
  * Subscribe to changes in the document's lines and get functions
  * for creating, update, and modifying the document's lines.
  */
-export function useLines() {
+export function useLines({doc, provider, awareness, yLines, undoManager}) {
   const rLastClear = React.useRef(Date.now());
   const [isSynced, setIsSynced] = React.useState(false);
   const [lines, setLines] = React.useState([]);

@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
 import styled from 'styled-components';
+import CanvasContainer from '../Components/Canvas/CanvasContainer';
 
 var canvas;
 var context;
@@ -158,7 +159,7 @@ const Room = (props) => {
                 <video autoPlay ref={partnerVideo} />
                 <button onClick = {handleMuteClick}>{muted}</button> */}
 
-        <Canvas />
+        <CanvasContainer roomID={roomID}/>
         <CodeEditor roomID={roomID} />
 
         <StyledVideo muted ref={userVideo} autoPlay playsInline />

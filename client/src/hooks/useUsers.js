@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { awareness } from '../utils/y';
+// import { awareness } from '../utils/y';
 
 /**
  * Subscribe to the presence of other users within the provider's awareness API.
  */
-export function useUsers() {
+export function useUsers(awareness) {
   const [users, setUsers] = React.useState([]);
 
   React.useEffect(() => {
