@@ -1,5 +1,5 @@
-import * as React from "react";
-import { awareness } from "../utils/y";
+import * as React from 'react';
+import { awareness } from '../utils/y';
 
 /**
  * Subscribe to the presence of other users within the provider's awareness API.
@@ -16,9 +16,9 @@ export function useUsers() {
 
     updateUsersState();
 
-    awareness.on("change", updateUsersState);
+    awareness.on('change', updateUsersState);
     return () => {
-      awareness.off("change", updateUsersState);
+      awareness.off('change', updateUsersState);
     };
   }, []);
 

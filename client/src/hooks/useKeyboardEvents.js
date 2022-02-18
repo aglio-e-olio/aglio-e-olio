@@ -1,11 +1,11 @@
-import * as React from "react";
-import { undoManager } from "../utils/y";
+import * as React from 'react';
+import { undoManager } from '../utils/y';
 
 export function useKeyboardEvents() {
   React.useEffect(() => {
     function handleKeyDown(e) {
       switch (e.key) {
-        case "z": {
+        case 'z': {
           if (e.ctrlKey || e.metaKey) {
             if (e.shiftKey) {
               undoManager.redo();
@@ -18,10 +18,10 @@ export function useKeyboardEvents() {
       }
     }
 
-    document.body.addEventListener("keydown", handleKeyDown);
+    document.body.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.body.removeEventListener("keydown", handleKeyDown);
+      document.body.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 }

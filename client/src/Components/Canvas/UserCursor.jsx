@@ -1,5 +1,4 @@
-import * as React from "react";
-
+import * as React from 'react';
 
 export const UserCursor = React.memo(({ user }) => {
   return (
@@ -8,7 +7,7 @@ export const UserCursor = React.memo(({ user }) => {
       cx={user.point[0]}
       cy={user.point[1]}
       r={4}
-      fill={user.isActive ? user.color : "grey"}
+      fill={user.isActive ? user.color : 'grey'}
     />
   );
 });

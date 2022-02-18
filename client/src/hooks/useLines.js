@@ -1,6 +1,6 @@
-import * as Y from "yjs";
-import * as React from "react";
-import { yLines, provider, undoManager, doc, awareness } from "../utils/y";
+import * as Y from 'yjs';
+import * as React from 'react';
+import { yLines, provider, undoManager, doc, awareness } from '../utils/y';
 
 /**
  * Subscribe to changes in the document's lines and get functions
@@ -43,10 +43,10 @@ export function useLines() {
     const user = awareness.getLocalState();
 
     doc.transact(() => {
-      yLine.set("id", id);
-      yLine.set("points", yPoints);
-      yLine.set("userColor", user.color);
-      yLine.set("isComplete", false);
+      yLine.set('id', id);
+      yLine.set('points', yPoints);
+      yLine.set('userColor', user.color);
+      yLine.set('isComplete', false);
     });
 
     rCurrentLine.current = yLine;
@@ -62,7 +62,7 @@ export function useLines() {
 
     if (!currentLine) return;
 
-    const points = currentLine.get("points");
+    const points = currentLine.get('points');
 
     // Don't add the new point to the line
     if (!points) return;
@@ -77,7 +77,7 @@ export function useLines() {
 
     if (!currentLine) return;
 
-    currentLine.set("isComplete", true);
+    currentLine.set('isComplete', true);
 
     rCurrentLine.current = undefined;
   }, []);
@@ -111,19 +111,19 @@ export function useLines() {
     }
 
     function handleDisconnect() {
-      provider.off("sync", handleConnect);
+      provider.off('sync', handleConnect);
       provider.disconnect();
     }
 
-    window.addEventListener("beforeunload", handleDisconnect);
+    window.addEventListener('beforeunload', handleDisconnect);
 
-    provider.on("sync", handleConnect);
+    provider.on('sync', handleConnect);
 
     provider.connect();
 
     return () => {
       handleDisconnect();
-      window.removeEventListener("beforeunload", handleDisconnect);
+      window.removeEventListener('beforeunload', handleDisconnect);
     };
   }, []);
 
@@ -135,6 +135,6 @@ export function useLines() {
     completeLine,
     clearAllLines,
     undoLine,
-    redoLine
+    redoLine,
   };
 }

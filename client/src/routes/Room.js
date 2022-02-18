@@ -1,13 +1,13 @@
-import React, { useRef, useEffect, useState, useContext } from "react";
-import io from "socket.io-client";
-import Peer from "simple-peer";
+import React, { useRef, useEffect, useState, useContext } from 'react';
+import io from 'socket.io-client';
+import Peer from 'simple-peer';
 
-import Canvas from "../Components/Canvas/Canvas";
-import "./Room.css";
-import { useParams } from "react-router-dom";
-import CodeEditor from "../Components/CodeEditor/Editor";
-import { codeContext } from "../Context/ContextProvider";
-import styled from "styled-components";
+import Canvas from '../Components/Canvas/Canvas';
+import './Room.css';
+import { useParams } from 'react-router-dom';
+import CodeEditor from '../Components/CodeEditor/Editor';
+import { codeContext } from '../Context/ContextProvider';
+import styled from 'styled-components';
 
 var canvas;
 var context;
@@ -21,7 +21,7 @@ const Video = (props) => {
   const ref = useRef();
 
   useEffect(() => {
-    props.peer.on("stream", (stream) => {
+    props.peer.on('stream', (stream) => {
       ref.current.srcObject = stream;
     });
   }, []);
@@ -40,10 +40,10 @@ const Room = (props) => {
   const { codes, compileResult, getCompileResult, getRoomInfo } =
     useContext(codeContext);
 
-  const [muted, setMute] = useState("Mute");
+  const [muted, setMute] = useState('Mute');
 
   function sendCode() {
-    socketRef.current.emit("code compile", { codes, roomID });
+    socketRef.current.emit('code compile', { codes, roomID });
   }
 
   function handleMuteClick() {
@@ -51,10 +51,10 @@ const Room = (props) => {
       .getAudioTracks()
       .forEach((track) => (track.enabled = !track.enabled));
 
-    if (muted === "Mute") {
-      setMute("UnMute");
+    if (muted === 'Mute') {
+      setMute('UnMute');
     } else {
-      setMute("Mute");
+      setMute('Mute');
     }
   }
 
@@ -65,12 +65,12 @@ const Room = (props) => {
         // userVideo.current.srcObject = stream;
         userStream.current = stream;
 
-        socketRef.current = io.connect("/");
+        socketRef.current = io.connect('/');
         getRoomInfo(roomID);
 
-        socketRef.current.emit("join room", roomID);
+        socketRef.current.emit('join room', roomID);
 
-        socketRef.current.on("other user", (userIDs) => {
+        socketRef.current.on('other user', (userIDs) => {
           if (userIDs) {
             const peers_ = [];
             userIDs.forEach((userID) => {
@@ -86,7 +86,7 @@ const Room = (props) => {
           }
         });
 
-        socketRef.current.on("user joined", (payload) => {
+        socketRef.current.on('user joined', (payload) => {
           const peer_ = addPeer(payload.signal, payload.callerID, stream);
           peerRef.current.push({
             peerID: payload.callerID,
@@ -95,11 +95,11 @@ const Room = (props) => {
           setPeers((users) => [...users, peer_]);
         });
 
-        socketRef.current.on("code response", (code) => {
+        socketRef.current.on('code response', (code) => {
           handleCompileResult(code);
         });
 
-        socketRef.current.on("receiving returned signal", (payload) => {
+        socketRef.current.on('receiving returned signal', (payload) => {
           const item = peerRef.current.find((p) => p.peerID === payload.id);
           item.peer_.signal(payload.signal);
         });
@@ -115,8 +115,8 @@ const Room = (props) => {
     });
 
     // RTC Connection
-    peer.on("signal", (signal) => {
-      socketRef.current.emit("sending signal", {
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('sending signal', {
         userToSignal,
         callerID,
         signal,
@@ -133,8 +133,8 @@ const Room = (props) => {
       stream,
     });
 
-    peer.on("signal", (signal) => {
-      socketRef.current.emit("returning signal", { signal, callerID });
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('returning signal', { signal, callerID });
     });
 
     peer.signal(incomingSignal);
@@ -174,7 +174,7 @@ const Room = (props) => {
           className="code-result"
           value={compileResult}
           placeholder={
-            "코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다."
+            '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
           }
         />
       </div>

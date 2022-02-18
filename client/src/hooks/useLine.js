@@ -1,6 +1,6 @@
-import * as Y from "yjs";
-import * as React from "react";
-import { toPairs } from "../utils/utils";
+import * as Y from 'yjs';
+import * as React from 'react';
+import { toPairs } from '../utils/utils';
 
 export function useLine(line) {
   const [isComplete, setIsComplete] = React.useState();
@@ -28,7 +28,7 @@ export function useLine(line) {
   // Subscribe to changes in the line's points array and sync
   // them into React state.
   React.useEffect(() => {
-    const points = line.get("points");
+    const points = line.get('points');
 
     function handleChange() {
       // For performance reasons (I think), we store the

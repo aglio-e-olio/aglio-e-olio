@@ -1,14 +1,13 @@
-import * as React from "react";
-import { Line } from "./Line";
-import { UserToken } from "./UserToken";
-import { UserCursor } from "./UserCursor";
-import { useLines } from "../../hooks/useLines";
-import { useUser } from "../../hooks/useUser";
-import { useUsers } from "../../hooks/useUsers";
-import { useKeyboardEvents } from "../../hooks/useKeyboardEvents";
-import "./Canvas.css";
-import { useState } from "react";
-
+import * as React from 'react';
+import { Line } from './Line';
+import { UserToken } from './UserToken';
+import { UserCursor } from './UserCursor';
+import { useLines } from '../../hooks/useLines';
+import { useUser } from '../../hooks/useUser';
+import { useUsers } from '../../hooks/useUsers';
+import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
+import './Canvas.css';
+import { useState } from 'react';
 
 const date = new Date();
 
@@ -53,7 +52,9 @@ export default function Canvas() {
     (e) => {
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      startLine(getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY));
+      startLine(
+        getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)
+      );
     },
     [startLine]
   );
@@ -61,7 +62,10 @@ export default function Canvas() {
   // On pointer move, update awareness and (if down) update the current line
   const handlePointerMove = React.useCallback(
     (e) => {
-      const point = getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY);
+      const point = getPoint(
+        e.clientX / window.innerWidth,
+        e.clientY + window.scrollY
+      );
 
       updateUserPoint(point);
 
@@ -97,10 +101,14 @@ export default function Canvas() {
   return (
     <div>
       <div>
-        <button className="switch-function" onClick={changeZofCanvas}>{zIndex === 10? "Code Editor Mode": "White Board Mode"}</button>
-        <button className="clear-button" onClick={clearAllLines}>Clear All</button>
+        <button className="switch-function" onClick={changeZofCanvas}>
+          {zIndex === 10 ? 'Code Editor Mode' : 'White Board Mode'}
+        </button>
+        <button className="clear-button" onClick={clearAllLines}>
+          Clear All
+        </button>
       </div>
-      <div className="canvas-container" style={{zIndex: zIndex}}>
+      <div className="canvas-container" style={{ zIndex: zIndex }}>
         <svg
           width={window.innerWidth}
           height={window.innerHeight}
@@ -115,7 +123,7 @@ export default function Canvas() {
           <g transform={`translate(0, -${getYOffset()})`}>
             {/* Lines */}
             {lines.map((line, i) => (
-              <Line key={line.get("id")} line={line} />
+              <Line key={line.get('id')} line={line} />
             ))}
             {/* Live Cursors */}
           </g>
