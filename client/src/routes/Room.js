@@ -17,6 +17,7 @@ const StyledVideo = styled.video`
   width: 0;
 `;
 
+// talker 시작
 const Video = (props) => {
   const ref = useRef();
 
