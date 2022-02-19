@@ -8,13 +8,9 @@ import { useParams } from 'react-router-dom';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
 import styled from 'styled-components';
-import CanvasContainer from '../Components/Canvas/CanvasContainer';
 
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
-
-var canvas;
-var context;
 
 const StyledVideo = styled.video`
   height: 0;
@@ -40,7 +36,7 @@ let awareness;
 let yLines;
 let undoManager;
 
-const Room = (props) => {
+const Room = () => {
   const [peers, setPeers] = useState([]);
   const userVideo = useRef();
   const partnerVideo = useRef([]);
@@ -51,6 +47,7 @@ const Room = (props) => {
   const { codes, compileResult, getCompileResult, getRoomInfo } =
     useContext(codeContext);
 
+  // 단 한번만 provider 만들기 : 다중 rendering 방지
   if (i === 0) {
     doc = new Y.Doc();
     provider = new WebrtcProvider(roomID, doc);
@@ -62,12 +59,7 @@ const Room = (props) => {
 
   const [muted, setMute] = useState('Mute');
 
-  console.log('inside room', socketRef.current);
-
   function sendCode() {
-    console.log('codes', codes);
-    console.log('roomID', roomID);
-    console.log('socketRef.current', socketRef.current);
     socketRef.current.emit('code compile', { codes, roomID });
   }
 

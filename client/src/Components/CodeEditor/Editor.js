@@ -1,19 +1,14 @@
-import * as Y from 'yjs';
 // @ts-ignore
 import { yCollab, yUndoManagerKeymap } from 'y-codemirror.next';
 // import { WebsocketProvider } from 'y-websocket'
-import { WebrtcProvider } from 'y-webrtc';
 
 import { EditorState, EditorView, basicSetup } from '@codemirror/basic-setup';
 import { keymap, ViewUpdate } from '@codemirror/view';
 import { javascript } from '@codemirror/lang-javascript';
 import { indentWithTab } from '@codemirror/commands';
-import { python } from '@codemirror/lang-python';
 import React, { useContext, useEffect } from 'react';
 import * as random from 'lib0/random';
-import { useParams } from 'react-router-dom';
 import './Editor.css';
-import { Line } from '@codemirror/text';
 import { codeContext } from '../../Context/ContextProvider';
 
 export const usercolors = [
@@ -32,16 +27,6 @@ export const userColor = usercolors[random.uint32() % usercolors.length];
 const CodeEditor = ({ doc, provider }) => {
   const { codes, extractCode } = useContext(codeContext);
   useEffect(() => {
-    // const ydoc = new Y.Doc();
-    // // const provider = new WebrtcProvider('codemirror6-demo-room', ydoc)
-    // const provider = new WebrtcProvider("proper room", ydoc, {
-    //   signaling: ['wss://signaling.yjs.dev'],
-    // });
-    // const provider = new WebsocketProvider(
-    //   'wss://demos.yjs.dev',
-    //   'codemirror.next-demo',
-    //   ydoc
-    // )
     const ytext = doc.getText('codemirror');
 
     provider.awareness.setLocalStateField('user', {
