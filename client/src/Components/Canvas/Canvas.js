@@ -9,6 +9,10 @@ import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
 import './Canvas.css';
 import { useState } from 'react';
 
+import * as Y from 'yjs';
+import { WebrtcProvider } from 'y-webrtc';
+
+
 const date = new Date();
 
 date.setUTCHours(0, 0, 0, 0);
@@ -24,15 +28,33 @@ function getPoint(x, y) {
   return [x, y + getYOffset()];
 }
 
-export default function Canvas({doc, provider, awareness, yLines, undoManager}) {
+let i = 0;
+let doc;
+let provider;
+let awareness;
+let yLines;
+let undoManager;
+
+export default function Canvas({roomID}) {
+
+
+  if (i === 0) {
+    doc = new Y.Doc();
+    provider = new WebrtcProvider(roomID, doc);
+    awareness = provider.awareness;
+    yLines = doc.getArray('lines~9');
+    undoManager = new Y.UndoManager(yLines);
+  }
+  i++;
+  
   const {
     user: self,
     updateUserPoint,
     activateUser,
     deactivateUser,
-  } = useUser(awareness);
+  } = useUser({awareness});
 
-  const { users } = useUsers(awareness);
+  const { users } = useUsers({awareness});
 
   const {
     lines,

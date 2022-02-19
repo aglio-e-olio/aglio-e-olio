@@ -34,7 +34,7 @@ const CodeEditor = ({ roomID }) => {
   useEffect(() => {
     const ydoc = new Y.Doc();
     // const provider = new WebrtcProvider('codemirror6-demo-room', ydoc)
-    const provider = new WebrtcProvider(roomID, ydoc, {
+    const provider = new WebrtcProvider("proper room", ydoc, {
       signaling: ['wss://signaling.yjs.dev'],
     });
     // const provider = new WebsocketProvider(

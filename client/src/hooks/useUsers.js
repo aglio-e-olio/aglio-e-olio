@@ -4,7 +4,7 @@ import * as React from 'react';
 /**
  * Subscribe to the presence of other users within the provider's awareness API.
  */
-export function useUsers(awareness) {
+export function useUsers({awareness}) {
   const [users, setUsers] = React.useState([]);
 
   React.useEffect(() => {
