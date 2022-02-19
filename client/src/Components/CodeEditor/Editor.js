@@ -29,20 +29,20 @@ export const usercolors = [
 
 export const userColor = usercolors[random.uint32() % usercolors.length];
 
-const CodeEditor = ({ roomID }) => {
+const CodeEditor = ({doc, provider, awareness, yLines, undoManager}) => {
   const { codes, extractCode } = useContext(codeContext);
   useEffect(() => {
-    const ydoc = new Y.Doc();
-    // const provider = new WebrtcProvider('codemirror6-demo-room', ydoc)
-    const provider = new WebrtcProvider("proper room", ydoc, {
-      signaling: ['wss://signaling.yjs.dev'],
-    });
+    // const ydoc = new Y.Doc();
+    // // const provider = new WebrtcProvider('codemirror6-demo-room', ydoc)
+    // const provider = new WebrtcProvider("proper room", ydoc, {
+    //   signaling: ['wss://signaling.yjs.dev'],
+    // });
     // const provider = new WebsocketProvider(
     //   'wss://demos.yjs.dev',
     //   'codemirror.next-demo',
     //   ydoc
     // )
-    const ytext = ydoc.getText('codemirror');
+    const ytext = doc.getText('codemirror');
 
     provider.awareness.setLocalStateField('user', {
       name: 'Anonymous ' + Math.floor(Math.random() * 100),
