@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { awareness } from '../utils/y';
+// import { awareness } from '../utils/y';
 
 const USER_COLORS = [
   '#EC5E41',
@@ -23,7 +23,8 @@ const sample = (arr) => arr[Math.floor(Math.random() * arr.length)];
 /**
  * Subscribe to the user's own presence within the provider's awareness API.
  */
-export function useUser() {
+export function useUser({awareness}) {
+
   const [user, setUser] = React.useState();
 
   // Set the initial user's state

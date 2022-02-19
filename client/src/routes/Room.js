@@ -9,8 +9,8 @@ import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
 import styled from 'styled-components';
 
-var canvas;
-var context;
+import * as Y from 'yjs';
+import { WebrtcProvider } from 'y-webrtc';
 
 const StyledVideo = styled.video`
   height: 0;
@@ -29,7 +29,14 @@ const Video = (props) => {
   return <StyledVideo playsInline autoPlay ref={ref} />;
 };
 
-const Room = (props) => {
+let i = 0;
+let doc;
+let provider;
+let awareness;
+let yLines;
+let undoManager;
+
+const Room = () => {
   const [peers, setPeers] = useState([]);
   const userVideo = useRef();
   const partnerVideo = useRef([]);
@@ -39,6 +46,16 @@ const Room = (props) => {
   const { roomID } = useParams();
   const { codes, compileResult, getCompileResult, getRoomInfo } =
     useContext(codeContext);
+
+  // 단 한번만 provider 만들기 : 다중 rendering 방지
+  if (i === 0) {
+    doc = new Y.Doc();
+    provider = new WebrtcProvider(roomID, doc);
+    awareness = provider.awareness;
+    yLines = doc.getArray('lines~9');
+    undoManager = new Y.UndoManager(yLines);
+  }
+  i++;
 
   const [muted, setMute] = useState('Mute');
 
@@ -158,8 +175,14 @@ const Room = (props) => {
                 <video autoPlay ref={partnerVideo} />
                 <button onClick = {handleMuteClick}>{muted}</button> */}
 
-        <Canvas />
-        <CodeEditor roomID={roomID} />
+        <Canvas
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+        />
+        <CodeEditor doc={doc} provider={provider} />
 
         <StyledVideo muted ref={userVideo} autoPlay playsInline />
         {peers.map((peer, index) => {
