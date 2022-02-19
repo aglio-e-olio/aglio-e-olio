@@ -9,9 +9,6 @@ import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
 import './Canvas.css';
 import { useState } from 'react';
 
-
-
-
 const date = new Date();
 
 date.setUTCHours(0, 0, 0, 0);
@@ -27,20 +24,21 @@ function getPoint(x, y) {
   return [x, y + getYOffset()];
 }
 
-
-
-export default function Canvas({doc, provider, awareness, yLines, undoManager}) {
-
-
-  
+export default function Canvas({
+  doc,
+  provider,
+  awareness,
+  yLines,
+  undoManager,
+}) {
   const {
     user: self,
     updateUserPoint,
     activateUser,
     deactivateUser,
-  } = useUser({awareness});
+  } = useUser({ awareness });
 
-  const { users } = useUsers({awareness});
+  const { users } = useUsers({ awareness });
 
   const {
     lines,
@@ -51,7 +49,7 @@ export default function Canvas({doc, provider, awareness, yLines, undoManager}) 
     clearAllLines,
     undoLine,
     redoLine,
-  } = useLines({doc, provider, awareness, yLines, undoManager});
+  } = useLines({ doc, provider, awareness, yLines, undoManager });
 
   useKeyboardEvents();
 

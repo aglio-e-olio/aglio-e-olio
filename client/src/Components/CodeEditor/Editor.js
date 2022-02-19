@@ -29,7 +29,7 @@ export const usercolors = [
 
 export const userColor = usercolors[random.uint32() % usercolors.length];
 
-const CodeEditor = ({doc, provider, awareness, yLines, undoManager}) => {
+const CodeEditor = ({ doc, provider }) => {
   const { codes, extractCode } = useContext(codeContext);
   useEffect(() => {
     // const ydoc = new Y.Doc();

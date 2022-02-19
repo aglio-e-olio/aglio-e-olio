@@ -62,7 +62,12 @@ const Room = (props) => {
 
   const [muted, setMute] = useState('Mute');
 
+  console.log('inside room', socketRef.current);
+
   function sendCode() {
+    console.log('codes', codes);
+    console.log('roomID', roomID);
+    console.log('socketRef.current', socketRef.current);
     socketRef.current.emit('code compile', { codes, roomID });
   }
 
@@ -178,8 +183,14 @@ const Room = (props) => {
                 <video autoPlay ref={partnerVideo} />
                 <button onClick = {handleMuteClick}>{muted}</button> */}
 
-        <Canvas doc={doc} provider = {provider} awareness={awareness} yLines ={yLines} undoManager = {undoManager}/>
-        <CodeEditor doc={doc} provider = {provider} awareness={awareness} yLines ={yLines} undoManager = {undoManager} />
+        <Canvas
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+        />
+        <CodeEditor doc={doc} provider={provider} />
 
         <StyledVideo muted ref={userVideo} autoPlay playsInline />
         {peers.map((peer, index) => {
