@@ -59,6 +59,7 @@ io.on('connection', (socket) => {
     console.log(`[${socketToRoom[socket.id]}]: ${socket.id} exit`);
     // disconnect한 user가 포함된 roomID
     const roomID = socketToRoom[socket.id];
+    // 떠나기전에 alert 보내기.
     // room에 포함된 유저
     let room = users[roomID];
     // room이 존재한다면(user들이 포함된)
@@ -66,6 +67,7 @@ io.on('connection', (socket) => {
       // disconnect user를 제외
       room = room.filter((id) => id !== socket.id);
       users[roomID] = room;
+      socket.to(roomID).emit("bye", socket.id);
     }
   });
 

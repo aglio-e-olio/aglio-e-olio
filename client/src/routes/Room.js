@@ -113,6 +113,10 @@ const Room = () => {
         alert(`${new_member} 가 입장했습니다.`);
       });
 
+      socketRef.current.on("bye", (left_user) => {
+        alert(`${left_user}가 떠났습니다.`)
+      })
+
       socketRef.current.on('user joined', (payload) => {
         const peer = addPeer(payload.signal, payload.callerID, stream);
         peersRef.current.push({
