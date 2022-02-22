@@ -20,7 +20,7 @@ const CreateRoom = (props) => {
     <button className="create-room-button" onClick={create}>
       Create Room
     </button>
-    <button onClick={history}>
+    <button class='btn' onClick={history}>
       My history
     </button>
     </div>

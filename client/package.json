@@ -11,15 +11,17 @@
     "@codemirror/lang-python": "^0.19.4",
     "@codemirror/text": "^0.19.6",
     "@codemirror/view": "^0.19.42",
+    "@craco/craco": "^6.4.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "daisyui": "^1.25.1",
     "hark": "^1.2.3",
     "perfect-freehand": "^1.0.16",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.1",
-    "react-scripts": "3.4.1",
+    "react-scripts": "4.0.3",
     "simple-peer": "^9.11.0",
     "socket.io-client": "^2.3.0",
     "styled-components": "^5.3.3",
@@ -29,9 +31,9 @@
     "yjs": "^13.5.27"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+     "build": "craco build",
+     "test": "craco test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -48,5 +50,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.8.8",
+    "postcss": "^7.0.39",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17"
   }
 }
