@@ -36,6 +36,9 @@ io.on('connection', (socket) => {
     socket.to(roomID).emit("hello", socket.id);
 
     socketToRoom[socket.id] = roomID;
+
+    console.log(`[${socketToRoom[socket.id]}]: ${socket.id} enter`);
+
     // 본인을 제외한 같은 room의 user array
     const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
 
@@ -55,11 +58,10 @@ io.on('connection', (socket) => {
     });
   });
   // user가 연결이 끊겼을 때 처리
-  socket.on('disconnecting', () => {
+  socket.on('disconnect', () => {
     console.log(`[${socketToRoom[socket.id]}]: ${socket.id} exit`);
     // disconnect한 user가 포함된 roomID
     const roomID = socketToRoom[socket.id];
-    // 떠나기전에 alert 보내기.
     // room에 포함된 유저
     let room = users[roomID];
     // room이 존재한다면(user들이 포함된)
@@ -67,8 +69,15 @@ io.on('connection', (socket) => {
       // disconnect user를 제외
       room = room.filter((id) => id !== socket.id);
       users[roomID] = room;
-      socket.to(roomID).emit("bye", socket.id);
+      // room 에 아무도 없다면 방 지우기.
+      if (room.length === 0) {
+        delete users[roomID];
+        return;
+      }
     }
+    socket.to(roomID).emit('bye', socket.id);
+    //방에 남아있는 사람 콘솔.
+    console.log(users);
   });
 
   socket.on('code compile', (payload) => {

@@ -84,57 +84,62 @@ const Room = () => {
 
   useEffect(() => {
     socketRef.current = io.connect('/');
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      userVideo.current.srcObject = stream;
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        userVideo.current.srcObject = stream;
 
-      let options = {};
-      let speechEvents = hark(stream, options);
+        let options = {};
+        let speechEvents = hark(stream, options);
 
-      speechEvents.on('speaking', function () {});
+        speechEvents.on('speaking', function () {});
 
-      speechEvents.on('stopped_speaking', () => {});
-      getRoomInfo(roomID);
-      socketRef.current.emit('join room', roomID);
-      socketRef.current.on('all users', (users) => {
-        const peers = [];
-        users.forEach((userID) => {
-          const peer = createPeer(userID, socketRef.current.id, stream);
+        speechEvents.on('stopped_speaking', () => {});
+        getRoomInfo(roomID);
+        socketRef.current.emit('join room', roomID);
+        socketRef.current.on('all users', (users) => {
+          const peers = [];
+          users.forEach((userID) => {
+            const peer = createPeer(userID, socketRef.current.id, stream);
+            peersRef.current.push({
+              peerID: userID,
+              peer,
+            });
+            peers.push(peer);
+          });
+          setPeers(peers);
+          console.log(peers);
+        });
+
+        socketRef.current.on('hello', (new_member) => {
+          alert(`${new_member} 가 입장했습니다.`);
+        });
+
+        socketRef.current.on('bye', (left_user) => {
+          alert(`${left_user}가 떠났습니다.`);
+        });
+
+        socketRef.current.on('user joined', (payload) => {
+          const peer = addPeer(payload.signal, payload.callerID, stream);
           peersRef.current.push({
-            peerID: userID,
+            peerID: payload.callerID,
             peer,
           });
-          peers.push(peer);
+          setPeers((users) => [...users, peer]);
         });
-        setPeers(peers);
-        console.log(peers);
-      });
 
-      socketRef.current.on('hello', (new_member) => {
-        alert(`${new_member} 가 입장했습니다.`);
-      });
+        socketRef.current.on('code response', (code) => {
+          handleCompileResult(code);
+        });
 
-      socketRef.current.on("bye", (left_user) => {
-        alert(`${left_user}가 떠났습니다.`)
+        socketRef.current.on('receiving returned signal', (payload) => {
+          const item = peersRef.current.find((p) => p.peerID === payload.id);
+          item.peer.signal(payload.signal);
+        });
       })
-
-      socketRef.current.on('user joined', (payload) => {
-        const peer = addPeer(payload.signal, payload.callerID, stream);
-        peersRef.current.push({
-          peerID: payload.callerID,
-          peer,
-        });
-        setPeers((users) => [...users, peer]);
+      .catch((error) => {
+        console.log(`getUserMedia error : ${error}`);
       });
-
-      socketRef.current.on('code response', (code) => {
-        handleCompileResult(code);
-      });
-
-      socketRef.current.on('receiving returned signal', (payload) => {
-        const item = peersRef.current.find((p) => p.peerID === payload.id);
-        item.peer.signal(payload.signal);
-      });
-    });
   }, []);
 
   /* Below are Simple Peer Library Function */
