@@ -125,12 +125,6 @@ export default function Canvas({
     [completeLine, completeErase]
   );
 
-  const deleteSecond = () => {
-    yLines.delete(1, 1);
-    const yMap = yLines.get(0);
-    console.log(yMap.get('points'), 'yline!');
-  };
-
   const [_, forceUpdate] = React.useReducer((s) => !s, false);
 
   React.useEffect(() => {
@@ -146,7 +140,6 @@ export default function Canvas({
   return (
     <div>
       <div>
-        <button onClick={deleteSecond}>delete second</button>
         <button className="switch-function" onClick={changeZofCanvas}>
           {zIndex === 10 ? 'Code Editor Mode' : 'White Board Mode'}
         </button>
