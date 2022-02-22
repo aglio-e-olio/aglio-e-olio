@@ -12,20 +12,28 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
-const rooms = {};
+const users = {};
+
+const socketToRoom = {};
 
 io.on('connection', (socket) => {
+  console.log(`${socket.id} 가 서버에 연결됨`);
   socket.on('join room', (roomID) => {
-    if (rooms[roomID]) {
-      rooms[roomID].push(socket.id);
+    if (users[roomID]) {
+      const length = users[roomID].length;
+      if (length === 4) {
+        socket.emit('room full');
+        return;
+      }
+      users[roomID].push(socket.id);
     } else {
-      rooms[roomID] = [socket.id];
+      users[roomID] = [socket.id];
     }
+    socketToRoom[socket.id] = roomID;
+    // 본인을 제외한 같은 room의 user array
+    const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
 
-    const otherUsersInRoom = rooms[roomID].filter((id) => id !== socket.id);
-    if (otherUsersInRoom) {
-      socket.emit('other user', otherUsersInRoom);
-    }
+    socket.emit('all users', usersInThisRoom);
   });
 
   socket.on('sending signal', (payload) => {
@@ -40,6 +48,21 @@ io.on('connection', (socket) => {
       id: socket.id,
     });
   });
+  // user가 연결이 끊겼을 때 처리
+  socket.on('disconnect', () => {
+    console.log(`[${socketToRoom[socket.id]}]: ${socket.id} exit`);
+    // disconnect한 user가 포함된 roomID
+    const roomID = socketToRoom[socket.id];
+    // room에 포함된 유저
+    let room = users[roomID];
+    // room이 존재한다면(user들이 포함된)
+    if (room) {
+      // disconnect user를 제외
+      room = room.filter((id) => id !== socket.id);
+      users[roomID] = room;
+    }
+  });
+
   socket.on('code compile', (payload) => {
     const url = 'https://api.jdoodle.com/v1/execute';
 
