@@ -30,7 +30,7 @@ io.on('connection', (socket) => {
       users[roomID] = [socket.id];
     }
     socketToRoom[socket.id] = roomID;
-     // 본인을 제외한 같은 room의 user array
+    // 본인을 제외한 같은 room의 user array
     const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
 
     socket.emit('all users', usersInThisRoom);
@@ -61,45 +61,44 @@ io.on('connection', (socket) => {
       room = room.filter((id) => id !== socket.id);
       users[roomID] = room;
     }
-   
   });
-  // socket.on('code compile', (payload) => {
-  //   const url = 'https://api.jdoodle.com/v1/execute';
 
-  //   const sendData = {
-  //     // put your own client id and client secret of jdoodle
-  //     clientId: '29c0d13db4b041ca805305faac6c9155',
-  //     clientSecret:
-  //       '73a9ee5ae33448935b7736ef5c9bdcbdf8365da265cdbc036842db09edad5372',
-  //     script: payload.codes,
-  //     stdin: '',
-  //     language: 'nodejs',
-  //     versionIndex: '3',
-  //   };
+  socket.on('code compile', (payload) => {
+    const url = 'https://api.jdoodle.com/v1/execute';
 
-  //   let response = {};
-  //   try {
-  //     response = axios({
-  //       method: 'post', //you can set what request you want to be
-  //       url,
-  //       data: sendData,
-  //     }).then((response) => {
-  //       rooms[payload.roomID].forEach((userID) => {
-  //         io.to(userID).emit('code response', response.data.output);
-  //       });
-  //     });
-  //   } catch (e) {
-  //     response = e;
-  //     return {
-  //       data: {
-  //         e: 'Error:404\nOops Something went wrong\n😢😞🙁',
-  //       },
-  //     };
-  //   }
-  // });
+    const sendData = {
+      // put your own client id and client secret of jdoodle
+      clientId: '29c0d13db4b041ca805305faac6c9155',
+      clientSecret:
+        '73a9ee5ae33448935b7736ef5c9bdcbdf8365da265cdbc036842db09edad5372',
+      script: payload.codes,
+      stdin: '',
+      language: 'nodejs',
+      versionIndex: '3',
+    };
+
+    let response = {};
+    try {
+      response = axios({
+        method: 'post', //you can set what request you want to be
+        url,
+        data: sendData,
+      }).then((response) => {
+        rooms[payload.roomID].forEach((userID) => {
+          io.to(userID).emit('code response', response.data.output);
+        });
+      });
+    } catch (e) {
+      response = e;
+      return {
+        data: {
+          e: 'Error:404\nOops Something went wrong\n😢😞🙁',
+        },
+      };
+    }
+  });
 });
 
 server.listen(process.env.PORT || 8000, () =>
   console.log('server is running on port 8000')
 );
-

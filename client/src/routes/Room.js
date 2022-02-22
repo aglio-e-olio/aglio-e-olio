@@ -17,31 +17,31 @@ const StyledAudio = styled.audio`
 const Audio = (props) => {
   const ref = useRef();
 
-  const [color, setColor] = useState("black");
+  const [color, setColor] = useState('black');
 
   useEffect(() => {
     props.peer.on('stream', (stream) => {
       ref.current.srcObject = stream;
-      let options = {}
+      let options = {};
       let speechEvents = hark(stream, options);
 
       speechEvents.on('speaking', function () {
-        setColor("yellow"); 
+        setColor('yellow');
       });
 
       speechEvents.on('stopped_speaking', function () {
-        setColor("black"); 
+        setColor('black');
       });
     });
 
-    return () => {
-      // console.log('컴포넌트가 화면에서 사라짐.');
-    };
+    return () => {};
   }, []);
   return (
     <div>
       <StyledAudio autoPlay ref={ref} />
-      <button  style={{backgroundColor : color, float : 'left'}}>상대방 버튼</button>
+      <button style={{ backgroundColor: color, float: 'left' }}>
+        상대방 버튼
+      </button>
     </div>
   );
 };
@@ -69,11 +69,11 @@ const Room = (props) => {
       let speechEvents = hark(stream, options);
 
       speechEvents.on('speaking', function () {
-        console.log('말하는중');
+        
       });
 
       speechEvents.on('stopped_speaking', () => {
-        console.log('안말하는 중');
+        
       });
       getRoomInfo(roomID);
       socketRef.current.emit('join room', roomID);
