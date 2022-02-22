@@ -29,6 +29,12 @@ io.on('connection', (socket) => {
     } else {
       users[roomID] = [socket.id];
     }
+
+    //socket roomID랑 조인하기
+    socket.join(roomID);
+    // 같은 방에 있는 소켓들에게 인사하기.
+    socket.to(roomID).emit("hello", socket.id);
+
     socketToRoom[socket.id] = roomID;
     // 본인을 제외한 같은 room의 user array
     const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
@@ -49,7 +55,7 @@ io.on('connection', (socket) => {
     });
   });
   // user가 연결이 끊겼을 때 처리
-  socket.on('disconnect', () => {
+  socket.on('disconnecting', () => {
     console.log(`[${socketToRoom[socket.id]}]: ${socket.id} exit`);
     // disconnect한 user가 포함된 roomID
     const roomID = socketToRoom[socket.id];

@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
 
-
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 
@@ -91,13 +90,9 @@ const Room = () => {
       let options = {};
       let speechEvents = hark(stream, options);
 
-      speechEvents.on('speaking', function () {
-        
-      });
+      speechEvents.on('speaking', function () {});
 
-      speechEvents.on('stopped_speaking', () => {
-        
-      });
+      speechEvents.on('stopped_speaking', () => {});
       getRoomInfo(roomID);
       socketRef.current.emit('join room', roomID);
       socketRef.current.on('all users', (users) => {
@@ -112,6 +107,10 @@ const Room = () => {
         });
         setPeers(peers);
         console.log(peers);
+      });
+
+      socketRef.current.on('hello', (new_member) => {
+        alert(`${new_member} 가 입장했습니다.`);
       });
 
       socketRef.current.on('user joined', (payload) => {
