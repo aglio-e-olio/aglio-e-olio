@@ -10,10 +10,20 @@ const CreateRoom = (props) => {
     navigate(`/room/${id}`);
   }
 
+  function history() {
+    const userID = 'HW';
+    navigate(`/history/${userID}`);
+  }
+
   return (
+    <div>
     <button className="create-room-button" onClick={create}>
       Create Room
     </button>
+    <button onClick={history}>
+      My history
+    </button>
+    </div>
   );
 };
 
