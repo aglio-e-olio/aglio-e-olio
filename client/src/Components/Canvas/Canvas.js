@@ -8,12 +8,23 @@ import { useUsers } from '../../hooks/useUsers';
 import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
 import './Canvas.css';
 import { useState } from 'react';
+import { useEraser } from '../../hooks/useEraser';
 
 const date = new Date();
 
 date.setUTCHours(0, 0, 0, 0);
 
 const START_TIME = date.getTime();
+
+let ERASER_FLAG = false;
+
+function changeToEraser() {
+  if (ERASER_FLAG) {
+    ERASER_FLAG = false;
+  } else {
+    ERASER_FLAG = true;
+  }
+}
 
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
@@ -24,15 +35,21 @@ function getPoint(x, y) {
   return [x, y + getYOffset()];
 }
 
-export default function Canvas() {
+export default function Canvas({
+  doc,
+  provider,
+  awareness,
+  yLines,
+  undoManager,
+}) {
   const {
     user: self,
     updateUserPoint,
     activateUser,
     deactivateUser,
-  } = useUser();
+  } = useUser({ awareness });
 
-  const { users } = useUsers();
+  const { users } = useUsers({ awareness });
 
   const {
     lines,
@@ -43,7 +60,15 @@ export default function Canvas() {
     clearAllLines,
     undoLine,
     redoLine,
-  } = useLines();
+  } = useLines({ doc, provider, awareness, yLines, undoManager });
+
+  const {
+    //lines,
+    //isSynced,
+    startErase,
+    addPointToErase,
+    completeErase,
+  } = useEraser({ doc, provider, awareness, yLines, undoManager });
 
   useKeyboardEvents();
 
@@ -52,11 +77,17 @@ export default function Canvas() {
     (e) => {
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      startLine(
-        getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)
-      );
+      if (ERASER_FLAG) {
+        startErase(
+          getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)
+        );
+      } else {
+        startLine(
+          getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)
+        );
+      }
     },
-    [startLine]
+    [startLine, startErase]
   );
 
   // On pointer move, update awareness and (if down) update the current line
@@ -69,21 +100,29 @@ export default function Canvas() {
 
       updateUserPoint(point);
 
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      if (e.currentTarget.hasPointerCapture(e.pointerId) && !ERASER_FLAG) {
         addPointToLine(point);
+      } else if (
+        e.currentTarget.hasPointerCapture(e.pointerId) &&
+        ERASER_FLAG
+      ) {
+        addPointToErase(point);
       }
     },
-    [addPointToLine, updateUserPoint]
+    [addPointToLine, updateUserPoint, addPointToErase]
   );
 
   // On pointer up, complete the current line
   const handlePointerUp = React.useCallback(
     (e) => {
       e.currentTarget.releasePointerCapture(e.pointerId);
-
-      completeLine();
+      if (ERASER_FLAG) {
+        completeErase();
+      } else {
+        completeLine();
+      }
     },
-    [completeLine]
+    [completeLine, completeErase]
   );
 
   const [_, forceUpdate] = React.useReducer((s) => !s, false);
@@ -106,6 +145,9 @@ export default function Canvas() {
         </button>
         <button className="clear-button" onClick={clearAllLines}>
           Clear All
+        </button>
+        <button className="eraser-button" onClick={changeToEraser}>
+          Eraser
         </button>
       </div>
       <div className="canvas-container" style={{ zIndex: zIndex }}>

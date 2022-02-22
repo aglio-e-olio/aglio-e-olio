@@ -9,6 +9,10 @@ import './Room.css';
 import { useParams } from 'react-router-dom';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
+import styled from 'styled-components';
+
+import * as Y from 'yjs';
+import { WebrtcProvider } from 'y-webrtc';
 
 const StyledAudio = styled.audio`
   float: left;
@@ -46,7 +50,14 @@ const Audio = (props) => {
   );
 };
 
-const Room = (props) => {
+let i = 0;
+let doc;
+let provider;
+let awareness;
+let yLines;
+let undoManager;
+
+const Room = () => {
   const [peers, setPeers] = useState([]);
   const socketRef = useRef();
   const userVideo = useRef();
@@ -55,6 +66,18 @@ const Room = (props) => {
 
   const { codes, compileResult, getCompileResult, getRoomInfo } =
     useContext(codeContext);
+
+  // 단 한번만 provider 만들기 : 다중 rendering 방지
+  if (i === 0) {
+    doc = new Y.Doc();
+    provider = new WebrtcProvider(roomID, doc);
+    awareness = provider.awareness;
+    yLines = doc.getArray('lines~9');
+    undoManager = new Y.UndoManager(yLines);
+  }
+  i++;
+
+  const [muted, setMute] = useState('Mute');
 
   function sendCode() {
     socketRef.current.emit('code compile', { codes, roomID });
@@ -164,8 +187,14 @@ const Room = (props) => {
         <button className="run-button" onClick={sendCode}>
           Run
         </button>
-        <Canvas />
-        <CodeEditor roomID={roomID} />
+        <Canvas
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+        />
+        <CodeEditor doc={doc} provider={provider} />
       </div>
       <div>
         <textarea

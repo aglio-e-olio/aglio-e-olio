@@ -6,7 +6,7 @@ import * as React from 'react';
  * Subscribe to changes in the document's lines and get functions
  * for creating, update, and modifying the document's lines.
  */
-export function useLines({doc, provider, awareness, yLines, undoManager}) {
+export function useEraser({ doc, provider, awareness, yLines, undoManager }) {
   const rLastClear = React.useRef(Date.now());
   const [isSynced, setIsSynced] = React.useState(false);
   const [lines, setLines] = React.useState([]);
@@ -31,7 +31,7 @@ export function useLines({doc, provider, awareness, yLines, undoManager}) {
   // When the user starts a new line, create a new shared
   // array and add it to the yLines shared array. Store a
   // ref to the new line so that we can update it later.
-  const startLine = React.useCallback((point) => {
+  const startErase = React.useCallback((point) => {
     // i++;
     const id = Date.now().toString();
     const yPoints = new Y.Array();
@@ -48,10 +48,10 @@ export function useLines({doc, provider, awareness, yLines, undoManager}) {
     doc.transact(() => {
       yLine.set('id', id);
       yLine.set('points', yPoints);
-      yLine.set('userColor', user.color);
+      yLine.set('userColor', '#ffffff');
       yLine.set('isComplete', false);
-      // for path Indexing
-      yLine.set('isEraser', false);
+      // for Erasing
+      yLine.set('isEraser', true);
     });
 
     rCurrentLine.current = yLine;
@@ -62,7 +62,7 @@ export function useLines({doc, provider, awareness, yLines, undoManager}) {
   // When the user draws, add the new point to the current
   // line's points array. This will be subscribed to in a
   // different hook.
-  const addPointToLine = React.useCallback((point) => {
+  const addPointToErase = React.useCallback((point) => {
     const currentLine = rCurrentLine.current;
 
     if (!currentLine) return;
@@ -77,7 +77,7 @@ export function useLines({doc, provider, awareness, yLines, undoManager}) {
 
   // When the user finishes, update the `isComplete` property
   // of the line.
-  const completeLine = React.useCallback(() => {
+  const completeErase = React.useCallback(() => {
     const currentLine = rCurrentLine.current;
 
     if (!currentLine) return;
@@ -135,9 +135,9 @@ export function useLines({doc, provider, awareness, yLines, undoManager}) {
   return {
     isSynced,
     lines,
-    startLine,
-    addPointToLine,
-    completeLine,
+    startErase,
+    addPointToErase,
+    completeErase,
     clearAllLines,
     undoLine,
     redoLine,
