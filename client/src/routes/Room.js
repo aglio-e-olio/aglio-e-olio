@@ -9,7 +9,6 @@ import './Room.css';
 import { useParams } from 'react-router-dom';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
-import styled from 'styled-components';
 
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
