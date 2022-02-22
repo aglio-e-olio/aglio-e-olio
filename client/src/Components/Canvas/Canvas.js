@@ -86,7 +86,6 @@ export default function Canvas({
           getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)
         );
       }
-      
     },
     [startLine, startErase]
   );
@@ -101,9 +100,12 @@ export default function Canvas({
 
       updateUserPoint(point);
 
-      if ((e.currentTarget.hasPointerCapture(e.pointerId)) && (!ERASER_FLAG)) {
+      if (e.currentTarget.hasPointerCapture(e.pointerId) && !ERASER_FLAG) {
         addPointToLine(point);
-      } else if ((e.currentTarget.hasPointerCapture(e.pointerId)) && (ERASER_FLAG)) {
+      } else if (
+        e.currentTarget.hasPointerCapture(e.pointerId) &&
+        ERASER_FLAG
+      ) {
         addPointToErase(point);
       }
     },
@@ -125,8 +127,8 @@ export default function Canvas({
 
   const deleteSecond = () => {
     yLines.delete(1, 1);
-    const yMap = yLines.get(0)
-    console.log(yMap.get('points'), "yline!")
+    const yMap = yLines.get(0);
+    console.log(yMap.get('points'), 'yline!');
   };
 
   const [_, forceUpdate] = React.useReducer((s) => !s, false);
@@ -151,7 +153,7 @@ export default function Canvas({
         <button className="clear-button" onClick={clearAllLines}>
           Clear All
         </button>
-        <button className='eraser-button' onClick={changeToEraser}>
+        <button className="eraser-button" onClick={changeToEraser}>
           Eraser
         </button>
       </div>

@@ -6,7 +6,7 @@ import * as React from 'react';
  * Subscribe to changes in the document's lines and get functions
  * for creating, update, and modifying the document's lines.
  */
-export function useEraser({doc, provider, awareness, yLines, undoManager}) {
+export function useEraser({ doc, provider, awareness, yLines, undoManager }) {
   const rLastClear = React.useRef(Date.now());
   const [isSynced, setIsSynced] = React.useState(false);
   const [lines, setLines] = React.useState([]);

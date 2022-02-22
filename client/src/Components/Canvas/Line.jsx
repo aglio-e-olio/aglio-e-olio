@@ -18,7 +18,6 @@ export const Line = React.memo(function Line({ line }) {
   let realColor;
 
   if (isEraser) {
-
     realColor = ercolor;
 
     erPoints.map((point) => {
@@ -54,7 +53,6 @@ export const Line = React.memo(function Line({ line }) {
       })
     );
   }
-  
 
   return (
     <g fill={realColor}>
