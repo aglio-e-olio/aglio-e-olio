@@ -151,7 +151,7 @@ export default function Canvas({
         <button className="clear-button" onClick={clearAllLines}>
           Clear All
         </button>
-        <button onClick={changeToEraser}>
+        <button className='eraser-button' onClick={changeToEraser}>
           Eraser
         </button>
       </div>

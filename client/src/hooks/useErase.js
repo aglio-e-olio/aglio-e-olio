@@ -3,8 +3,8 @@ import * as React from 'react';
 import { toPairs } from '../utils/utils';
 
 export function useErase(line) {
-  const [isComplete, setIsComplete] = React.useState();
-  const [color, setColor] = React.useState();
+  const [iserComplete, setIsComplete] = React.useState();
+  const [ercolor, setColor] = React.useState();
   const [erPts, setErPts] = React.useState([]);
 
   // Subscribe to changes to the line itself and sync
@@ -46,5 +46,5 @@ export function useErase(line) {
     };
   }, [line]);
 
-  return { erPoints: erPts, color, isComplete };
+  return { erPoints: erPts, ercolor, iserComplete };
 }

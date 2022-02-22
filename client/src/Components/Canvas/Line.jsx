@@ -7,6 +7,7 @@ import { getSvgPathFromStroke } from '../../utils/utils';
 
 export const Line = React.memo(function Line({ line }) {
   const { points, color, isComplete } = useLine(line);
+  const { erPoints, ercolor, iserComplete } = useErase(line);
 
   let new_points = [];
 
@@ -14,23 +15,35 @@ export const Line = React.memo(function Line({ line }) {
 
   let pathData = [];
 
-  points.map((point) => {
-    const x = point[0] * window.innerWidth;
-    const y = point[1];
-    new_points.push([x, y]);
-  });
+  let realColor;
 
   if (isEraser) {
+
+    realColor = ercolor;
+
+    erPoints.map((point) => {
+      const x = point[0] * window.innerWidth;
+      const y = point[1];
+      new_points.push([x, y]);
+    });
+
     pathData = getSvgPathFromStroke(
       getStroke(new_points, {
-        size: 5,
-        thinning: 1.5,
+        size: 40,
+        thinning: 2,
         streamline: 0.6,
         smoothing: 0.7,
-        last: isComplete,
+        last: iserComplete,
       })
     );
   } else {
+    realColor = color;
+    points.map((point) => {
+      const x = point[0] * window.innerWidth;
+      const y = point[1];
+      new_points.push([x, y]);
+    });
+
     pathData = getSvgPathFromStroke(
       getStroke(new_points, {
         size: 5,
@@ -44,7 +57,7 @@ export const Line = React.memo(function Line({ line }) {
   
 
   return (
-    <g fill={color}>
+    <g fill={realColor}>
       <path className="canvas-line" d={pathData} />
     </g>
   );
