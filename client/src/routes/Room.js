@@ -13,6 +13,9 @@ import { codeContext } from '../Context/ContextProvider';
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 
+import Save from '../Components/Save/Save';
+import Record from '../Components/Record/Record';
+
 const StyledAudio = styled.audio`
   float: left;
 `;
@@ -153,8 +156,8 @@ const Room = () => {
     // RTC Connection
     peer.on('signal', (signal) => {
       socketRef.current.emit('sending signal', {
-        userToSignal,
-        callerID,
+        userToSignal, // 상대방 소켓 id
+        callerID,// 내 소켓 id
         signal,
       });
     });
@@ -195,6 +198,8 @@ const Room = () => {
         <button className="run-button" onClick={sendCode}>
           Run
         </button>
+        <Save />
+        <Record />
         <Canvas
           doc={doc}
           provider={provider}
