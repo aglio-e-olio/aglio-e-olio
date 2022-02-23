@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { codeContext } from '../../Context/ContextProvider';
 
 const Navbar = () => {
+    const {nickName} = useContext(codeContext);
     return (
         <div class="navbar bg-base-100">
         <div class="flex-none">
@@ -9,7 +11,7 @@ const Navbar = () => {
             </button>
         </div>
         <div class="flex-1">
-            <a class="btn btn-ghost normal-case text-xl">History</a>
+            <a class="btn btn-ghost normal-case text-xl">{nickName}님 반갑습네다!</a>
         </div>
         <div class="flex-none">
             <button class="btn btn-square btn-ghost">
