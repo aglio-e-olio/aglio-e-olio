@@ -20,8 +20,6 @@ const TagSort = () => {
             ))}
             
         </ul>
-            <div class="divider lg:divider-horizontal"></div> 
-            <InfoList />
         </div>
     );
 };
