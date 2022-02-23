@@ -17,14 +17,12 @@ const TagSort = () => {
     }
     
     return (
-        <div class='flex'>
         <ul class='menu bg-base-100 w-56 p-2 rounded-box'>
             {mockData.map((tags)=>(
                 <li key={tags.toString()} onClick={() => getInfobyTag(tags)}><a>#{tags}</a></li>
             ))}
             
         </ul>
-        </div>
     );
 };
 

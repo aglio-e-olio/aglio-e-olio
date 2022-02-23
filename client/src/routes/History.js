@@ -10,7 +10,7 @@ const History = () => {
     return (
         <div>
             <Navbar />
-            <SplitPane split="vertical" minSize={100} defaultSize="33%">
+            <SplitPane split="vertical" minSize={100} defaultSize="20%">
             <TagSort />
             <SplitPane split='vertical' defaultSize="50%">
             <InfoList />
