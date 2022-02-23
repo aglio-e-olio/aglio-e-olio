@@ -9,6 +9,7 @@ const initialState = {
   compileResult: '',
   roomInfo: '',
   nickName: '',
+  currentTag: '',
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -36,6 +37,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         nickName: action.payload,
+      }
+    
+    case 'SET_TAG':
+      return {
+        ...state,
+        currentTag: action.payload,
       }
 
     default:
@@ -75,6 +82,13 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function getTag(currentTag) {
+    dispatch({
+      type: 'SET_TAG',
+      payload: currentTag,
+    })
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -87,6 +101,8 @@ const ContextProvider = ({ children }) => {
         getRoomInfo,
         nickName: state.nickName,
         joinUser,
+        currentTag: state.currentTag,
+        getTag,
       }}
     >
       {children}
