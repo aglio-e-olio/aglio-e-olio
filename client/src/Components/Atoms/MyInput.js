@@ -4,7 +4,7 @@ import { codeContext } from '../../Context/ContextProvider';
 
 function MyInput() {
   const [text, setText] = useState('');
-  const {joinUser} = useContext(codeContext);
+  const { joinUser } = useContext(codeContext);
 
   const navigate = useNavigate();
 
@@ -13,18 +13,19 @@ function MyInput() {
   };
 
   const submitID = () => {
-      joinUser(text);
-      navigate('/');
-  }
-
+    joinUser(text);
+    navigate('/');
+  };
 
   return (
-    <div class='form-control'>
-      <input class='input input-bordered' onChange={onChange} value={text}  />
-      
+    <div class="form-control">
+      <input class="input input-bordered" onChange={onChange} value={text} />
+
       <div class="form-control mt-6">
-          <button class="btn btn-primary" onClick={submitID}>시작하기!</button>
-        </div>
+        <button class="btn btn-primary" onClick={submitID}>
+          시작하기!
+        </button>
+      </div>
     </div>
   );
 }
