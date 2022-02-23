@@ -19,11 +19,12 @@ function MyInput() {
 
 
   return (
-    <div>
+    <div class='form-control'>
       <input class='input input-bordered' onChange={onChange} value={text}  />
-      <button class='btn btn-primary' onClick={submitID}>
-          시작하기!
-      </button>
+      
+      <div class="form-control mt-6">
+          <button class="btn btn-primary" onClick={submitID}>시작하기!</button>
+        </div>
     </div>
   );
 }
