@@ -22,7 +22,7 @@ function MyInput() {
     <div>
       <input class='input input-bordered' onChange={onChange} value={text}  />
       <button class='btn btn-primary' onClick={submitID}>
-          참가하기!
+          시작하기!
       </button>
     </div>
   );
