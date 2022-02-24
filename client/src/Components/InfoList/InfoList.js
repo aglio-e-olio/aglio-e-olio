@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import axios from 'axios';
-import OptionForSort from './OptionForSort';
 
 const initialState = {};
 
@@ -26,8 +25,8 @@ function InfoList({ algorithm_tag }) {
           if (a.name > b.name) return 1;
           return 0;
         });
-        setTagData(res.data);
-        setSearchedData(res.data);
+        setTagData(firstSortedData);
+        setSearchedData(firstSortedData);
       })
       .catch((err) => {
         console.log(err);
