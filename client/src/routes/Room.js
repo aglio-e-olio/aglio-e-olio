@@ -6,7 +6,7 @@ import hark from 'hark';
 
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
 
@@ -60,6 +60,7 @@ let yLines;
 let undoManager;
 
 const Room = () => {
+  const navigate = useNavigate();
   const [peers, setPeers] = useState([]);
   const socketRef = useRef();
   const userVideo = useRef();

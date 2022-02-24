@@ -8,6 +8,8 @@ const initialState = {
   codes: '',
   compileResult: '',
   roomInfo: '',
+  nickName: '',
+  currentTag: '',
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -30,6 +32,18 @@ const reducer = (state, action) => {
         ...state,
         roomInfo: action.payload,
       };
+    
+    case 'USER_JOIN':
+      return {
+        ...state,
+        nickName: action.payload,
+      }
+    
+    case 'SET_TAG':
+      return {
+        ...state,
+        currentTag: action.payload,
+      }
 
     default:
       throw new Error();
@@ -61,6 +75,20 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function joinUser(nickName) {
+    dispatch({
+      type: 'USER_JOIN',
+      payload: nickName,
+    });
+  }
+
+  function getTag(currentTag) {
+    dispatch({
+      type: 'SET_TAG',
+      payload: currentTag,
+    })
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -71,6 +99,10 @@ const ContextProvider = ({ children }) => {
         getCompileResult,
         roomInfo: state.roomInfo,
         getRoomInfo,
+        nickName: state.nickName,
+        joinUser,
+        currentTag: state.currentTag,
+        getTag,
       }}
     >
       {children}
