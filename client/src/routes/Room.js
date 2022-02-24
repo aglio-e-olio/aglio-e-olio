@@ -224,6 +224,7 @@ const Room = () => {
           isOpen={isOpen}
           onSubmit={handleSaveSubmit}
           onCancel={handleSaveCancel}
+          yLines={yLines}
         />
         <Canvas
           doc={doc}
