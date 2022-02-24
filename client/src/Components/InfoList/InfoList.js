@@ -6,7 +6,6 @@ const initialState = {};
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoList({ algorithm_tag }) {
-  let postId = [1, 2, 3];
   const [tagData, setTagData] = useState([]);
   const [searchedData, setSearchedData] = useState(tagData);
   const [query, setQuery] = useState('');
@@ -15,15 +14,15 @@ function InfoList({ algorithm_tag }) {
   useEffect(() => {
     axios({
       method: 'GET',
-      url: 'https://jsonplaceholder.typicode.com/comments',
-      params: { postId: postId },
-      // params: { algorithm: algorithm_tag },
+      url: 'http://localhost:4000/tags',
+      params: { algorithm: "Array" },
     })
       .then((res) => {
+        console.log(res.data)
         let firstSortedData = [...res.data];
         firstSortedData.sort((a, b) => {
-          if (a.name < b.name) return -1;
-          if (a.name > b.name) return 1;
+          if (a.title < b.title) return -1;
+          if (a.title > b.title) return 1;
           return 0;
         });
         setTagData(firstSortedData);
@@ -36,14 +35,10 @@ function InfoList({ algorithm_tag }) {
 
   function handleSearch(e) {
     setQuery(e.target.value);
-    // if (e.charCode)
   }
 
   function handleKeyPress(e) {
-    // if (e.keyCode === 13) {
-    //   handleSubmit();
-    // }
-    console.log("yeah")
+    console.log('yeah');
   }
 
   /* 검색 처리 : filter 이용 */
@@ -51,7 +46,10 @@ function InfoList({ algorithm_tag }) {
     console.log(query);
     let result = [];
     result = tagData.filter((data) => {
-      if (data.name.search(query) != -1 || data.email.search(query) != -1) {
+      if (
+        data.announcer.search(query) !== -1 ||
+        data.email.search(query) !== -1
+      ) {
         return true;
       }
       return false;
@@ -83,13 +81,12 @@ function InfoList({ algorithm_tag }) {
             >
               <div class="card-body hover:bg-sky-700">
                 <h2 class="card-title">
-                  {value.postId}
-                  <div class="badge badge-secondary">{value.id}</div>
+                  {value.title}
                 </h2>
-                <p>{value.name}</p>
+                <p>{value.announcer}</p>
+                <p>{value.savingTime}</p>
                 <div class="justify-end card-actions">
-                  <span class="badge badge-outline">{value.email}</span>
-                  <span class="badge badge-outline">{value.email}</span>
+                  {value.tags.map(tag => <span class="badge badge-outline">{tag}</span>)}
                 </div>
               </div>
             </div>
