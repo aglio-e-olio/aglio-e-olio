@@ -16,6 +16,20 @@ import { WebrtcProvider } from 'y-webrtc';
 import Save from '../Components/Save/Save';
 import Record from '../Components/Record/Record';
 
+import { uploadFile } from 'react-s3';
+
+const S3_BUCKET ='screen-audio-record';
+const REGION ='ap-northeast-2';
+const ACCESS_KEY ='';
+const SECRET_ACCESS_KEY ='';
+
+const config = {
+    bucketName: S3_BUCKET,
+    region: REGION,
+    accessKeyId: ACCESS_KEY,
+    secretAccessKey: SECRET_ACCESS_KEY,
+}
+
 const StyledAudio = styled.audio`
   float: left;
 `;
@@ -190,9 +204,13 @@ const Room = () => {
     const startElem = document.getElementById("start");
     const stopElem = document.getElementById("stop");
 
+    /* Change the below values to improve video quality. */
     const displayMediaOptions = {
       video: {
-        cursor: "always"
+        cursor: "always",
+        width: {max: 800},
+        height: {max: 600},
+        frameRate: 10
       }
     };
 
@@ -218,10 +236,19 @@ const Room = () => {
         mediaRecorder.stop();
       }
 
-      mediaRecorder.onstop = (e) => {
+      mediaRecorder.onstop = async (e) => {
         const blob = new Blob(chunks, { 'type': 'video/webm' })
+        const fileName = prompt("녹화 파일의 이름을 적어주세요.");
+        const newFile = new File([blob], fileName+".webm", {
+          type: blob.type,
+        })
+        console.log(newFile);
         const screenURL = window.URL.createObjectURL(blob);
         console.log(screenURL);
+
+        uploadFile(newFile, config)
+          .then(data => console.log(data))
+          .catch(err => console.log(err))
       }
     }
   }, [allAudioStreams]);
