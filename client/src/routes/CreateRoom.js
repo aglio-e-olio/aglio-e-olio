@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { v1 as uuid } from 'uuid';
+import { codeContext } from '../Context/ContextProvider';
 import './CreateRoom.css';
+import MyInput from '../Components/Atoms/MyInput';
 
 const CreateRoom = (props) => {
+  const { nickName, joinUser } = useContext(codeContext);
+
   const navigate = useNavigate();
   function create() {
     const id = uuid();
@@ -11,18 +15,44 @@ const CreateRoom = (props) => {
   }
 
   function history() {
-    const userID = 'HW';
+    const userID = nickName;
     navigate(`/history/${userID}`);
   }
 
   return (
     <div>
-    <button className="create-room-button" onClick={create}>
-      Create Room
-    </button>
-    <button class='btn' onClick={history}>
-      My history
-    </button>
+      {nickName ? (
+        <div>
+          <button className="create-room-button" onClick={create}>
+            Create Room
+          </button>
+          <button class="btn" onClick={history}>
+            My history
+          </button>
+        </div>
+      ) : (
+        <div class="hero min-h-screen bg-base-200">
+          <div class="flex-col hero-content lg:flex-row-reverse">
+            <div class="text-center lg:text-left">
+              <h1 class="text-5xl font-bold">Login now!</h1>
+              <p class="py-6">
+                코딩 테스트를 위한 알고리즘 스터디의 처음과 끝을 알리오
+                올리오에서 경험해보세요!
+              </p>
+            </div>
+            <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+              <div class="card-body">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text">사용자 이름</span>
+                  </label>
+                  <MyInput />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

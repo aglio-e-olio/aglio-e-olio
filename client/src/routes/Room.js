@@ -6,7 +6,7 @@ import hark from 'hark';
 
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
 
@@ -14,7 +14,7 @@ import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 
 import Save from '../Components/Save/Save';
-import Record from '../Components/Record/Record';
+import UrlCopy from '../Components/UrlCopy';
 
 const StyledAudio = styled.audio`
   float: left;
@@ -39,8 +39,6 @@ const Audio = (props) => {
         setColor('black');
       });
     });
-
-    return () => {};
   }, []);
   return (
     <div>
@@ -60,6 +58,7 @@ let yLines;
 let undoManager;
 
 const Room = () => {
+  const navigate = useNavigate();
   const [peers, setPeers] = useState([]);
   const socketRef = useRef();
   const userVideo = useRef();
@@ -79,7 +78,22 @@ const Room = () => {
   }
   i++;
 
+  const [isOpen, setOpen] = useState(false);
   const [muted, setMute] = useState('Mute');
+
+  const handleSave = () => {
+    // 여기서 모달 열어줌
+    setOpen(true);
+  };
+
+  const handleSaveSubmit = () => {
+    //submit 비즈니스 로직
+    setOpen(false);
+  };
+
+  const handleSaveCancel = () => {
+    setOpen(false);
+  };
 
   function sendCode() {
     socketRef.current.emit('code compile', { codes, roomID });
@@ -115,11 +129,11 @@ const Room = () => {
         });
 
         socketRef.current.on('hello', (new_member) => {
-          alert(`${new_member} 가 입장했습니다.`);
+          // alert(`${new_member} 가 입장했습니다.`);
         });
 
         socketRef.current.on('bye', (left_user) => {
-          alert(`${left_user}가 떠났습니다.`);
+          // alert(`${left_user}가 떠났습니다.`);
         });
 
         socketRef.current.on('user joined', (payload) => {
@@ -157,7 +171,7 @@ const Room = () => {
     peer.on('signal', (signal) => {
       socketRef.current.emit('sending signal', {
         userToSignal, // 상대방 소켓 id
-        callerID,// 내 소켓 id
+        callerID, // 내 소켓 id
         signal,
       });
     });
@@ -198,8 +212,19 @@ const Room = () => {
         <button className="run-button" onClick={sendCode}>
           Run
         </button>
-        <Save />
-        <Record />
+
+        <UrlCopy />
+        <button
+          class="btn btn-success cursor-pointer absolute top-0 right-40"
+          onClick={handleSave}
+        >
+          저장 모달 열기
+        </button>
+        <Save
+          isOpen={isOpen}
+          onSubmit={handleSaveSubmit}
+          onCancel={handleSaveCancel}
+        />
         <Canvas
           doc={doc}
           provider={provider}
