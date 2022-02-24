@@ -1,56 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import ReactModal from 'react-modal';
 import './Save.css';
 import axios from 'axios';
+// import jsonSize from 'json-size'
+// import Select, {ActionMeta, OnChangeValue} from 'react-select';
+import CreatableSelect from 'react-select/creatable';
+import Select from 'react-select';
 
 const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
 
+  // json 파일 크기 byte로 출력 나옴.
+  // const jsonYLines = yLines.toJSON();
+  // console.log(jsonYLines);
+  // console.log(jsonSize(jsonYLines));
+
   const titleHandler = (e) => {
     e.preventDefault();
     setTitle(e.target.value);
   };
 
-  const announcerHandler = (e) => {
-    e.preventDefault();
-    setAnnouncer(e.target.value);
-  };
+  const handleChangeAnnouncer = useCallback(
+    (inputValue) => setAnnouncer(inputValue),
+    []
+  );
 
-  const announcerOptions = [
-    { key: '박현우', value: '박현우' },
-    { key: '최준영', value: '최준영' },
-    { key: '조헌일', value: '조헌일' },
-    { key: '김도경', value: '김도경' },
-    { key: '진승현', value: '진승현' },
-  ];
+  //나중에 쓰일 듯.
+  const [announcerOptions, setAnnouncerOptions] = useState([
+    { label: '박현우', value: '박현우' },
+    { label: '최준영', value: '최준영' },
+    { label: '김도경', value: '김도경' },
+    { label: '조헌일', value: '조헌일' },
+    { label: '진승현', value: '진승현' },
+  ]);
 
-  const algorithmHandler = (e) => {
-    e.preventDefault();
-    setAlgorithm([
-      ...algorithm,
-      e.target.value,
-    ]);
+  const [algorithmOptions, setAlgorithmOptions] = useState([
+    { label: 'BFS', value: 'BFS' },
+    { label: 'DFS', value: 'DFS' },
+    { label: 'STACK', value: 'STACK' },
+    { label: 'QUEUE', value: 'QUEUE' },
+  ]);
 
-  };
+  const handleChangeAlgorithm = useCallback(
+    (inputValue) => setAlgorithm(inputValue),
+    []
+  );
 
-  const algorithmOptions = [
-    { key: 'BFS', value: 'BFS' },
-    { key: 'DFS', value: 'DFS' },
-    { key: 'STACK', value: 'STACK' },
-    { key: 'QUEUE', value: 'QUEUE' },
-  ];
+  const handleCreateAlgorithm = useCallback(
+    (inputValue) => {
+      const newValue = { value: inputValue.toLowerCase(), label: inputValue };
+      setAlgorithmOptions([...algorithmOptions, newValue]);
+      setAlgorithm(newValue);
+    },
+    [algorithmOptions]
+  );
 
-
-  // console.log(yLines.toJSON());
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
     console.log('submit 발생');
     e.preventDefault();
-    console.log(title);
-    console.log(algorithm);
-    console.log(announcer);
 
     let body = {
       title: title,
@@ -75,7 +85,9 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
   };
   return (
     <ReactModal isOpen={isOpen}>
+      <div className="category" />
       <div>세이브 모달 입니다.</div>
+      <div className="category" />
       <form
         onSubmit={submitHandler}
         style={{ display: 'flex', flexDirection: 'column' }}
@@ -87,31 +99,31 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
           value={title}
           onChange={titleHandler}
         ></input>
-        <select onChange={algorithmHandler} value={algorithm}>
-          {algorithmOptions.map((item, index) => (
-            <option key={item.key} value={item.key}>
-              {item.value}
-            </option>
-          ))}
-        </select>
-        <select onChange={announcerHandler} value={announcer}>
-          {announcerOptions.map((item, index) => (
-            <option key={item.key} value={item.key}>
-              {item.value}
-            </option>
-          ))}
-        </select>
-
+        <div className="category" />
+        <CreatableSelect
+          placeholder="알고리즘 태그"
+          value={algorithm}
+          options={algorithmOptions}
+          onChange={handleChangeAlgorithm}
+          onCreateOption={handleCreateAlgorithm}
+          isMulti
+        />
+        <div className="category" />
+        <Select
+          placeholder="발표자"
+          value={announcer}
+          options={announcerOptions}
+          onChange={handleChangeAnnouncer}
+        />
+        <div className="category" />
         <button type="submit" class="btn btn-success">
           저장
         </button>
       </form>
-
-      <div>
-        <button class="btn btn-error" onClick={handleClickCancel}>
-          취소
-        </button>
-      </div>
+      <div className="category" />
+      <button class="btn btn-error" onClick={handleClickCancel}>
+        취소
+      </button>
     </ReactModal>
   );
 };
