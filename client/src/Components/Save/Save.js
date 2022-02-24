@@ -1,19 +1,27 @@
 import React from 'react';
-import styled from 'styled-components';
+import ReactModal from 'react-modal';
+import './Save.css';
 
-const StyledSave = styled.div`
-margin-left : 900px;
-`;
+const Save = ({ isOpen, onSubmit, onCancel }) => {
+  const handleClickSubmit = () => {
+    onSubmit();
+  };
 
-const Save = () => {
-  function save_snapshot() {}
-
+  const handleClickCancel = () => {
+    onCancel();
+  };
   return (
-    <StyledSave>
-      <button className="save-snapshot-button" onClick={save_snapshot}>
-        Save
-      </button>
-    </StyledSave>
+    <ReactModal isOpen={isOpen}>
+      <div>세이브 모달 입니다.</div>
+      <div>
+        <button class="btn btn-success" onClick={handleClickSubmit}>
+          저장
+        </button>
+        <button class="btn btn-error" onClick={handleClickCancel}>
+          취소
+        </button>
+      </div>
+    </ReactModal>
   );
 };
 
