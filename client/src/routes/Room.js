@@ -22,11 +22,13 @@ const StyledAudio = styled.audio`
 
 const Audio = (props) => {
   const ref = useRef();
+  const { addAudioStream } = useContext(codeContext);
 
   const [color, setColor] = useState('black');
 
   useEffect(() => {
     props.peer.on('stream', (stream) => {
+      addAudioStream(stream);
       ref.current.srcObject = stream;
       let options = {};
       let speechEvents = hark(stream, options);
@@ -40,7 +42,7 @@ const Audio = (props) => {
       });
     });
 
-    return () => {};
+    return () => { };
   }, []);
   return (
     <div>
@@ -66,7 +68,7 @@ const Room = () => {
   const peersRef = useRef([]);
   const { roomID } = useParams();
 
-  const { codes, compileResult, getCompileResult, getRoomInfo } =
+  const { codes, compileResult, getCompileResult, getRoomInfo, allAudioStreams, addAudioStream } =
     useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
@@ -90,14 +92,13 @@ const Room = () => {
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
-        userVideo.current.srcObject = stream;
-
+        addAudioStream(stream);
         let options = {};
         let speechEvents = hark(stream, options);
 
-        speechEvents.on('speaking', function () {});
+        speechEvents.on('speaking', function () { });
 
-        speechEvents.on('stopped_speaking', () => {});
+        speechEvents.on('stopped_speaking', () => { });
         getRoomInfo(roomID);
         socketRef.current.emit('join room', roomID);
         socketRef.current.on('all users', (users) => {
@@ -185,11 +186,53 @@ const Room = () => {
     getCompileResult(code);
   }
 
+  useEffect(() => {
+    const startElem = document.getElementById("start");
+    const stopElem = document.getElementById("stop");
+
+    const displayMediaOptions = {
+      video: {
+        cursor: "always"
+      }
+    };
+
+    startElem.onclick = async (e) => {
+      var chunks = [];
+
+      const audioContext = new AudioContext();
+      const acDest = audioContext.createMediaStreamDestination();
+      for (let i = 0; i < allAudioStreams.length; i++) {
+        audioContext.createMediaStreamSource(allAudioStreams[i]).connect(acDest);
+      }
+      const screenStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+      const mergedStream = new MediaStream([...screenStream.getTracks(), ...acDest.stream.getTracks()]);
+
+      const mediaRecorder = new MediaRecorder(mergedStream);
+      mediaRecorder.start();
+
+      mediaRecorder.ondataavailable = (e) => {
+        chunks.push(e.data);
+      }
+
+      stopElem.onclick = () => {
+        mediaRecorder.stop();
+      }
+
+      mediaRecorder.onstop = (e) => {
+        const blob = new Blob(chunks, { 'type': 'video/webm' })
+        const screenURL = window.URL.createObjectURL(blob);
+        console.log(screenURL);
+      }
+    }
+  }, [allAudioStreams]);
+
   /* Render */
   return (
     <div>
       <div>
-        <StyledAudio className="user-sound" ref={userVideo} autoPlay />
+        <p><button id="start">Start Capture</button>&nbsp;<button id="stop">Stop Capture</button></p>
+      </div>
+      <div>
         {peers.map((peer, index) => {
           return <Audio key={index} peer={peer} />;
         })}

@@ -8,6 +8,7 @@ const initialState = {
   codes: '',
   compileResult: '',
   roomInfo: '',
+  allAudioStreams: [],
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -31,6 +32,11 @@ const reducer = (state, action) => {
         roomInfo: action.payload,
       };
 
+    case 'ADD_AUDIO_STREAM':
+      return {
+        ...state,
+        allAudioStreams: [...state.allAudioStreams, action.payload],
+      }
     default:
       throw new Error();
   }
@@ -61,6 +67,13 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function addAudioStream(audioStream) {
+    dispatch({
+      type: "ADD_AUDIO_STREAM",
+      payload: audioStream,
+    });
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -71,6 +84,8 @@ const ContextProvider = ({ children }) => {
         getCompileResult,
         roomInfo: state.roomInfo,
         getRoomInfo,
+        allAudioStreams: state.allAudioStreams,
+        addAudioStream,
       }}
     >
       {children}
