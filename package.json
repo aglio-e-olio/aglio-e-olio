@@ -1,8 +1,4 @@
 {
-    "name": "native-webrtc-drawing",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "cd back && npm install && npm start",
@@ -11,16 +7,5 @@
     "engines": {
         "node": "16.14.0",
         "yarn": "1.22.17"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/aglio-e-olio/native-webrtc-drawing.git"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/aglio-e-olio/native-webrtc-drawing/issues"
-    },
-    "homepage": "https://github.com/aglio-e-olio/native-webrtc-drawing#readme"
+    }
 }

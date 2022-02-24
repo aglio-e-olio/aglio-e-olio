@@ -1,2 +1,0 @@
-const faker = require('faker');
-
