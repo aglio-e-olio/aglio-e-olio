@@ -1,9 +1,10 @@
 import React from 'react';
+import InfoList from '../Components/InfoList/InfoList';
 
 const History = () => {
     return (
         <div>
-            Hello world!
+            <InfoList />
         </div>
     );
 };
