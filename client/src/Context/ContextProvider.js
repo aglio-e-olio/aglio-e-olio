@@ -9,6 +9,7 @@ const initialState = {
   compileResult: '',
   roomInfo: '',
   nickName: '',
+  email: '',
   currentTag: '',
 };
 
@@ -37,6 +38,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         nickName: action.payload,
+      }
+
+    case 'USER_EMAIL':
+      return {
+        ...state,
+        email: action.payload,
       }
     
     case 'SET_TAG':
@@ -82,6 +89,13 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function getEmail(email) {
+    dispatch({
+      type: 'USER_EMAIL',
+      payload: email,
+    })
+  }
+
   function getTag(currentTag) {
     dispatch({
       type: 'SET_TAG',
@@ -101,6 +115,8 @@ const ContextProvider = ({ children }) => {
         getRoomInfo,
         nickName: state.nickName,
         joinUser,
+        email: state.email,
+        getEmail,
         currentTag: state.currentTag,
         getTag,
       }}
