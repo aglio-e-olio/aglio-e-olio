@@ -6,10 +6,11 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "cd back && npm install && npm start",
-        "heroku-postbuild": "cd client && npm install yarn && yarn run build"
+        "heroku-postbuild": "cd client && yarn install && yarn run build"
     },
     "engines": {
-        "node": "16.14.0"
+        "node": "16.14.0",
+        "yarn": "1.22.17"
     },
     "repository": {
         "type": "git",
