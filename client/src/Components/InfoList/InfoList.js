@@ -9,6 +9,7 @@ function InfoList({ algorithm_tag }) {
   let postId = [1, 2, 3];
   const [tagData, setTagData] = useState([]);
   const [searchedData, setSearchedData] = useState(tagData);
+  const [query, setQuery] = useState('');
 
   /* props으로 받은 tag 처리 */
   useEffect(() => {
@@ -33,12 +34,24 @@ function InfoList({ algorithm_tag }) {
       });
   }, []);
 
-  /* 검색 처리 : filter 이용 */
   function handleSearch(e) {
-    let value = e.target.value;
+    setQuery(e.target.value);
+    // if (e.charCode)
+  }
+
+  function handleKeyPress(e) {
+    // if (e.keyCode === 13) {
+    //   handleSubmit();
+    // }
+    console.log("yeah")
+  }
+
+  /* 검색 처리 : filter 이용 */
+  function searchKeyword() {
+    console.log(query);
     let result = [];
     result = tagData.filter((data) => {
-      if (data.name.search(value) != -1 || data.email.search(value) != -1) {
+      if (data.name.search(query) != -1 || data.email.search(query) != -1) {
         return true;
       }
       return false;
@@ -51,17 +64,24 @@ function InfoList({ algorithm_tag }) {
     <div>
       <input
         onChange={handleSearch}
+        onKeyPress={handleKeyPress}
         type="text"
         placeholder="Type here"
         class="input input-bordered w-full max-w-xs"
         style={{ margin: 10 }}
       ></input>
-      <button class="btn btn-active btn-primary">Search</button>
-      <div className='card-wrapper'>
+      <button class="btn btn-active btn-primary" onClick={searchKeyword}>
+        Search
+      </button>
+      <div className="card-wrapper">
         {searchedData.map((value, index) => {
           return (
-            <div class="card w-96 bg-base-100 card-compact shadow-xl" key={index}>
-              <div class="card-body">
+            <div
+              class="card w-96 bg-base-100 card-compact shadow-xl hover:shadow-md cursor-pointer"
+              onClick={() => console.log(`${value.email} clicked`)}
+              key={index}
+            >
+              <div class="card-body hover:bg-sky-700">
                 <h2 class="card-title">
                   {value.postId}
                   <div class="badge badge-secondary">{value.id}</div>
@@ -76,41 +96,6 @@ function InfoList({ algorithm_tag }) {
           );
         })}
       </div>
-
-      {/* <div class="overflow-x-auto">
-        <table class="table w-full">
-          <thead>
-            <tr>
-              <th></th>
-              <th>
-                  postId
-              </th>
-              <th>
-                  id
-              </th>
-              <th>
-                  name
-              </th>
-              <th>
-                  email
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {searchedData.map((value, index) => {
-              return (
-                <tr key={index}>
-                  <th></th>
-                  <th>{value.postId}</th>
-                  <td>{value.id}</td>
-                  <td>{value.name}</td>
-                  <td>{value.email}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div> */}
     </div>
   );
 }
