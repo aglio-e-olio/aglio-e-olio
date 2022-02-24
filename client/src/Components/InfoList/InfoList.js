@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import axios from 'axios';
+import './InfoList.css';
 
 const initialState = {};
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoList({ algorithm_tag }) {
-
   let postId = [1, 2, 3];
   const [tagData, setTagData] = useState([]);
   const [searchedData, setSearchedData] = useState(tagData);
@@ -33,7 +33,6 @@ function InfoList({ algorithm_tag }) {
       });
   }, []);
 
-
   /* 검색 처리 : filter 이용 */
   function handleSearch(e) {
     let value = e.target.value;
@@ -48,8 +47,6 @@ function InfoList({ algorithm_tag }) {
     setSearchedData(result);
   }
 
-
-
   return (
     <div>
       <input
@@ -59,16 +56,28 @@ function InfoList({ algorithm_tag }) {
         class="input input-bordered w-full max-w-xs"
         style={{ margin: 10 }}
       ></input>
-      <select
-        class="select select-bordered select-xs w-full max-w-xs"
-      >
-        <option disabled selected>
-          정렬 순서
-        </option>
-        <option>ID 오름차순</option>
-        <option>ID 내림차순</option>
-      </select>
-      <div class="overflow-x-auto">
+      <button class="btn btn-active btn-primary">Search</button>
+      <div className='card-wrapper'>
+        {searchedData.map((value, index) => {
+          return (
+            <div class="card w-96 bg-base-100 card-compact shadow-xl" key={index}>
+              <div class="card-body">
+                <h2 class="card-title">
+                  {value.postId}
+                  <div class="badge badge-secondary">{value.id}</div>
+                </h2>
+                <p>{value.name}</p>
+                <div class="justify-end card-actions">
+                  <span class="badge badge-outline">{value.email}</span>
+                  <span class="badge badge-outline">{value.email}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* <div class="overflow-x-auto">
         <table class="table w-full">
           <thead>
             <tr>
@@ -101,7 +110,7 @@ function InfoList({ algorithm_tag }) {
             })}
           </tbody>
         </table>
-      </div>
+      </div> */}
     </div>
   );
 }
