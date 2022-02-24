@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import axios from 'axios';
 import './InfoList.css';
 
+
 const initialState = {};
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
@@ -51,7 +52,7 @@ function InfoList({ algorithm_tag }) {
     console.log(query);
     let result = [];
     result = tagData.filter((data) => {
-      if (data.name.search(query) != -1 || data.email.search(query) != -1) {
+      if (data.name.search(query) !== -1 || data.email.search(query) !== -1) {
         return true;
       }
       return false;
@@ -61,7 +62,7 @@ function InfoList({ algorithm_tag }) {
   }
 
   return (
-    <div>
+    <div >
       <input
         onChange={handleSearch}
         onKeyPress={handleKeyPress}
@@ -73,7 +74,7 @@ function InfoList({ algorithm_tag }) {
       <button class="btn btn-active btn-primary" onClick={searchKeyword}>
         Search
       </button>
-      <div className="card-wrapper">
+      <div class="overflow-auto h-screen card-wrapper">
         {searchedData.map((value, index) => {
           return (
             <div
