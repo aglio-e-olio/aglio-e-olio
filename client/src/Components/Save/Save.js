@@ -5,18 +5,18 @@ import axios from 'axios';
 
 const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
   const [title, setTitle] = useState('');
-  const [inputsAlgorithm, setInputsAlgorithm] = useState({});
   const [announcer, setAnnouncer] = useState();
+  const [algorithm, setAlgorithm] = useState([]);
 
   const titleHandler = (e) => {
     e.preventDefault();
     setTitle(e.target.value);
   };
 
-  const announcerHandler = e => {
+  const announcerHandler = (e) => {
     e.preventDefault();
     setAnnouncer(e.target.value);
-  }
+  };
 
   const announcerOptions = [
     { key: '박현우', value: '박현우' },
@@ -26,14 +26,13 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
     { key: '진승현', value: '진승현' },
   ];
 
-  const { algorithm } = inputsAlgorithm;
+  const algorithmHandler = (e) => {
+    e.preventDefault();
+    setAlgorithm([
+      ...algorithm,
+      e.target.value,
+    ]);
 
-  const algorithmHandler = e => {
-    const { name, value } = e.target;
-    setInputsAlgorithm({
-      ...inputsAlgorithm,
-      [name]: value
-    });
   };
 
   const algorithmOptions = [
@@ -43,13 +42,6 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
     { key: 'QUEUE', value: 'QUEUE' },
   ];
 
-  // const showAlgorithm = ({ algorithm }) => {
-  //   return (
-  //     <div>
-  //       <b>{algorithm}</b>
-  //     </div>
-  //   );
-  // };
 
   // console.log(yLines.toJSON());
   // 저장 버튼 클릭시
@@ -63,7 +55,7 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
     let body = {
       title: title,
       algorithm: algorithm,
-      announcer : announcer,
+      announcer: announcer,
     };
 
     axios
@@ -95,7 +87,7 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
           value={title}
           onChange={titleHandler}
         ></input>
-        <select onChange={algorithmHandler} value={algorithm} name={algorithm}>
+        <select onChange={algorithmHandler} value={algorithm}>
           {algorithmOptions.map((item, index) => (
             <option key={item.key} value={item.key}>
               {item.value}
