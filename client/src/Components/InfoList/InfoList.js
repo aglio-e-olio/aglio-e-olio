@@ -1,8 +1,6 @@
-import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './InfoList.css';
-
-const initialState = {};
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoList({ algorithm_tag }) {
@@ -14,11 +12,10 @@ function InfoList({ algorithm_tag }) {
   useEffect(() => {
     axios({
       method: 'GET',
-      url: 'http://localhost:4000/tags',
+      url: 'http://localhost:4000/meta',
       params: { algorithm: 'Array' },
     })
       .then((res) => {
-        console.log(res.data);
         let firstSortedData = [...res.data];
         firstSortedData.sort((a, b) => {
           if (a.title < b.title) return -1;
@@ -51,7 +48,7 @@ function InfoList({ algorithm_tag }) {
         data.title.search(query) !== -1 ||
         data.announcer.search(query) !== -1 ||
         data.email.search(query) !== -1 ||
-        data.tags.find((_data) => _data.includes(query)) // 여러 태그 일부만 검색해도 검색 가능
+        data.tags.find((tag) => tag.value.includes(query)) // 여러 태그 일부만 검색해도 검색 가능
       ) {
         return true;
       }
@@ -80,7 +77,7 @@ function InfoList({ algorithm_tag }) {
             <div
               class="card w-96 bg-base-100 card-compact shadow-xl hover:shadow-md cursor-pointer"
               onClick={() => console.log(`${value.email} clicked`)}
-              key={index}
+              key={value._id}
             >
               <div class="card-body hover:bg-sky-700">
                 <h2 class="card-title">{value.title}</h2>
@@ -88,7 +85,7 @@ function InfoList({ algorithm_tag }) {
                 <p>{value.savingTime}</p>
                 <div class="justify-end card-actions">
                   {value.tags.map((tag) => (
-                    <span class="badge badge-outline">{tag}</span>
+                    <span key={tag._id} class="badge badge-outline">{tag.value}</span>  // tag 안에 _id와 value 넣음
                   ))}
                 </div>
               </div>
