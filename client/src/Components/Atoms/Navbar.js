@@ -24,7 +24,7 @@ const Navbar = () => {
       </div>
       <div class="flex-1">
         <a class="btn btn-ghost normal-case text-xl">
-          {nickName}님 반갑습네다!
+          {nickName}님 반갑습니다!
         </a>
       </div>
       <div class="flex-none">

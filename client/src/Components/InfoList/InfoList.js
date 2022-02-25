@@ -1,7 +1,14 @@
-import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import axios from 'axios';
 import './InfoList.css';
-
+import { codeContext } from '../../Context/ContextProvider';
 
 const initialState = {};
 
@@ -11,15 +18,16 @@ function InfoList({ algorithm_tag }) {
   const [searchedData, setSearchedData] = useState(tagData);
   const [query, setQuery] = useState('');
 
+  const { currentTag, nickName } = useContext(codeContext);
+
   /* props으로 받은 tag 처리 */
   useEffect(() => {
     axios({
       method: 'GET',
       url: 'http://localhost:4000/tags',
-      params: { algorithm: "Array" },
+      params: { algorithm: currentTag, nickname: nickName },
     })
       .then((res) => {
-        console.log(res.data)
         let firstSortedData = [...res.data];
         firstSortedData.sort((a, b) => {
           if (a.title < b.title) return -1;
@@ -32,7 +40,7 @@ function InfoList({ algorithm_tag }) {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [currentTag]);
 
   function handleSearch(e) {
     setQuery(e.target.value);
@@ -51,7 +59,6 @@ function InfoList({ algorithm_tag }) {
         data.announcer.search(query) !== -1 ||
         data.email.search(query) !== -1
       ) {
-
         return true;
       }
       return false;
@@ -61,7 +68,7 @@ function InfoList({ algorithm_tag }) {
   }
 
   return (
-    <div >
+    <div>
       <input
         onChange={handleSearch}
         onKeyPress={handleKeyPress}
@@ -82,13 +89,13 @@ function InfoList({ algorithm_tag }) {
               key={index}
             >
               <div class="card-body hover:bg-sky-700">
-                <h2 class="card-title">
-                  {value.title}
-                </h2>
+                <h2 class="card-title">{value.title}</h2>
                 <p>{value.announcer}</p>
                 <p>{value.savingTime}</p>
                 <div class="justify-end card-actions">
-                  {value.tags.map(tag => <span class="badge badge-outline">{tag}</span>)}
+                  {value.tags.map((tag) => (
+                    <span class="badge badge-outline">{tag}</span>
+                  ))}
                 </div>
               </div>
             </div>
