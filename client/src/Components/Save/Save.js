@@ -112,7 +112,7 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
     // //yline을 JSON.stringify 하면 jsonYLines와 같다. 신기하네.
 
     axios
-      .post('/api/user/snapshot', JSON.stringify(body))
+      .post('/myroom/save', JSON.stringify(body))
       .then(function (res) {
         console.log(res);
         onCancel();
