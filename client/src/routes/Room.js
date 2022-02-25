@@ -227,6 +227,7 @@ const Room = () => {
       }
 
       mediaRecorder.onstop = async (e) => {
+        screenStream.getTracks()[0].stop();
         const blob = new Blob(chunks, { 'type': 'video/webm' })
         const fileName = prompt("녹화 파일의 이름을 적어주세요.");
         const newFile = new File([blob], fileName + ".webm", {
