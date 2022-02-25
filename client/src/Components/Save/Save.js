@@ -105,20 +105,22 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
     // console.log('yline은 ', yLines);
     // console.log('ylines를 json으로 바꾸면', JSON.stringify(yLines));
     // console.log('json으로 바꾼 ylines의 타입은', typeof JSON.stringify(yLines));
-    // console.log('body는 ', body);
-    // console.log('JSON으로 바꾸면', JSON.stringify(body));
+    console.log('body는 ', body);
+    console.log('JSON으로 바꾸면', JSON.stringify(body));
     // console.log('body의 타입은', typeof body);
     // console.log(typeof JSON.stringify(body));
     // //yline을 JSON.stringify 하면 jsonYLines와 같다. 신기하네.
 
     axios
-      .post('/api/user/snapshot', body)
+      .post('/api/user/snapshot', JSON.stringify(body))
       .then(function (res) {
         console.log(res);
         onCancel();
       })
       .catch(function (err) {
         console.log(err);
+        alert('post 실패');
+        onCancel();
       });
   };
 
@@ -129,7 +131,7 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
   return (
     <ReactModal isOpen={isOpen}>
       <div className="category" />
-      <div>세이브 모달 입니다.</div>
+      <div>저장 화면 입니다.</div>
       <div className="category" />
       <form
         onSubmit={submitHandler}
