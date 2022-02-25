@@ -9,6 +9,9 @@ const initialState = {
   compileResult: '',
   roomInfo: '',
   allAudioStreams: [],
+  nickName: '',
+  email: '',
+  currentTag: '',
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -31,6 +34,24 @@ const reducer = (state, action) => {
         ...state,
         roomInfo: action.payload,
       };
+    
+    case 'USER_JOIN':
+      return {
+        ...state,
+        nickName: action.payload,
+      }
+
+    case 'USER_EMAIL':
+      return {
+        ...state,
+        email: action.payload,
+      }
+    
+    case 'SET_TAG':
+      return {
+        ...state,
+        currentTag: action.payload,
+      }
 
     case 'ADD_AUDIO_STREAM':
       return {
@@ -74,6 +95,27 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function joinUser(nickName) {
+    dispatch({
+      type: 'USER_JOIN',
+      payload: nickName,
+    });
+  }
+
+  function getEmail(email) {
+    dispatch({
+      type: 'USER_EMAIL',
+      payload: email,
+    })
+  }
+
+  function getTag(currentTag) {
+    dispatch({
+      type: 'SET_TAG',
+      payload: currentTag,
+    })
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -86,6 +128,12 @@ const ContextProvider = ({ children }) => {
         getRoomInfo,
         allAudioStreams: state.allAudioStreams,
         addAudioStream,
+        nickName: state.nickName,
+        joinUser,
+        email: state.email,
+        getEmail,
+        currentTag: state.currentTag,
+        getTag,
       }}
     >
       {children}

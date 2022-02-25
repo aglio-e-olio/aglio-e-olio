@@ -7,7 +7,6 @@ import './App.css';
 import ContextProvider from './Context/ContextProvider';
 
 function App() {
-  const isLogin = false;
 
   return (
     <div className="App">

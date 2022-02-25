@@ -18,3 +18,8 @@
   float: right;
   bottom: 10px;
 }
+
+.save-button{
+  position: static;
+  margin-left: 500px;
+}
