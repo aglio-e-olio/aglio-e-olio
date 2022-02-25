@@ -1,24 +1,24 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import ReactModal from 'react-modal';
 import './Save.css';
 import axios from 'axios';
 // import jsonSize from 'json-size'
-// import Select, {ActionMeta, OnChangeValue} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
+import { codeContext } from '../../Context/ContextProvider';
 
-const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
+const Save = ({ isOpen, onCancel, yLines }) => {
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  // json 파일 크기 byte로 출력 나옴.
-  // console.log(yLines);
+  const { urlSnapshot } = useContext(codeContext);
+
+  console.log('모달창 안!',urlSnapshot);
+
   const jsonYLines = yLines.toJSON();
-  // console.log(jsonYLines);
-  // console.log(jsonSize(jsonYLines));
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -101,15 +101,12 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
       teemMates: announcerOptions,
       saveTime: saveTime,
       doc: jsonYLines,
+      urlSnapshot : urlSnapshot
     };
-    // console.log('yline은 ', yLines);
-    // console.log('ylines를 json으로 바꾸면', JSON.stringify(yLines));
-    // console.log('json으로 바꾼 ylines의 타입은', typeof JSON.stringify(yLines));
+    
     console.log('body는 ', body);
     console.log('JSON으로 바꾸면', JSON.stringify(body));
-    // console.log('body의 타입은', typeof body);
-    // console.log(typeof JSON.stringify(body));
-    // //yline을 JSON.stringify 하면 jsonYLines와 같다. 신기하네.
+    
 
     axios
       .post('/myroom/save', JSON.stringify(body))

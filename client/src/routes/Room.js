@@ -43,7 +43,7 @@ const Audio = (props) => {
   }, []);
   return (
     <div>
-      <StyledAudio autoPlay ref={ref} />
+      <StyledAudio muted autoPlay ref={ref} />
       <button style={{ backgroundColor: color, float: 'left' }}>
         상대방 버튼
       </button>
@@ -66,7 +66,7 @@ const Room = () => {
   const peersRef = useRef([]);
   const { roomID } = useParams();
 
-  const { codes, compileResult, getCompileResult, getRoomInfo } =
+  const { codes, compileResult, getCompileResult, getRoomInfo, getUrl } =
     useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
@@ -84,14 +84,8 @@ const Room = () => {
 
   const handleSave = () => {
     // 여기서 모달 열어줌
-    console.log(yLines);
     onCapture();
     setOpen(true);
-  };
-
-  const handleSaveSubmit = () => {
-    //submit 비즈니스 로직
-    setOpen(false);
   };
 
   const handleSaveCancel = () => {
@@ -203,24 +197,16 @@ const Room = () => {
   }
 
   const onCapture = async () => {
+    let snapshotUrl = '';
     console.log('onCapture');
-    await html2canvas(document.body).then(
-      async (canvas) => {
-        await onSaveAs(canvas.toDataURL('image/png'), 'image-download.png');
-      }
-    );
-  };
-
-  const onSaveAs = (url, filename) => {
-    console.log('onSaveAs');
-    console.log(url);
-    console.log(typeof (url));
-    let link = document.createElement('a');
-    document.body.appendChild(link);
-    link.href = url;
-    link.download = filename;
-    link.click();
-    document.body.removeChild(link);
+    await html2canvas(document.body)
+      .then(async (canvas) => {
+        snapshotUrl = canvas.toDataURL('image/png');
+        getUrl(snapshotUrl);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   /* Render */
@@ -244,12 +230,7 @@ const Room = () => {
         >
           저장 모달 열기
         </button>
-        <Save
-          isOpen={isOpen}
-          onSubmit={handleSaveSubmit}
-          onCancel={handleSaveCancel}
-          yLines={yLines}
-        />
+        <Save isOpen={isOpen} onCancel={handleSaveCancel} yLines={yLines} />
 
         <Canvas
           doc={doc}

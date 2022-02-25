@@ -10,6 +10,7 @@ const initialState = {
   roomInfo: '',
   nickName: '',
   currentTag: '',
+  urlSnapshot: '',
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -43,6 +44,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         currentTag: action.payload,
+      }
+    
+    case 'CAPTURE_URL':
+      return {
+        ...state,
+        urlSnapshot: action.payload,
       }
 
     default:
@@ -89,6 +96,13 @@ const ContextProvider = ({ children }) => {
     })
   }
 
+  function getUrl(urlSnapshot) {
+    dispatch({
+      type: 'CAPTURE_URL',
+      payload: urlSnapshot,
+    })
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -103,6 +117,8 @@ const ContextProvider = ({ children }) => {
         joinUser,
         currentTag: state.currentTag,
         getTag,
+        urlSnapshot: state.urlSnapshot,
+        getUrl,
       }}
     >
       {children}
