@@ -204,19 +204,20 @@ const Room = () => {
 
   const onCapture = async () => {
     console.log('onCapture');
-    await html2canvas(document.getElementById('snapshot')).then(
+    await html2canvas(document.body).then(
       async (canvas) => {
         await onSaveAs(canvas.toDataURL('image/png'), 'image-download.png');
       }
     );
   };
 
-  const onSaveAs = (uri, filename) => {
+  const onSaveAs = (url, filename) => {
     console.log('onSaveAs');
-    console.log(uri);
+    console.log(url);
+    console.log(typeof (url));
     let link = document.createElement('a');
     document.body.appendChild(link);
-    link.href = uri;
+    link.href = url;
     link.download = filename;
     link.click();
     document.body.removeChild(link);
