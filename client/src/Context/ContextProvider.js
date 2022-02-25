@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 
 // context를 생성한 후 export 한다
 export const codeContext = React.createContext();
@@ -8,7 +8,9 @@ const initialState = {
   codes: '',
   compileResult: '',
   roomInfo: '',
+  allAudioStreams: [],
   nickName: '',
+  email: '',
   currentTag: '',
   urlSnapshot: '',
 };
@@ -39,6 +41,12 @@ const reducer = (state, action) => {
         ...state,
         nickName: action.payload,
       }
+
+    case 'USER_EMAIL':
+      return {
+        ...state,
+        email: action.payload,
+      }
     
     case 'SET_TAG':
       return {
@@ -52,6 +60,11 @@ const reducer = (state, action) => {
         urlSnapshot: action.payload,
       }
 
+    case 'ADD_AUDIO_STREAM':
+      return {
+        ...state,
+        allAudioStreams: [...state.allAudioStreams, action.payload],
+      }
     default:
       throw new Error();
   }
@@ -60,6 +73,23 @@ const reducer = (state, action) => {
 const ContextProvider = ({ children }) => {
   // useReducer를 사용해서 state와 dispatch를 생성한다.
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const [persistUser, setPersistUser] = useState("")
+
+  useEffect(() => {
+    const persistUserData = JSON.parse(localStorage.getItem('persisUser'))
+    if (persistUserData) {
+      setPersistUser(persistUserData)
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('persisUser', JSON.stringify(persistUser))
+  }, [persistUser]);
+
+  function addUser(newUser) {
+    setPersistUser(newUser)
+  }
 
   function extractCode(codes) {
     dispatch({
@@ -82,11 +112,25 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function addAudioStream(audioStream) {
+    dispatch({
+      type: "ADD_AUDIO_STREAM",
+      payload: audioStream,
+    });
+  }
+
   function joinUser(nickName) {
     dispatch({
       type: 'USER_JOIN',
       payload: nickName,
     });
+  }
+
+  function getEmail(email) {
+    dispatch({
+      type: 'USER_EMAIL',
+      payload: email,
+    })
   }
 
   function getTag(currentTag) {
@@ -113,12 +157,18 @@ const ContextProvider = ({ children }) => {
         getCompileResult,
         roomInfo: state.roomInfo,
         getRoomInfo,
+        allAudioStreams: state.allAudioStreams,
+        addAudioStream,
         nickName: state.nickName,
         joinUser,
+        email: state.email,
+        getEmail,
         currentTag: state.currentTag,
         getTag,
         urlSnapshot: state.urlSnapshot,
         getUrl,
+        persistUser,
+        addUser,
       }}
     >
       {children}

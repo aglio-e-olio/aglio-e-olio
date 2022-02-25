@@ -16,6 +16,7 @@ import { WebrtcProvider } from 'y-webrtc';
 import Save from '../Components/Save/Save';
 import UrlCopy from '../Components/UrlCopy';
 import html2canvas from 'html2canvas';
+import Record from '../Components/Record/Record';
 
 const StyledAudio = styled.audio`
   float: left;
@@ -23,11 +24,13 @@ const StyledAudio = styled.audio`
 
 const Audio = (props) => {
   const ref = useRef();
+  const { addAudioStream } = useContext(codeContext);
 
   const [color, setColor] = useState('black');
 
   useEffect(() => {
     props.peer.on('stream', (stream) => {
+      addAudioStream(stream);
       ref.current.srcObject = stream;
       let options = {};
       let speechEvents = hark(stream, options);
@@ -62,11 +65,10 @@ const Room = () => {
   const navigate = useNavigate();
   const [peers, setPeers] = useState([]);
   const socketRef = useRef();
-  const userVideo = useRef();
   const peersRef = useRef([]);
   const { roomID } = useParams();
 
-  const { codes, compileResult, getCompileResult, getRoomInfo, getUrl } =
+  const { codes, compileResult, getCompileResult, getRoomInfo, getUrl, addAudioStream } =
     useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
@@ -101,14 +103,13 @@ const Room = () => {
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
-        userVideo.current.srcObject = stream;
-
+        addAudioStream(stream);
         let options = {};
         let speechEvents = hark(stream, options);
 
-        speechEvents.on('speaking', function () {});
+        speechEvents.on('speaking', function () { });
 
-        speechEvents.on('stopped_speaking', () => {});
+        speechEvents.on('stopped_speaking', () => { });
         getRoomInfo(roomID);
         socketRef.current.emit('join room', roomID);
         socketRef.current.on('all users', (users) => {
@@ -212,17 +213,17 @@ const Room = () => {
   /* Render */
   return (
     <div>
+
       <div>
-        <StyledAudio className="user-sound" ref={userVideo} autoPlay />
         {peers.map((peer, index) => {
           return <Audio key={index} peer={peer} />;
         })}
       </div>
       <div>
+        <Record />
         <button className="run-button" onClick={sendCode}>
           Run
         </button>
-
         <UrlCopy />
         <button
           class="btn btn-success cursor-pointer absolute top-0 right-40"

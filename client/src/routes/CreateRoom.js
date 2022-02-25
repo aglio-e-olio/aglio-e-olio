@@ -6,7 +6,7 @@ import './CreateRoom.css';
 import MyInput from '../Components/Atoms/MyInput';
 
 const CreateRoom = (props) => {
-  const { nickName, joinUser } = useContext(codeContext);
+  const { persistUser, joinUser } = useContext(codeContext);
 
   const navigate = useNavigate();
   function create() {
@@ -15,13 +15,13 @@ const CreateRoom = (props) => {
   }
 
   function history() {
-    const userID = nickName;
+    const userID = persistUser;
     navigate(`/history/${userID}`);
   }
 
   return (
     <div>
-      {nickName ? (
+      {persistUser ? (
         <div>
           <button className="create-room-button" onClick={create}>
             Create Room
@@ -34,7 +34,7 @@ const CreateRoom = (props) => {
         <div class="hero min-h-screen bg-base-200">
           <div class="flex-col hero-content lg:flex-row-reverse">
             <div class="text-center lg:text-left">
-              <h1 class="text-5xl font-bold">Login now!</h1>
+              <h1 class="text-5xl font-bold">Start now!</h1>
               <p class="py-6">
                 코딩 테스트를 위한 알고리즘 스터디의 처음과 끝을 알리오
                 올리오에서 경험해보세요!
