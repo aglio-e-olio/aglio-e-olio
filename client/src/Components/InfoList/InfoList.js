@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import axios from 'axios';
 import './InfoList.css';
 
-
 const initialState = {};
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
@@ -16,10 +15,10 @@ function InfoList({ algorithm_tag }) {
     axios({
       method: 'GET',
       url: 'http://localhost:4000/tags',
-      params: { algorithm: "Array" },
+      params: { algorithm: 'Array' },
     })
       .then((res) => {
-        console.log(res.data)
+        console.log(res.data);
         let firstSortedData = [...res.data];
         firstSortedData.sort((a, b) => {
           if (a.title < b.title) return -1;
@@ -38,20 +37,22 @@ function InfoList({ algorithm_tag }) {
     setQuery(e.target.value);
   }
 
-  function handleKeyPress(e) {
-    console.log('yeah');
+  function handleKeyPress(e) {  // enter 키 검색
+    if (e.key === 'Enter') {
+      searchKeyword();
+    }
   }
 
   /* 검색 처리 : filter 이용 */
   function searchKeyword() {
-    console.log(query);
     let result = [];
     result = tagData.filter((data) => {
       if (
+        data.title.search(query) !== -1 ||
         data.announcer.search(query) !== -1 ||
-        data.email.search(query) !== -1
+        data.email.search(query) !== -1 ||
+        data.tags.find((_data) => _data.includes(query)) // 여러 태그 일부만 검색해도 검색 가능
       ) {
-
         return true;
       }
       return false;
@@ -61,7 +62,7 @@ function InfoList({ algorithm_tag }) {
   }
 
   return (
-    <div >
+    <div>
       <input
         onChange={handleSearch}
         onKeyPress={handleKeyPress}
@@ -82,13 +83,13 @@ function InfoList({ algorithm_tag }) {
               key={index}
             >
               <div class="card-body hover:bg-sky-700">
-                <h2 class="card-title">
-                  {value.title}
-                </h2>
+                <h2 class="card-title">{value.title}</h2>
                 <p>{value.announcer}</p>
                 <p>{value.savingTime}</p>
                 <div class="justify-end card-actions">
-                  {value.tags.map(tag => <span class="badge badge-outline">{tag}</span>)}
+                  {value.tags.map((tag) => (
+                    <span class="badge badge-outline">{tag}</span>
+                  ))}
                 </div>
               </div>
             </div>
