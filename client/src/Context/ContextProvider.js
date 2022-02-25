@@ -8,6 +8,7 @@ const initialState = {
   codes: '',
   compileResult: '',
   roomInfo: '',
+  allAudioStreams: [],
   nickName: '',
   email: '',
   currentTag: '',
@@ -52,6 +53,11 @@ const reducer = (state, action) => {
         currentTag: action.payload,
       }
 
+    case 'ADD_AUDIO_STREAM':
+      return {
+        ...state,
+        allAudioStreams: [...state.allAudioStreams, action.payload],
+      }
     default:
       throw new Error();
   }
@@ -99,6 +105,13 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function addAudioStream(audioStream) {
+    dispatch({
+      type: "ADD_AUDIO_STREAM",
+      payload: audioStream,
+    });
+  }
+
   function joinUser(nickName) {
     dispatch({
       type: 'USER_JOIN',
@@ -130,6 +143,8 @@ const ContextProvider = ({ children }) => {
         getCompileResult,
         roomInfo: state.roomInfo,
         getRoomInfo,
+        allAudioStreams: state.allAudioStreams,
+        addAudioStream,
         nickName: state.nickName,
         joinUser,
         email: state.email,
