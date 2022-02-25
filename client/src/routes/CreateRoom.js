@@ -6,7 +6,7 @@ import './CreateRoom.css';
 import MyInput from '../Components/Atoms/MyInput';
 
 const CreateRoom = (props) => {
-  const { nickName, joinUser } = useContext(codeContext);
+  const { persistUser, joinUser } = useContext(codeContext);
 
   const navigate = useNavigate();
   function create() {
@@ -15,13 +15,13 @@ const CreateRoom = (props) => {
   }
 
   function history() {
-    const userID = nickName;
+    const userID = persistUser;
     navigate(`/history/${userID}`);
   }
 
   return (
     <div>
-      {nickName ? (
+      {persistUser ? (
         <div>
           <button className="create-room-button" onClick={create}>
             Create Room

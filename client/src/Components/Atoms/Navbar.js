@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 
 const Navbar = () => {
-  const { nickName } = useContext(codeContext);
+  const { persistUser } = useContext(codeContext);
   return (
     <div class="navbar bg-base-100">
       <div class="flex-none">
@@ -24,7 +24,7 @@ const Navbar = () => {
       </div>
       <div class="flex-1">
         <a class="btn btn-ghost normal-case text-xl">
-          {nickName}님 반갑습니다!
+          {persistUser}님 반갑습니다!
         </a>
       </div>
       <div class="flex-none">
