@@ -23,7 +23,7 @@ const TagSort = () => {
           return 0;
         });
         firstSortedData.map((data) => {
-          setTagData((tagData) => [...tagData, data.algorithm]);
+          setTagData((tagData) => [...new Set([...tagData, data.algorithm])]);
         });
       })
       .catch((err) => {
@@ -39,7 +39,7 @@ const TagSort = () => {
     <ul class="menu bg-base-100 w-56 p-2 rounded-box">
       {tagData.map((tags) => (
         <li onClick={() => getInfobyTag(tags)}>
-          <a>#{tags}</a>
+          <a class="text-center">#{tags}</a>
         </li>
       ))}
     </ul>

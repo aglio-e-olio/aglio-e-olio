@@ -1,16 +1,13 @@
+
 import React, {
   useContext,
   useEffect,
-  useMemo,
-  useReducer,
-  useRef,
   useState,
 } from 'react';
 import axios from 'axios';
 import './InfoList.css';
 import { codeContext } from '../../Context/ContextProvider';
 
-const initialState = {};
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoList({ algorithm_tag }) {
@@ -24,7 +21,7 @@ function InfoList({ algorithm_tag }) {
   useEffect(() => {
     axios({
       method: 'GET',
-      url: 'http://localhost:4000/tags',
+      url: 'http://localhost:4000/meta',
       params: { algorithm: currentTag, nickname: nickName },
     })
       .then((res) => {
@@ -46,18 +43,21 @@ function InfoList({ algorithm_tag }) {
     setQuery(e.target.value);
   }
 
-  function handleKeyPress(e) {
-    console.log('yeah');
+  function handleKeyPress(e) {  // enter 키 검색
+    if (e.key === 'Enter') {
+      searchKeyword();
+    }
   }
 
   /* 검색 처리 : filter 이용 */
   function searchKeyword() {
-    console.log(query);
     let result = [];
     result = tagData.filter((data) => {
       if (
+        data.title.search(query) !== -1 ||
         data.announcer.search(query) !== -1 ||
-        data.email.search(query) !== -1
+        data.email.search(query) !== -1 ||
+        data.tags.find((tag) => tag.value.includes(query)) // 여러 태그 일부만 검색해도 검색 가능
       ) {
         return true;
       }
@@ -86,7 +86,7 @@ function InfoList({ algorithm_tag }) {
             <div
               class="card w-96 bg-base-100 card-compact shadow-xl hover:shadow-md cursor-pointer"
               onClick={() => console.log(`${value.email} clicked`)}
-              key={index}
+              key={value._id}
             >
               <div class="card-body hover:bg-sky-700">
                 <h2 class="card-title">{value.title}</h2>
@@ -94,7 +94,7 @@ function InfoList({ algorithm_tag }) {
                 <p>{value.savingTime}</p>
                 <div class="justify-end card-actions">
                   {value.tags.map((tag) => (
-                    <span class="badge badge-outline">{tag}</span>
+                    <span key={tag._id} class="badge badge-outline">{tag.value}</span>  // tag 안에 _id와 value 넣음
                   ))}
                 </div>
               </div>
