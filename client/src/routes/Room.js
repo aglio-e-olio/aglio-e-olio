@@ -15,6 +15,7 @@ import { WebrtcProvider } from 'y-webrtc';
 
 import Save from '../Components/Save/Save';
 import UrlCopy from '../Components/UrlCopy';
+import html2canvas from 'html2canvas';
 
 const StyledAudio = styled.audio`
   float: left;
@@ -83,6 +84,8 @@ const Room = () => {
 
   const handleSave = () => {
     // 여기서 모달 열어줌
+    console.log(yLines);
+    onCapture();
     setOpen(true);
   };
 
@@ -199,6 +202,26 @@ const Room = () => {
     getCompileResult(code);
   }
 
+  const onCapture = async () => {
+    console.log('onCapture');
+    await html2canvas(document.getElementById('snapshot')).then(
+      async (canvas) => {
+        await onSaveAs(canvas.toDataURL('image/png'), 'image-download.png');
+      }
+    );
+  };
+
+  const onSaveAs = (uri, filename) => {
+    console.log('onSaveAs');
+    console.log(uri);
+    let link = document.createElement('a');
+    document.body.appendChild(link);
+    link.href = uri;
+    link.download = filename;
+    link.click();
+    document.body.removeChild(link);
+  };
+
   /* Render */
   return (
     <div>
@@ -226,6 +249,7 @@ const Room = () => {
           onCancel={handleSaveCancel}
           yLines={yLines}
         />
+
         <Canvas
           doc={doc}
           provider={provider}

@@ -15,7 +15,7 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
   const [extras, setExtras] = useState([]);
 
   // json 파일 크기 byte로 출력 나옴.
-
+  // console.log(yLines);
   const jsonYLines = yLines.toJSON();
   // console.log(jsonYLines);
   // console.log(jsonSize(jsonYLines));
