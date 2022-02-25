@@ -15,14 +15,14 @@ function InfoList({ algorithm_tag }) {
   const [searchedData, setSearchedData] = useState(tagData);
   const [query, setQuery] = useState('');
 
-  const { currentTag, nickName } = useContext(codeContext);
+  const { currentTag, persistUser } = useContext(codeContext);
 
   /* props으로 받은 tag 처리 */
   useEffect(() => {
     axios({
       method: 'GET',
       url: 'http://localhost:4000/meta',
-      params: { algorithm: currentTag, nickname: nickName },
+      params: { algorithm: currentTag, nickname: persistUser },
     })
       .then((res) => {
         let firstSortedData = [...res.data];
