@@ -18,18 +18,6 @@ import Record from '../Components/Record/Record';
 
 import { uploadFile } from 'react-s3';
 
-const S3_BUCKET ='screen-audio-record';
-const REGION ='ap-northeast-2';
-const ACCESS_KEY ='';
-const SECRET_ACCESS_KEY ='';
-
-const config = {
-    bucketName: S3_BUCKET,
-    region: REGION,
-    accessKeyId: ACCESS_KEY,
-    secretAccessKey: SECRET_ACCESS_KEY,
-}
-
 const StyledAudio = styled.audio`
   float: left;
 `;
@@ -208,9 +196,9 @@ const Room = () => {
     const displayMediaOptions = {
       video: {
         cursor: "always",
-        width: {max: 800},
-        height: {max: 600},
-        frameRate: 10
+        width: { max: 1920 },
+        height: { max: 1080 },
+        frameRate: 20
       }
     };
 
@@ -225,7 +213,9 @@ const Room = () => {
       const screenStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
       const mergedStream = new MediaStream([...screenStream.getTracks(), ...acDest.stream.getTracks()]);
 
-      const mediaRecorder = new MediaRecorder(mergedStream);
+      const mediaRecorder = new MediaRecorder(mergedStream, {
+        mimeType: 'video/webm; codecs=vp8'
+      });
       mediaRecorder.start();
 
       mediaRecorder.ondataavailable = (e) => {
@@ -239,12 +229,24 @@ const Room = () => {
       mediaRecorder.onstop = async (e) => {
         const blob = new Blob(chunks, { 'type': 'video/webm' })
         const fileName = prompt("녹화 파일의 이름을 적어주세요.");
-        const newFile = new File([blob], fileName+".webm", {
+        const newFile = new File([blob], fileName + ".webm", {
           type: blob.type,
         })
         console.log(newFile);
-        const screenURL = window.URL.createObjectURL(blob);
+        const screenURL = window.URL.createObjectURL(newFile);
         console.log(screenURL);
+
+        const S3_BUCKET = 'screen-audio-record';
+        const REGION = 'ap-northeast-2';
+        const ACCESS_KEY = prompt("AWS ACCESS_KEY를 입력해주세요.");
+        const SECRET_ACCESS_KEY = prompt('AWS SECRET_ACCESS_KEY를 입력해주세요.');
+
+        const config = {
+          bucketName: S3_BUCKET,
+          region: REGION,
+          accessKeyId: ACCESS_KEY,
+          secretAccessKey: SECRET_ACCESS_KEY,
+        }
 
         uploadFile(newFile, config)
           .then(data => console.log(data))
