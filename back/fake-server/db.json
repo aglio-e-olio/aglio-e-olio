@@ -15,7 +15,7 @@
     "nickname": "SH",
     "_id": "6218979c4fd34311d5f2cf2c",
     "index": 2,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "SH",
@@ -27,7 +27,7 @@
     "nickname": "HW",
     "_id": "6218979ca48311d785d9acf9",
     "index": 4,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "JY",
@@ -135,7 +135,7 @@
     "nickname": "DK",
     "_id": "6218979c1bc007d6db59c1cc",
     "index": 22,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "HI",
@@ -189,7 +189,7 @@
     "nickname": "SH",
     "_id": "6218979ca23fd2b29dd820d3",
     "index": 31,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "HI",
@@ -249,7 +249,7 @@
     "nickname": "HW",
     "_id": "6218979c1253c601e68fa42b",
     "index": 41,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "DK",
@@ -273,13 +273,13 @@
     "nickname": "JY",
     "_id": "6218979ca2d98ef5d2ff030f",
     "index": 45,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "DK",
     "_id": "6218979c7bbe104baa76ce10",
     "index": 46,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "JY",
@@ -357,7 +357,7 @@
     "nickname": "DK",
     "_id": "6218979c32d3e34cf359042f",
     "index": 59,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "SH",
@@ -375,7 +375,7 @@
     "nickname": "SH",
     "_id": "6218979ccd596dc7ca2e74ba",
     "index": 62,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "DK",
@@ -405,7 +405,7 @@
     "nickname": "SH",
     "_id": "6218979c456dd3399788459f",
     "index": 67,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "HW",
@@ -477,7 +477,7 @@
     "nickname": "HW",
     "_id": "6218979c1f22f7a900e5896e",
     "index": 79,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "SH",
@@ -759,7 +759,7 @@
     "nickname": "JY",
     "_id": "6218979c3294e73823919183",
     "index": 126,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "HI",
@@ -825,7 +825,7 @@
     "nickname": "HI",
     "_id": "6218979cf25e0aada67afa65",
     "index": 137,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "JY",
@@ -849,7 +849,7 @@
     "nickname": "HI",
     "_id": "6218979c9b6e3a857a19a6f5",
     "index": 141,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "JY",
@@ -999,7 +999,7 @@
     "nickname": "SH",
     "_id": "6218979c53a733fbb3161cbf",
     "index": 166,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "DK",
@@ -1089,7 +1089,7 @@
     "nickname": "HI",
     "_id": "6218979c8402a39d3f0852f7",
     "index": 181,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "SH",
@@ -1131,7 +1131,7 @@
     "nickname": "DK",
     "_id": "6218979cc69bc811b916c05d",
     "index": 188,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "SH",
@@ -1167,7 +1167,7 @@
     "nickname": "JY",
     "_id": "6218979cb86857dc96017f19",
     "index": 194,
-    "algorithm": "Dynamic Programming"
+    "algorithm": "DP"
   },
   {
     "nickname": "JY",
@@ -1190,7 +1190,7 @@
       "_id": "6218973d225a6b2aae50eb04",
       "index": 0,
       "title": "sint labore",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "DK",
       "tags": [
         {
@@ -1296,7 +1296,7 @@
       "_id": "6218973dffcda4533b84b493",
       "index": 2,
       "title": "duis dolore",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "DK",
       "tags": [
         {
@@ -1402,7 +1402,7 @@
       "_id": "6218973dfdca0b791f8c6b60",
       "index": 4,
       "title": "laboris consequat",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "HW",
       "tags": [
         {
@@ -1508,7 +1508,7 @@
       "_id": "6218973d79c86c04e97e383a",
       "index": 6,
       "title": "id enim",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "HI",
       "tags": [
         {
@@ -2515,7 +2515,7 @@
       "_id": "6218973debcca975b55bd0d0",
       "index": 25,
       "title": "aute eu",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "SH",
       "tags": [
         {
@@ -2886,7 +2886,7 @@
       "_id": "6218973d0d155fbcf564732c",
       "index": 32,
       "title": "sunt proident",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "DK",
       "tags": [
         {
@@ -6013,7 +6013,7 @@
       "_id": "6218973deeb6c8c095c9a818",
       "index": 91,
       "title": "deserunt qui",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "HI",
       "tags": [
         {
@@ -6225,7 +6225,7 @@
       "_id": "6218973de9950bb90d0b8d10",
       "index": 95,
       "title": "do laborum",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "HW",
       "tags": [
         {
@@ -6331,7 +6331,7 @@
       "_id": "6218973dd32714ae936770f1",
       "index": 97,
       "title": "occaecat adipisicing",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "DK",
       "tags": [
         {
@@ -8080,7 +8080,7 @@
       "_id": "6218973d74824f6e853b6901",
       "index": 130,
       "title": "est nisi",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "DK",
       "tags": [
         {
@@ -9140,7 +9140,7 @@
       "_id": "6218973da77a315bdfab6ace",
       "index": 150,
       "title": "ex ad",
-      "algorithm": "Dynamic Programming",
+      "algorithm": "DP",
       "announcer": "SH",
       "tags": [
         {

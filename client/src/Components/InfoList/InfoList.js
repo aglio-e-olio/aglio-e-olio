@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from 'react';
+
+import React, {
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import axios from 'axios';
 import './InfoList.css';
+import { codeContext } from '../../Context/ContextProvider';
+
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoList({ algorithm_tag }) {
@@ -8,12 +15,14 @@ function InfoList({ algorithm_tag }) {
   const [searchedData, setSearchedData] = useState(tagData);
   const [query, setQuery] = useState('');
 
+  const { currentTag, nickName } = useContext(codeContext);
+
   /* props으로 받은 tag 처리 */
   useEffect(() => {
     axios({
       method: 'GET',
       url: 'http://localhost:4000/meta',
-      params: { algorithm: 'Array' },
+      params: { algorithm: currentTag, nickname: nickName },
     })
       .then((res) => {
         let firstSortedData = [...res.data];
@@ -28,7 +37,7 @@ function InfoList({ algorithm_tag }) {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [currentTag]);
 
   function handleSearch(e) {
     setQuery(e.target.value);
