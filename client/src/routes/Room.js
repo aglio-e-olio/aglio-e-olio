@@ -16,8 +16,6 @@ import { WebrtcProvider } from 'y-webrtc';
 import Save from '../Components/Save/Save';
 import Record from '../Components/Record/Record';
 
-import { uploadFile } from 'react-s3';
-
 const StyledAudio = styled.audio`
   float: left;
 `;
@@ -66,11 +64,10 @@ let undoManager;
 const Room = () => {
   const [peers, setPeers] = useState([]);
   const socketRef = useRef();
-  const userVideo = useRef();
   const peersRef = useRef([]);
   const { roomID } = useParams();
 
-  const { codes, compileResult, getCompileResult, getRoomInfo, allAudioStreams, addAudioStream } =
+  const { codes, compileResult, getCompileResult, getRoomInfo, addAudioStream } =
     useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
@@ -188,91 +185,21 @@ const Room = () => {
     getCompileResult(code);
   }
 
-  useEffect(() => {
-    const startElem = document.getElementById("start");
-    const stopElem = document.getElementById("stop");
-
-    /* Change the below values to improve video quality. */
-    const displayMediaOptions = {
-      video: {
-        cursor: "always",
-        width: { max: 1920 },
-        height: { max: 1080 },
-        frameRate: 20
-      }
-    };
-
-    startElem.onclick = async (e) => {
-      var chunks = [];
-
-      const audioContext = new AudioContext();
-      const acDest = audioContext.createMediaStreamDestination();
-      for (let i = 0; i < allAudioStreams.length; i++) {
-        audioContext.createMediaStreamSource(allAudioStreams[i]).connect(acDest);
-      }
-      const screenStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
-      const mergedStream = new MediaStream([...screenStream.getTracks(), ...acDest.stream.getTracks()]);
-
-      const mediaRecorder = new MediaRecorder(mergedStream, {
-        mimeType: 'video/webm; codecs=vp8'
-      });
-      mediaRecorder.start();
-
-      mediaRecorder.ondataavailable = (e) => {
-        chunks.push(e.data);
-      }
-
-      stopElem.onclick = () => {
-        mediaRecorder.stop();
-      }
-
-      mediaRecorder.onstop = async (e) => {
-        screenStream.getTracks()[0].stop();
-        const blob = new Blob(chunks, { 'type': 'video/webm' })
-        const fileName = prompt("녹화 파일의 이름을 적어주세요.");
-        const newFile = new File([blob], fileName + ".webm", {
-          type: blob.type,
-        })
-        console.log(newFile);
-        const screenURL = window.URL.createObjectURL(newFile);
-        console.log(screenURL);
-
-        const S3_BUCKET = 'screen-audio-record';
-        const REGION = 'ap-northeast-2';
-        const ACCESS_KEY = prompt("AWS ACCESS_KEY를 입력해주세요.");
-        const SECRET_ACCESS_KEY = prompt('AWS SECRET_ACCESS_KEY를 입력해주세요.');
-
-        const config = {
-          bucketName: S3_BUCKET,
-          region: REGION,
-          accessKeyId: ACCESS_KEY,
-          secretAccessKey: SECRET_ACCESS_KEY,
-        }
-
-        uploadFile(newFile, config)
-          .then(data => console.log(data))
-          .catch(err => console.log(err))
-      }
-    }
-  }, [allAudioStreams]);
-
   /* Render */
   return (
     <div>
-      <div>
-        <p><button id="start">Start Capture</button>&nbsp;<button id="stop">Stop Capture</button></p>
-      </div>
+
       <div>
         {peers.map((peer, index) => {
           return <Audio key={index} peer={peer} />;
         })}
       </div>
       <div>
+        <Record />
         <button className="run-button" onClick={sendCode}>
           Run
         </button>
         <Save />
-        <Record />
         <Canvas
           doc={doc}
           provider={provider}
