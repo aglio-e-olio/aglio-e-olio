@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import axios from 'axios';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
 // const mockData = ['Dijkstra', 'BFS', 'DFS', '완전탐색', '분할정복', '그래프'];
 
@@ -8,12 +9,15 @@ const TagSort = () => {
   const { nickName, getTag } = useContext(codeContext);
   const [tagData, setTagData] = useState([]);
 
+  const [persistName, setPersist] = useLocalStorage("persistName", "");
+
   /* props으로 받은 tag 처리 */
   useEffect(() => {
+    setPersist(nickName);
     axios({
       method: 'GET',
       url: 'http://localhost:4000/tags',
-      params: { nickname: nickName },
+      params: { nickname: persistName },
     })
       .then((res) => {
         let firstSortedData = [...res.data];
@@ -29,7 +33,7 @@ const TagSort = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [persistName]);
 
   function getInfobyTag(tags) {
     getTag(tags);
