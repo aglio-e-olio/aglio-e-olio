@@ -5,15 +5,18 @@ import axios from 'axios';
 // import jsonSize from 'json-size'
 // import Select, {ActionMeta, OnChangeValue} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 
 const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
+  const [extras, setExtras] = useState([]);
 
   // json 파일 크기 byte로 출력 나옴.
-  // const jsonYLines = yLines.toJSON();
+
+  const jsonYLines = yLines.toJSON();
   // console.log(jsonYLines);
   // console.log(jsonSize(jsonYLines));
 
@@ -43,6 +46,8 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
     { label: 'QUEUE', value: 'QUEUE' },
   ]);
 
+  const [extrasOptions, setExtrasOptions] = useState([]);
+
   const handleChangeAlgorithm = useCallback(
     (inputValue) => setAlgorithm(inputValue),
     []
@@ -57,16 +62,54 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
     [algorithmOptions]
   );
 
+  const handleChangeExtras = useCallback(
+    (inputValue) => setExtras(inputValue),
+    []
+  );
+
+  const handleCreateExtras = useCallback(
+    (inputValue) => {
+      const newValue = { value: inputValue.toLowerCase(), label: inputValue };
+      setExtrasOptions([...extrasOptions, newValue]);
+      setExtras(newValue);
+    },
+    [extrasOptions]
+  );
+
+  const loadExtrasOptions = (inputValue, callback) =>
+    setTimeout(() => {
+      callback(
+        extrasOptions.filter((item) =>
+          item.label.toLowerCase().includes(inputValue.toLowerCase())
+        )
+      );
+    }, 3000);
+
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
     console.log('submit 발생');
     e.preventDefault();
 
+    let saveTime = new Date();
+
     let body = {
       title: title,
       algorithm: algorithm,
       announcer: announcer,
+      extras: extras,
+      isPicture: true,
+      teemMates: announcerOptions,
+      saveTime: saveTime,
+      doc: jsonYLines,
     };
+    // console.log('yline은 ', yLines);
+    // console.log('ylines를 json으로 바꾸면', JSON.stringify(yLines));
+    // console.log('json으로 바꾼 ylines의 타입은', typeof JSON.stringify(yLines));
+    // console.log('body는 ', body);
+    // console.log('JSON으로 바꾸면', JSON.stringify(body));
+    // console.log('body의 타입은', typeof body);
+    // console.log(typeof JSON.stringify(body));
+    // //yline을 JSON.stringify 하면 jsonYLines와 같다. 신기하네.
 
     axios
       .post('/api/user/snapshot', body)
@@ -114,6 +157,17 @@ const Save = ({ isOpen, onSubmit, onCancel, yLines }) => {
           value={announcer}
           options={announcerOptions}
           onChange={handleChangeAnnouncer}
+        />
+        <div className="category" />
+        <AsyncCreatableSelect
+          isClearable
+          value={extras}
+          options={extrasOptions}
+          onChange={handleChangeExtras}
+          onCreateOption={handleCreateExtras}
+          cacheOptions
+          loadOptions={loadExtrasOptions}
+          placeholder="추가 태그"
         />
         <div className="category" />
         <button type="submit" class="btn btn-success">
