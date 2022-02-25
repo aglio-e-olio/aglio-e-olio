@@ -10,12 +10,12 @@ import { codeContext } from '../../Context/ContextProvider';
 
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
-function InfoList({ algorithm_tag }) {
+function InfoList() {
   const [tagData, setTagData] = useState([]);
   const [searchedData, setSearchedData] = useState(tagData);
   const [query, setQuery] = useState('');
 
-  const { currentTag, nickName } = useContext(codeContext);
+  const { currentTag, nickName, selectPreview } = useContext(codeContext);
 
   /* props으로 받은 tag 처리 */
   useEffect(() => {
@@ -67,6 +67,11 @@ function InfoList({ algorithm_tag }) {
     setSearchedData(result);
   }
 
+  function handleCardClick(value) {
+    selectPreview(value._id)
+  }
+  
+
   return (
     <div>
       <input
@@ -85,7 +90,7 @@ function InfoList({ algorithm_tag }) {
           return (
             <div
               class="card w-96 bg-base-100 card-compact shadow-xl hover:shadow-md cursor-pointer"
-              onClick={() => console.log(`${value.email} clicked`)}
+              onClick={() => handleCardClick(value)}
               key={value._id}
             >
               <div class="card-body hover:bg-sky-700">
