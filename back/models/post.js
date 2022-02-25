@@ -71,8 +71,10 @@ postSchema.statics.create = function(params){// params를 payload로 바꾸기
                             }
                             
                         })
-                        const tag = { $set: update_tag, upsert:true};
-                        TagCollection.updateTag(filter,  tag);
+
+                        const tag_ = { $set: update_tag, upsert:true};
+                        TagCollection.updateTag(filter,  tag_)
+                            .catch(e=>console.error(e));
                     }
                 })
             

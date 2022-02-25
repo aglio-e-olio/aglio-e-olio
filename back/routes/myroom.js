@@ -2,6 +2,7 @@ const router = require('express').Router();
 const MetaData = require('../models/meta_data');
 const Post = require('../models/post');
 const TagCollection = require('../models/tag_collection');
+const mongoose = require('mongoose')
 
 
 const metaDataString = 'people_tag extra_tag'
@@ -9,13 +10,13 @@ const metaDataString = 'people_tag extra_tag'
 router.post('/save', (req, res)=>{
 
     const body = {
-        user_id:"123naver.com",
+        user_id:"gopas3167",
         type:"image",
         date: "1995-11-13",
         updated_date : false, 
-        algo_tag : ["dfs", "bfs", "dp", "undefined", "떠나자", "헌일이짱"],
-        people_tag : "승현", 
-        extra_tag : ["extra1, extra2"],
+        algo_tag : ["dp", "dfs"],
+        people_tag : "준영", 
+        extra_tag : ["extra4, extra5, extra6"],
         thumbnail: "thumbnail",
         data_ref: "data_ref"
     }
@@ -60,26 +61,78 @@ router.get('/tags/:id', (req, res)=>{
         catch(err=>res.status(500).send(err))
 })
 
-router.delete('/delete/:post_id', (req, res)=>{
-    /*
-    1. Posts에서 지워야 한다. => deleteOne
-    2. MetaData에서 삭제 해야 한다. => deleteMany by post_id
-    3. Tag Collection에서 수정해야 한다.
-    */
+
+router.delete('/delete/:post_id', async(req, res)=>{
+
+    const post_id = req.params.post_id;
+    Post.findByIdAndDelete(post_id, function(err, result){
+        if(err){
+            res.status(500).send(err);
+        } else{
+            const user_id = result.user_id;
+            const algo_tag = result.algo_tag;
+
+            TagCollection.findOne({user_id:user_id})
+                .select('algo_tag')
+                .exec(function(res, data){
+                    let set_tag = {}
+                    let unset_tag = {}
+                    algo_tag.forEach(tag=>{
+                        if(data.algo_tag[tag] - 1>0)
+                            set_tag["algo_tag."+tag] = data.algo_tag[tag] - 1;
+                        else if(data.algo_tag[tag] - 1 == 0)
+                        unset_tag["algo_tag."+tag] = ""
+                    })
+                    const tag_ = {$set:set_tag, $unset:unset_tag}
+
+                    TagCollection.updateTag({user_id:user_id}, tag_)
+                        .catch(e=>console.error(e))
+                })
+
+            // data ref도 삭제 해줘야 한다..~!
+
+        }
+    });
+
+    await MetaData.deleteMany({post_id:mongoose.Types.ObjectId(post_id)});
+    res.json({success:"success"})
 })
 
-// meta_data
-// metadata?user_id= & algo_tag=
 router.get('/metadata', (req, res)=>{
     const user_id = req.query.id;
     const algo_tag = req.query.tag;
-    // pk만 해서 보내준다고 하고 그거에 맞는 형태를 쫌 보자. 
+
     MetaData.find({user_id:user_id, algo_tag:algo_tag})
         .populate('post_id', metaDataString)
+        .select('algo_other_tag post_id -_id')
         .exec(function(err, result){
-            res.json(result)
-        })
+            var res_array = [];
+            var prop = 0;
+            result.forEach(elem=>{
+                var tag_array = new Array();
+                elem.algo_other_tag.forEach(tag=>{
+                    tag_array.push(tag)
+                })
 
+                console.log(tag_array)
+                if (elem.post_id.people_tag)
+                    tag_array.push(elem.post_id.people_tag)
+
+                elem.post_id.extra_tag.forEach(tag=>{
+                    tag_array.push(tag)
+                })
+
+                const changed_elem = {
+                    primary_key : elem.post_id._id,
+                    tags:tag_array,
+                    prop: prop
+                }
+                prop += 1;
+
+                res_array.push(changed_elem)
+            })
+            res.json(res_array)
+        })
 })
 
 

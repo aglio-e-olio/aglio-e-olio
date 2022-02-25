@@ -16,7 +16,7 @@ metaDataSchema.statics.createOne = function(user_id, algo_tag, algo_other_tag, p
     })
 
     doc.save()
-        .then(()=>console.log("Success MetaData's create"))
+        // .then(()=>console.log("Success MetaData's create"))
         .catch(e=> console.error(e))
 
 }
