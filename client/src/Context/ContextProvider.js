@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 
 // context를 생성한 후 export 한다
 export const codeContext = React.createContext();
@@ -67,6 +67,23 @@ const ContextProvider = ({ children }) => {
   // useReducer를 사용해서 state와 dispatch를 생성한다.
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const [persistUser, setPersistUser] = useState("")
+
+  useEffect(() => {
+    const persistUserData = JSON.parse(localStorage.getItem('persisUser'))
+    if (persistUserData) {
+      setPersistUser(persistUserData)
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('persisUser', JSON.stringify(persistUser))
+  }, [persistUser]);
+
+  function addUser(newUser) {
+    setPersistUser(newUser)
+  }
+
   function extractCode(codes) {
     dispatch({
       type: 'EXTRACT_CODE',
@@ -134,6 +151,8 @@ const ContextProvider = ({ children }) => {
         getEmail,
         currentTag: state.currentTag,
         getTag,
+        persistUser,
+        addUser
       }}
     >
       {children}
