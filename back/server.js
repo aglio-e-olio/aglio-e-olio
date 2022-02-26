@@ -7,6 +7,8 @@ const io = socket(server);
 const axios = require('axios');
 const path = require('path');
 
+const cors = require('cors')
+
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
@@ -20,9 +22,16 @@ mongoose.connect(MONGO_URI)
       console.error(e);
   })
 
+/* Cors */
+app.use(cors({
+  origin:'*'
+}))
+
 /* middleware setting */
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+
+
 
 /* routing */
 app.use('/myroom', require('./routes/myroom'));

@@ -9,6 +9,7 @@ const metaDataString = 'people_tag extra_tag'
 
 router.post('/save', (req, res)=>{
     const body = req.body;
+    
     if(body.length===0){
         res.status(500).json({success:"fail"})
     }
