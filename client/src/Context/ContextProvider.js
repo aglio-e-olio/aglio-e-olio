@@ -12,6 +12,7 @@ const initialState = {
   nickName: '',
   email: '',
   currentTag: '',
+  urlSnapshot: '',
   selectedPreviewKey: ''
 };
 
@@ -52,6 +53,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         currentTag: action.payload,
+      }
+    
+    case 'CAPTURE_URL':
+      return {
+        ...state,
+        urlSnapshot: action.payload,
       }
 
     case 'SELECT_PRE':
@@ -141,6 +148,13 @@ const ContextProvider = ({ children }) => {
     })
   }
 
+  function getUrl(urlSnapshot) {
+    dispatch({
+      type: 'CAPTURE_URL',
+      payload: urlSnapshot,
+    })
+  }
+
   function selectPreview(selectedPreviewKey) {
     dispatch({
       type: 'SELECT_PRE',
@@ -166,10 +180,12 @@ const ContextProvider = ({ children }) => {
         getEmail,
         currentTag: state.currentTag,
         getTag,
+        urlSnapshot: state.urlSnapshot,
+        getUrl,
         selectedPreviewKey: state.selectedPreviewKey,
         selectPreview,
         persistUser,
-        addUser
+        addUser,
       }}
     >
       {children}
