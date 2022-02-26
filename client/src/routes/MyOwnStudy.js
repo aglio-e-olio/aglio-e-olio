@@ -1,0 +1,101 @@
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useParams,
+} from 'react';
+import * as Y from 'yjs';
+import io from 'socket.io-client';
+import html2canvas from 'html2canvas';
+import { codeContext } from '../Context/ContextProvider';
+import Save from '../Components/Save/Save';
+import Canvas from '../Components/Canvas/Canvas';
+import CodeEditor from '../Components/CodeEditor/Editor';
+
+let i = 0;
+let doc;
+let yLines;
+
+const MyOwnStudy = () => {
+  const socketRef = useRef();
+  const [isOpen, setOpen] = useState(false);
+  const { codes, compileResult, getCompileResult, getRoomInfo, getUrl } =
+    useContext(codeContext);
+  const { roomID } = useParams();
+
+  if (i === 0) {
+    doc = new Y.Doc();
+    yLines = doc.getArray('lines~9');
+  }
+  i++;
+
+  const handleSave = () => {
+    // 여기서 모달 열어줌
+    onCapture();
+    setOpen(true);
+  };
+
+  const onCapture = async () => {
+    let snapshotUrl = '';
+    console.log('onCapture');
+    await html2canvas(document.body)
+      .then(async (canvas) => {
+        snapshotUrl = canvas.toDataURL('image/png');
+        getUrl(snapshotUrl);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const handleSaveCancel = () => {
+    setOpen(false);
+  };
+
+  function sendCode() {
+    socketRef.current.emit('code compile', { codes, roomID });
+  }
+
+  function handleCompileResult(code) {
+    getCompileResult(code);
+  }
+
+  useEffect(() => {
+    socketRef.current = io.connect('/');
+
+    socketRef.current.on('code response', (code) => {
+      handleCompileResult(code);
+    });
+  }, []);
+
+  return (
+    <div>
+      <div>
+        <button className="run-button" onClick={sendCode}>
+          Run
+        </button>
+        <button
+          class="btn btn-success cursor-pointer absolute top-0 right-40"
+          onClick={handleSave}
+        >
+          저장 모달 열기
+        </button>
+        <Save isOpen={isOpen} onCancel={handleSaveCancel} yLines={yLines} />
+        <Canvas doc={doc} yLines={yLines} />
+        <CodeEditor doc={doc} />
+      </div>
+      <div>
+        <textarea
+          className="code-result"
+          value={compileResult}
+          placeholder={
+            '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
+          }
+        />
+      </div>
+    </div>
+  );
+};
+
+export default MyOwnStudy;
