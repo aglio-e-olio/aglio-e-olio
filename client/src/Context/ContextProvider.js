@@ -13,6 +13,7 @@ const initialState = {
   email: '',
   currentTag: '',
   urlSnapshot: '',
+  selectedPreviewKey: ''
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -60,12 +61,19 @@ const reducer = (state, action) => {
         urlSnapshot: action.payload,
       }
 
+    case 'SELECT_PRE':
+      return {
+        ...state,
+        selectedPreviewKey: action.payload,
+      }
+
     case 'ADD_AUDIO_STREAM':
       return {
         ...state,
         allAudioStreams: [...state.allAudioStreams, action.payload],
       }
-    default:
+
+      default:
       throw new Error();
   }
 };
@@ -147,6 +155,13 @@ const ContextProvider = ({ children }) => {
     })
   }
 
+  function selectPreview(selectedPreviewKey) {
+    dispatch({
+      type: 'SELECT_PRE',
+      payload: selectedPreviewKey,
+    })
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -167,6 +182,8 @@ const ContextProvider = ({ children }) => {
         getTag,
         urlSnapshot: state.urlSnapshot,
         getUrl,
+        selectedPreviewKey: state.selectedPreviewKey,
+        selectPreview,
         persistUser,
         addUser,
       }}
