@@ -9,6 +9,9 @@ import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
 import './Canvas.css';
 import { useState } from 'react';
 import { useEraser } from '../../hooks/useEraser';
+import PenIcon from '../Atoms/PenIcon';
+import EraserIcon from '../Atoms/EraserIcon';
+import TrashIcon from '../Atoms/TrashIcon';
 
 const date = new Date();
 
@@ -19,11 +22,12 @@ const START_TIME = date.getTime();
 let ERASER_FLAG = false;
 
 function changeToEraser() {
-  if (ERASER_FLAG) {
-    ERASER_FLAG = false;
-  } else {
     ERASER_FLAG = true;
-  }
+  
+}
+
+function changeToPencil() {
+  ERASER_FLAG = false;
 }
 
 function getYOffset() {
@@ -143,12 +147,23 @@ export default function Canvas({
         <button className="switch-function" onClick={changeZofCanvas}>
           {zIndex === 10 ? 'Code Editor Mode' : 'White Board Mode'}
         </button>
-        <button className="clear-button" onClick={clearAllLines}>
-          Clear All
-        </button>
-        <button className="eraser-button" onClick={changeToEraser}>
-          Eraser
-        </button>
+        <ul class="menu bg-base-100 p-2 rounded-box fixed z-50 top-1/3 ">
+          <li onClick={changeToPencil}>
+            <a>
+              <PenIcon />
+            </a>
+          </li>
+          <li onClick={changeToEraser}>
+            <a>
+              <EraserIcon />
+            </a>
+          </li>
+          <li onClick={clearAllLines}>
+            <a>
+              <TrashIcon />
+            </a>
+          </li>
+        </ul>
       </div>
       <div className="canvas-container" style={{ zIndex: zIndex }}>
         <svg
