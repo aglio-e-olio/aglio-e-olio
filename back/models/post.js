@@ -5,41 +5,69 @@ const MetaData = require('./meta_data');
 
 // post_id는 알아서 만들어주니깐
 const postSchema = new mongoose.Schema({
+    
+    title:String,
     user_id: String,
-    type: String,
-    date: String, // Date 말고 String 으로 받는 것도 괜찮으려나 음.
-    updated_date: String,
+    nickname: String,
+
     algo_tag: Array,
-    people_tag: String,
     extra_tag: Array,
-    thumbnail: String, // temp
-    data_ref: String, // temp
+    announcer: String,
+    
+    snapshot:String, // 일단은 mongoDB에 저장 -> 추후에 바꿈 -> S3로 ref로 바꿀 예정
+    // 이름 Thunmbnail
+    doc:Array, // Room 저장한 경우
+    data_ref: String, // video 인 경우 // 그냥 일단 다 넣어주고 해야게싿.
+    
+    type: String,
+    date: String, 
+    updated_date: String,
+    startTime:String,
+    endTime:String,
+    teamMates:Array
 })
 
-// statics 등록
-
-postSchema.statics.create = function(params){// params를 payload로 바꾸기
+// 네이밍 통일하고 코드 길이 줄여야 겠다.
+postSchema.statics.create = function(body){// params를 payload로 바꾸기
+    // Room 저장시
+    if(body.isPicture){
+        // 따로 처리해줘야 하는데 일단 나중에
+    }
+    const title = body.title;
+    const user_id = body.email;
+    const nickname = body.email;
     
-    // const { user_id, ~~ } = params;
-    const user_id = params.user_id;
-    const type = params.type;
-    const date = params.data;
-    const algo_tag = params.algo_tag;
-    const people_tag = params.people_tag;
-    const other_tag = params.other_tag;
-    const thumbnail_ref = params.thumbnail; //일단 신경쓰지 말자.
-    const data_ref = params.data_ref;
+    const algo_tag = body.algorithm;
+    const extra_tag = body.extras;
+    const announcer = body.announcer;
+
+    const snapshot = body.snapshot;
+    const doc = body.doc;
+    const data_ref=body.data_ret; // 나중에 client쪽으로 설정해라고 해야 할 듯.
+
+    const type = "room"; // room 인지 video 인지에 따라 많이 달라진다.
+    const date = body.saveTime;
+    const updated_date = false;
+    const startTime = body.startTime;
+    const endTime = body.endTime;
+    const teamMates = body.teamMates;
 
     var new_post = new this({
-        user_id: user_id,
-        type: type, 
-        date: date,
-        updated_date: date, // any type이 없네
-        algo_tag: algo_tag,
-        people_tag: people_tag,
-        other_tag: other_tag,
-        thumbnail_ref: thumbnail_ref,
-        data_ref: data_ref
+        title:title,
+        user_id:user_id,
+        nickname:nickname,
+        algo_tag:algo_tag,
+        extra_tag:extra_tag, 
+        announcer:announcer,
+        snapshot:snapshot,
+        doc:doc,
+        data_ref:data_ref,
+        type:type,
+        date:date, 
+        updated_date:updated_date,
+        startTime:startTime,
+        endTime:endTime,
+        teamMates:teamMates
     })
 
     new_post.save()
@@ -69,7 +97,6 @@ postSchema.statics.create = function(params){// params를 payload로 바꾸기
                             else{
                                 update_tag["algo_tag."+tag] = 1;
                             }
-                            
                         })
 
                         const tag_ = { $set: update_tag, upsert:true};
@@ -86,8 +113,6 @@ postSchema.statics.create = function(params){// params를 payload로 바꾸기
                 MetaData.createOne(user_id, tag, other_tag, saved_post._id);
             })
         })
-
-
     return true;
 }
 

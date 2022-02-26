@@ -8,18 +8,7 @@ const mongoose = require('mongoose')
 const metaDataString = 'people_tag extra_tag'
 
 router.post('/save', (req, res)=>{
-
-    const body = {
-        user_id:"gopas3167",
-        type:"image",
-        date: "1995-11-13",
-        updated_date : false, 
-        algo_tag : ["dp", "dfs"],
-        people_tag : "준영", 
-        extra_tag : ["extra4, extra5, extra6"],
-        thumbnail: "thumbnail",
-        data_ref: "data_ref"
-    }
+    const body = req.body    ;
     
     if(Post.create(body)===true){
         res.json({success:"success"})
@@ -88,8 +77,6 @@ router.delete('/delete/:post_id', async(req, res)=>{
                     TagCollection.updateTag({user_id:user_id}, tag_)
                         .catch(e=>console.error(e))
                 })
-
-            // data ref도 삭제 해줘야 한다..~!
 
         }
     });
