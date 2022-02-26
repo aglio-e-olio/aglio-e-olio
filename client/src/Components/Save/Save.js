@@ -104,7 +104,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
       ),
       saveTime: saveTime,
       doc: jsonYLines,
-      urlSnapshot: urlSnapshot,
+      // urlSnapshot: urlSnapshot,
       email: 'tmdgus3901@gmail.com',
       nickname: persistUser,
       // codes : codes
@@ -114,9 +114,10 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     console.log('JSON으로 바꾸면', JSON.stringify(body));
 
     axios
-      .post('http://18.221.46.146:8000/myroom/save', body)
+      .post('http://localhost:8000/myroom/save', body)
       .then(function (res) {
         console.log(res);
+        alert('post 성공');
         // onCancel();
       })
       .catch(function (err) {

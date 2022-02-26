@@ -7,10 +7,41 @@ const io = socket(server);
 const axios = require('axios');
 const path = require('path');
 
+const cors = require('cors')
+
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
+const MONGO_URI = 'mongodb://localhost:27017/mongoose';
+
+/* DB Connection */
+mongoose.Promise = global.Promise;
+mongoose.connect(MONGO_URI)
+  .then(()=>console.log("Successfully connected to mongodb"))
+  .catch(e=>{
+      console.error(e);
+  })
+
+/* Cors */
+app.use(cors({
+  origin:'*'
+}))
+
+/* middleware setting */
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
+
+
+
+/* routing */
+app.use('/myroom', require('./routes/myroom'));
+
+/**
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
+ */
 
 const users = {};
 
