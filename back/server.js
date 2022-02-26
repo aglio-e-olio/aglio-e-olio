@@ -101,7 +101,7 @@ io.on('connection', (socket) => {
         url,
         data: sendData,
       }).then((response) => {
-        rooms[payload.roomID].forEach((userID) => {
+        users[payload.roomID].forEach((userID) => {
           io.to(userID).emit('code response', response.data.output);
         });
       });
