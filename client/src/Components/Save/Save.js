@@ -14,10 +14,10 @@ const Save = ({ isOpen, onCancel, yLines }) => {
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  const { codes, urlSnapshot } = useContext(codeContext);
-  
+  const { codes, urlSnapshot, email, persistUser } = useContext(codeContext);
+
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  // console.log('모달창 안!',codes);
+  console.log('모달창 안!', persistUser);
 
   const jsonYLines = yLines.toJSON();
 
@@ -95,30 +95,37 @@ const Save = ({ isOpen, onCancel, yLines }) => {
 
     let body = {
       title: title,
-      algorithm: algorithm.map((algo)=> algo.value),
+      algorithm: algorithm.map((algo) => algo.value),
       announcer: announcer.value,
-      extras: extras.map((extra)=>extra.value),
+      extras: extras.map((extra) => extra.value),
       isPicture: true,
-      teemMates: announcerOptions.map((announcerOption)=>announcerOption.value),
+      teemMates: announcerOptions.map(
+        (announcerOption) => announcerOption.value
+      ),
       saveTime: saveTime,
       doc: jsonYLines,
-      urlSnapshot : urlSnapshot
+      // urlSnapshot: urlSnapshot,
+      email: 'tmdgus3901@gmail.com',
+      nickname: persistUser,
     };
-    
+
     console.log('body는 ', body);
     console.log('JSON으로 바꾸면', JSON.stringify(body));
-    
 
     axios
-      .post('/myroom/save', JSON.stringify(body))
+      .post('http://18.221.46.146:8000/myroom/save', JSON.stringify(body), {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       .then(function (res) {
         console.log(res);
-        onCancel();
+        // onCancel();
       })
       .catch(function (err) {
         console.log(err);
         alert('post 실패');
-        onCancel();
+        // onCancel();
       });
   };
 
