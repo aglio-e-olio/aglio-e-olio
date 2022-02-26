@@ -4,6 +4,7 @@ import Navbar from '../Components/Atoms/Navbar';
 import InfoList from '../Components/InfoList/InfoList';
 import SplitPane from 'react-split-pane';
 import './History.css';
+import Preview from '../Components/Preview/Preview';
 
 const History = () => {
   return (
@@ -13,7 +14,7 @@ const History = () => {
         <TagSort />
         <SplitPane split="vertical" defaultSize="50%">
           <InfoList />
-          <div>check!</div>
+          <Preview />
         </SplitPane>
       </SplitPane>
     </div>
