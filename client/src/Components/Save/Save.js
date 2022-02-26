@@ -93,15 +93,21 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     let saveTime = new Date();
 
     let body = {
+      email:"test@gmail.com",
+      nickname:"heonil",
       title: title,
-      algorithm: algorithm,
-      announcer: announcer,
-      extras: extras,
+      algorithm: algorithm.map((algo) =>
+        algo.value
+      ),
+      announcer: announcer.value,
+      extras: new Array(extras.value),
       isPicture: true,
-      teemMates: announcerOptions,
+      teemMates: announcerOptions.map((announcerOption)=>
+        announcerOption.value
+      ),
       saveTime: saveTime,
       doc: jsonYLines,
-      urlSnapshot : urlSnapshot
+      // urlSnapshot : urlSnapshot
     };
     
     console.log('body는 ', body);
@@ -109,7 +115,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     
 
     axios
-      .post('/myroom/save', JSON.stringify(body))
+      .post('http://localhost:8000/myroom/save', body)
       .then(function (res) {
         console.log(res);
         onCancel();
