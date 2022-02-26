@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import axios from 'axios';
 
@@ -15,7 +15,6 @@ function Preview() {
         params: { _id: selectedPreviewKey },
       });
       setMetaData(res.data[0]);
-      console.log(res.data[0]);
     } catch (err) {
       console.error(err);
     }
