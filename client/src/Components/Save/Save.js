@@ -14,9 +14,10 @@ const Save = ({ isOpen, onCancel, yLines }) => {
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  const { urlSnapshot } = useContext(codeContext);
-
-  console.log('모달창 안!',urlSnapshot);
+  const { codes, urlSnapshot } = useContext(codeContext);
+  
+  //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
+  // console.log('모달창 안!',codes);
 
   const jsonYLines = yLines.toJSON();
 
@@ -57,7 +58,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     (inputValue) => {
       const newValue = { value: inputValue.toLowerCase(), label: inputValue };
       setAlgorithmOptions([...algorithmOptions, newValue]);
-      setAlgorithm(newValue);
+      // setAlgorithm(newValue);
     },
     [algorithmOptions]
   );
@@ -94,11 +95,11 @@ const Save = ({ isOpen, onCancel, yLines }) => {
 
     let body = {
       title: title,
-      algorithm: algorithm,
-      announcer: announcer,
-      extras: extras,
+      algorithm: algorithm.map((algo)=> algo.value),
+      announcer: announcer.value,
+      extras: extras.map((extra)=>extra.value),
       isPicture: true,
-      teemMates: announcerOptions,
+      teemMates: announcerOptions.map((announcerOption)=>announcerOption.value),
       saveTime: saveTime,
       doc: jsonYLines,
       urlSnapshot : urlSnapshot
@@ -167,6 +168,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
           cacheOptions
           loadOptions={loadExtrasOptions}
           placeholder="추가 태그"
+          isMulti
         />
         <div className="category" />
         <button type="submit" class="btn btn-success">
