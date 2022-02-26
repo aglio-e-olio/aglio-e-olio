@@ -12,21 +12,30 @@ import { codeContext } from '../Context/ContextProvider';
 import Save from '../Components/Save/Save';
 import Canvas from '../Components/Canvas/Canvas';
 import CodeEditor from '../Components/CodeEditor/Editor';
+import { WebrtcProvider } from 'y-webrtc';
+import {v1 as uuid} from 'uuid';
 
 let i = 0;
 let doc;
+let provider;
+let awareness;
 let yLines;
+let undoManager;
 
 const MyOwnStudy = () => {
   const socketRef = useRef();
   const [isOpen, setOpen] = useState(false);
-  const { codes, compileResult, getCompileResult, getRoomInfo, getUrl } =
+  const { codes, compileResult, getCompileResult, getUrl } =
     useContext(codeContext);
-  const { roomID } = useParams();
-
+//   const { roomID } = useParams();
+  const roomID = uuid();
+  
   if (i === 0) {
     doc = new Y.Doc();
+    provider = new WebrtcProvider(roomID, doc);
+    awareness = provider.awareness;
     yLines = doc.getArray('lines~9');
+    undoManager = new Y.UndoManager(yLines);
   }
   i++;
 
@@ -82,8 +91,14 @@ const MyOwnStudy = () => {
           저장 모달 열기
         </button>
         <Save isOpen={isOpen} onCancel={handleSaveCancel} yLines={yLines} />
-        <Canvas doc={doc} yLines={yLines} />
-        <CodeEditor doc={doc} />
+        <Canvas
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+        />
+        <CodeEditor doc={doc} provider={provider} />
       </div>
       <div>
         <textarea

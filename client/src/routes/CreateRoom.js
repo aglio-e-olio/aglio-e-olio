@@ -19,6 +19,11 @@ const CreateRoom = (props) => {
     navigate(`/history/${userID}`);
   }
 
+  // 임시 MOstudyRoom
+  function MOstudy() {
+    navigate('/momostudy/test')
+  }
+
   return (
     <div>
       {persistUser ? (
@@ -34,6 +39,12 @@ const CreateRoom = (props) => {
             onClick={history}
           >
             My history
+          </button>
+          <button
+            class="btn btn-outline btn-success btn-lg m-auto"
+            onClick={MOstudy}
+          >
+            MO Study Room
           </button>
         </div>
       ) : (
