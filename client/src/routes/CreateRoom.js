@@ -22,11 +22,17 @@ const CreateRoom = (props) => {
   return (
     <div>
       {persistUser ? (
-        <div>
-          <button className="create-room-button" onClick={create}>
+        <div class='flex h-screen'>
+          <button
+            class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg m-auto "
+            onClick={create}
+          >
             Create Room
           </button>
-          <button class="btn" onClick={history}>
+          <button
+            class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg m-auto"
+            onClick={history}
+          >
             My history
           </button>
         </div>
