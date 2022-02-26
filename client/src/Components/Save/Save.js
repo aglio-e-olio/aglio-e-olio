@@ -58,7 +58,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     (inputValue) => {
       const newValue = { value: inputValue.toLowerCase(), label: inputValue };
       setAlgorithmOptions([...algorithmOptions, newValue]);
-      // setAlgorithm(newValue);
+    
     },
     [algorithmOptions]
   );
@@ -72,7 +72,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     (inputValue) => {
       const newValue = { value: inputValue.toLowerCase(), label: inputValue };
       setExtrasOptions([...extrasOptions, newValue]);
-      setExtras(newValue);
+      
     },
     [extrasOptions]
   );
@@ -95,19 +95,19 @@ const Save = ({ isOpen, onCancel, yLines }) => {
 
     let body = {
       title: title,
-      algorithm: algorithm.map((algo) => algo.value),
+      algo_tag: algorithm.map((algo) => algo.value),
       announcer: announcer.value,
-      extras: extras.map((extra) => extra.value),
+      extra_tag: extras.map((extra) => extra.value),
       isPicture: true,
-      teemMates: announcerOptions.map(
+      teemmates: announcerOptions.map(
         (announcerOption) => announcerOption.value
       ),
-      saveTime: saveTime,
-      doc: jsonYLines,
-      // urlSnapshot: urlSnapshot,
-      email: 'tmdgus3901@gmail.com',
+      save_time: saveTime,
+      canvas_data: jsonYLines,
+      // image_tn_ref: image_tn_ref, //지금은 ref 없다.
+      user_email: 'tmdgus3901@gmail.com',
       nickname: persistUser,
-      // codes : codes
+      // code_data : codes
     };
 
     console.log('body는 ', body);
@@ -165,7 +165,6 @@ const Save = ({ isOpen, onCancel, yLines }) => {
         />
         <div className="category" />
         <AsyncCreatableSelect
-          isClearable
           value={extras}
           options={extrasOptions}
           onChange={handleChangeExtras}
