@@ -46,7 +46,7 @@ const Audio = (props) => {
   }, []);
   return (
     <div>
-      <StyledAudio muted autoPlay ref={ref} />
+      <StyledAudio  autoPlay ref={ref} />
       <button style={{ backgroundColor: color, float: 'left' }}>
         상대방 버튼
       </button>
