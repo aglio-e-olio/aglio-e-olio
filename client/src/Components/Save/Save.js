@@ -104,20 +104,17 @@ const Save = ({ isOpen, onCancel, yLines }) => {
       ),
       saveTime: saveTime,
       doc: jsonYLines,
-      // urlSnapshot: urlSnapshot,
+      urlSnapshot: urlSnapshot,
       email: 'tmdgus3901@gmail.com',
       nickname: persistUser,
+      // codes : codes
     };
 
     console.log('body는 ', body);
     console.log('JSON으로 바꾸면', JSON.stringify(body));
 
     axios
-      .post('http://18.221.46.146:8000/myroom/save', JSON.stringify(body), {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      .post('http://18.221.46.146:8000/myroom/save', body)
       .then(function (res) {
         console.log(res);
         // onCancel();
