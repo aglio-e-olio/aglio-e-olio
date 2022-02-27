@@ -6,7 +6,7 @@ import useLocalStorage from '../../hooks/useLocalStorage';
 // const mockData = ['Dijkstra', 'BFS', 'DFS', '완전탐색', '분할정복', '그래프'];
 
 const TagSort = () => {
-  const { persistUser, getTag } = useContext(codeContext);
+  const { persistEmail, getTag } = useContext(codeContext);
   const [tagData, setTagData] = useState([]);
 
   // const [persistName, setPersist] = useLocalStorage("persistName", );
@@ -15,38 +15,35 @@ const TagSort = () => {
   useEffect(() => {
     axios({
       method: 'GET',
-      url: 'http://localhost:4000/tags',
-      params: { nickname: persistUser },
+      url: 'http://18.221.46.146:8000/myroom/tags/' + persistEmail,
     })
       .then((res) => {
-        let firstSortedData = [...res.data];
+        let firstSortedData = [...res.data.tags];
         firstSortedData.sort((a, b) => {
-          if (a.algorithm < b.algorithm) return -1;
-          if (a.algorithm > b.algorithm) return 1;
+          if (a.tag_name < b.tag_name) return -1;
+          if (a.tag_name > b.tag_name) return 1;
           return 0;
         });
-        firstSortedData.map((data) => {
-          setTagData((tagData) => [...new Set([...tagData, data.algorithm])]);
-        });
+        setTagData(firstSortedData);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [persistUser]);
+  }, [persistEmail]);
 
   function getInfobyTag(tags) {
     getTag(tags);
   }
 
-  return (
+  return tagData ? (
     <ul class="menu bg-base-100 w-56 p-2 rounded-box">
       {tagData.map((tags) => (
-        <li onClick={() => getInfobyTag(tags)}>
-          <a class="text-center">#{tags}</a>
+        <li key={tags.prop} onClick={() => getInfobyTag(tags.tag_name)}>
+          <a class="text-center">#{tags.tag_name}</a>
         </li>
       ))}
     </ul>
-  );
+  ) : null;
 };
 
 export default TagSort;
