@@ -7,6 +7,9 @@ import CreatableSelect from 'react-select/creatable';
 import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import { codeContext } from '../../Context/ContextProvider';
+import { uploadFile } from 'react-s3';
+
+import { v1, v3, v4, v5 } from 'uuid';
 
 const Save = ({ isOpen, onCancel, yLines }) => {
   const [title, setTitle] = useState('');
@@ -17,7 +20,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
   const { codes, urlSnapshot, email, persistUser } = useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  console.log('모달창 안!', persistUser);
+  console.log('SAVE 컴포넌트 안!');
 
   const jsonYLines = yLines.toJSON();
 
@@ -58,7 +61,6 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     (inputValue) => {
       const newValue = { value: inputValue.toLowerCase(), label: inputValue };
       setAlgorithmOptions([...algorithmOptions, newValue]);
-    
     },
     [algorithmOptions]
   );
@@ -72,7 +74,6 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     (inputValue) => {
       const newValue = { value: inputValue.toLowerCase(), label: inputValue };
       setExtrasOptions([...extrasOptions, newValue]);
-      
     },
     [extrasOptions]
   );
@@ -91,40 +92,57 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     console.log('submit 발생');
     e.preventDefault();
 
-    let saveTime = new Date();
 
-    let body = {
-      title: title,
-      algo_tag: algorithm.map((algo) => algo.value),
-      announcer: announcer.value,
-      extra_tag: extras.map((extra) => extra.value),
-      isPicture: true,
-      teemmates: announcerOptions.map(
-        (announcerOption) => announcerOption.value
-      ),
-      save_time: saveTime,
-      canvas_data: jsonYLines,
-      // image_tn_ref: image_tn_ref, //지금은 ref 없다.
-      user_email: 'tmdgus3901@gmail.com',
-      nickname: persistUser,
-      // code_data : codes
+    //image S3에 저장하기 위함.
+    const S3_BUCKET = 'screen-audio-record';
+    const REGION = 'ap-northeast-2';
+    const ACCESS_KEY = prompt('AWS ACCESS_KEY를 입력해주세요.');
+    const SECRET_ACCESS_KEY = prompt('AWS SECRET_ACCESS_KEY를 입력해주세요.');
+
+    const config = {
+      bucketName: S3_BUCKET,
+      region: REGION,
+      accessKeyId: ACCESS_KEY,
+      secretAccessKey: SECRET_ACCESS_KEY,
     };
 
-    console.log('body는 ', body);
-    console.log('JSON으로 바꾸면', JSON.stringify(body));
+    uploadFile(urlSnapshot, config)
+      .then((data) => {
+        console.log(data);
+        let saveTime = new Date();
+        let body = {
+          title: title,
+          algo_tag: algorithm.map((algo) => algo.value),
+          announcer: announcer.value,
+          extra_tag: extras.map((extra) => extra.value),
+          is_picture: true,
+          teemMates: announcerOptions.map(
+            (announcerOption) => announcerOption.value
+          ),
+          save_time: saveTime,
+          canvas_data: jsonYLines,
+          image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
+          user_email: 'tmdgus3901@gmail.com',
+          nickname: persistUser,
+          // code_data : codes
+        };
 
-    axios
-      .post('http://localhost:8000/myroom/save', body)
-      .then(function (res) {
-        console.log(res);
-        alert('post 성공');
-        // onCancel();
+        axios
+        .post('http://18.221.46.146:8000/myroom/save', body)
+        .then(function (res) {
+          console.log(res);
+          alert('post 성공');
+          // onCancel();
+        })
+        .catch(function (err) {
+          console.log(err);
+          alert('post 실패');
+          // onCancel();
+        });
+
       })
-      .catch(function (err) {
-        console.log(err);
-        alert('post 실패');
-        // onCancel();
-      });
+      .catch((err) => console.log(err));
+
   };
 
   //취소 버튼 클릭시
