@@ -8,8 +8,7 @@ import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
-
-import { v1, v3, v4, v5 } from 'uuid';
+import {v1, v3, v4, v5 } from 'uuid';
 
 const Save = ({ isOpen, onCancel, yLines }) => {
   const [title, setTitle] = useState('');
@@ -92,7 +91,6 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     console.log('submit 발생');
     e.preventDefault();
 
-
     //image S3에 저장하기 위함.
     const S3_BUCKET = 'screen-audio-record';
     const REGION = 'ap-northeast-2';
@@ -106,7 +104,20 @@ const Save = ({ isOpen, onCancel, yLines }) => {
       secretAccessKey: SECRET_ACCESS_KEY,
     };
 
-    uploadFile(urlSnapshot, config)
+    const byteString = atob(urlSnapshot.split(",")[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    const blob = new Blob([ia], {
+      type: "image/png"
+    });
+
+    const file = new File([blob], `image/${v1().toString().replace("-","")}.png`)
+
+    uploadFile(file, config)
       .then((data) => {
         console.log(data);
         let saveTime = new Date();
