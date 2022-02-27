@@ -83,20 +83,30 @@ const ContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const [persistUser, setPersistUser] = useState("")
+  const [persistEmail, setPersistEmail] = useState("")
 
   useEffect(() => {
     const persistUserData = JSON.parse(localStorage.getItem('persisUser'))
     if (persistUserData) {
       setPersistUser(persistUserData)
     }
+    const persistEmail = JSON.parse(localStorage.getItem('persistEmail'))
+    if (persistEmail) {
+      setPersistEmail(persistEmail)
+    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem('persisUser', JSON.stringify(persistUser))
-  }, [persistUser]);
+    localStorage.setItem('persistEmail', JSON.stringify(persistEmail))
+  }, [persistUser, persistEmail]);
 
   function addUser(newUser) {
     setPersistUser(newUser)
+  }
+
+  function addEmail(newEmail) {
+    setPersistEmail(newEmail)
   }
 
   function extractCode(codes) {
@@ -186,6 +196,8 @@ const ContextProvider = ({ children }) => {
         selectPreview,
         persistUser,
         addUser,
+        persistEmail,
+        addEmail,
       }}
     >
       {children}
