@@ -19,6 +19,11 @@ const CreateRoom = (props) => {
     navigate(`/history/${userID}`);
   }
 
+  // 임시 MOstudyRoom
+  // function MOstudy() {
+  //   navigate('/momostudy/test')
+  // }
+
   return (
     <div>
       {persistUser ? (
