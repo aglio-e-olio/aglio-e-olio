@@ -1,7 +1,7 @@
 {
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "cd back && npm install && npm start",
+        "start": "cd back && yarn install && yarn start",
         "heroku-postbuild": "cd client && yarn install && yarn run build"
     },
     "engines": {

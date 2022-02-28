@@ -138,17 +138,17 @@ const Save = ({ isOpen, onCancel, yLines }) => {
         };
 
         axios
-          .post('http://18.221.46.146:8000/myroom/save', body)
-          .then(function (res) {
-            console.log(res);
-            alert('post 성공');
-            // onCancel();
-          })
-          .catch(function (err) {
-            console.log(err);
-            alert('post 실패');
-            // onCancel();
-          });
+        .post('https://aglio-olio.shop/myroom/save', body)
+        .then(function (res) {
+          console.log(res);
+          alert('post 성공');
+          // onCancel();
+        })
+        .catch(function (err) {
+          console.log(err);
+          alert('post 실패');
+          // onCancel();
+        });
       })
       .catch((err) => console.log(err));
   };

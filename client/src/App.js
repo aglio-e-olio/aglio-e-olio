@@ -5,6 +5,7 @@ import Room from './routes/Room';
 import History from './routes/History';
 import './App.css';
 import ContextProvider from './Context/ContextProvider';
+import SelfStudyRoom from './routes/SelfStudyRoom';
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
             <Route path="/" element={<CreateRoom />} />
             <Route path="/room/:roomID" element={<Room />} />
             <Route path="/history/:userID" element={<History />} />
+            <Route path="/history/selfstudy/:userID" element={<SelfStudyRoom />} />
           </Routes>
         </BrowserRouter>
       </ContextProvider>
