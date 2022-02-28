@@ -13,10 +13,11 @@
 
 .code-result {
   position: fixed;
-  width: 50%;
+  width: 33%;
   height: 60px;
   float: right;
   bottom: 10px;
+  right: 2px;
 }
 
 .save-button{
