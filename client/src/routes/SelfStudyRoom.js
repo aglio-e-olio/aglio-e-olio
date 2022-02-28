@@ -86,12 +86,8 @@ const SelfStudyRoom = () => {
     })
       .then((res) => {
         const encodedDoc = res.data.canvas_data;
-        console.log(encodedDoc, "제대로 오나")
-        const docToUint8 = Uint8Array.from(encodedDoc);
-        console.log(docToUint8, "uint8 변환")
-        console.log(yLines, "ylines 갱신전")
+        const docToUint8 = Uint8Array.from(Object.values(encodedDoc[0]));
         Y.applyUpdateV2(doc, docToUint8)
-        console.log(yLines, "ylines. selfroom")
       })
       .catch((error) => console.error(error));
   }, [selectedPreviewKey]);
