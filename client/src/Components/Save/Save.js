@@ -116,41 +116,46 @@ const Save = ({ isOpen, onCancel, yLines }) => {
       `image/${v1().toString().replace('-', '')}.png`
     );
 
-    uploadFile(file, config)
-      .then((data) => {
-        console.log(data);
-        let saveTime = new Date();
-        let body = {
-          title: title,
-          algo_tag: algorithm.map((algo) => algo.value),
-          announcer: announcer.value,
-          extra_tag: extras.map((extra) => extra.value),
-          is_picture: true,
-          teemMates: announcerOptions.map(
-            (announcerOption) => announcerOption.value
-          ),
-          save_time: saveTime,
-          canvas_data: jsonYLines,
-          image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
-          user_email: 'tmdgus3901@gmail.com',
-          nickname: persistUser,
-          // code_data : codes
-        };
+    if (!(title && algorithm && announcer)) {
+      alert('빈칸을 입력해 주세요.');
+      return;
+    } else {
+      uploadFile(file, config)
+        .then((data) => {
+          console.log(data);
+          let saveTime = new Date();
+          let body = {
+            title: title,
+            algo_tag: algorithm.map((algo) => algo.value),
+            announcer: announcer.value,
+            extra_tag: extras.map((extra) => extra.value),
+            is_picture: true,
+            teemMates: announcerOptions.map(
+              (announcerOption) => announcerOption.value
+            ),
+            save_time: saveTime,
+            canvas_data: jsonYLines,
+            image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
+            user_email: 'tmdgus3901@gmail.com',
+            nickname: persistUser,
+            // code_data : codes
+          };
 
-        axios
-        .post('https://aglio-olio.shop/myroom/save', body)
-        .then(function (res) {
-          console.log(res);
-          alert('post 성공');
-          // onCancel();
+          axios
+            .post('https://aglio-olio-api.shop/myroom/save', body)
+            .then(function (res) {
+              console.log(res);
+              alert('post 성공');
+              // onCancel();
+            })
+            .catch(function (err) {
+              console.log(err);
+              alert('post 실패');
+              // onCancel();
+            });
         })
-        .catch(function (err) {
-          console.log(err);
-          alert('post 실패');
-          // onCancel();
-        });
-      })
-      .catch((err) => console.log(err));
+        .catch((err) => console.log(err));
+    }
   };
 
   //취소 버튼 클릭시

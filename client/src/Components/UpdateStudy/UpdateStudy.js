@@ -1,0 +1,234 @@
+import React, { useState, useCallback, useContext, useEffect } from 'react';
+import ReactModal from 'react-modal';
+import '../Save/Save.css';
+import axios from 'axios';
+// import jsonSize from 'json-size'
+import CreatableSelect from 'react-select/creatable';
+import AsyncCreatableSelect from 'react-select/creatable';
+import Select from 'react-select';
+import { codeContext } from '../../Context/ContextProvider';
+import { uploadFile } from 'react-s3';
+import { v1 } from 'uuid';
+import dotenv from 'dotenv';
+
+const UpdateStudy = ({ isOpen, onCancel, yLines }) => {
+  dotenv.config();
+
+  const [metaData, setMetaData] = useState([]);
+  const [title, setTitle] = useState(metaData.title);
+  const [announcer, setAnnouncer] = useState(metaData.announcer);
+  const [algorithm, setAlgorithm] = useState(
+    metaData.algo_tag && [...metaData.algo_tag]
+  );
+  const [extras, setExtras] = useState(
+    metaData.extra_tag && [...metaData.extra_tag]
+  );
+
+  const { codes, urlSnapshot, persistEmail, persistUser, selectedPreviewKey } =
+    useContext(codeContext);
+
+  useEffect(async () => {
+    try {
+      const res = await axios({
+        method: 'GET',
+        url: 'https://aglio-olio-api.shop/myroom/preview',
+        params: { user_email: persistEmail },
+      });
+      console.log("persistEmail", persistEmail)
+      setMetaData(res.data);
+      console.log('error??', res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
+  console.log('SAVE 컴포넌트 안!');
+  console.log('metaData', metaData);
+
+  const jsonYLines = yLines.toJSON();
+
+  const titleHandler = (e) => {
+    e.preventDefault();
+    setTitle(e.target.value);
+  };
+
+  const handleChangeAnnouncer = useCallback(
+    (inputValue) => setAnnouncer(inputValue),
+    []
+  );
+
+  //나중에 쓰일 듯.
+  const [announcerOptions, setAnnouncerOptions] = useState([
+    metaData.announcer,
+  ]);
+
+  const [algorithmOptions, setAlgorithmOptions] = useState(
+    metaData.algo_tag && [...metaData.algo_tag]
+  );
+
+  const [extrasOptions, setExtrasOptions] = useState(
+    metaData.extra_tag && [...metaData.extra_tag]
+  );
+
+  const handleChangeAlgorithm = useCallback(
+    (inputValue) => setAlgorithm(defaultValue => [...defaultValue, inputValue]),
+    []
+  );
+
+  const handleCreateAlgorithm = useCallback(
+    (inputValue) => {
+      const newValue = { value: inputValue.toLowerCase(), label: inputValue };
+      setAlgorithmOptions([...algorithmOptions, newValue]);
+    },
+    [algorithmOptions]
+  );
+
+  const handleChangeExtras = useCallback(
+    (inputValue) => setExtras(defaultValue => [...defaultValue, inputValue]),
+    []
+  );
+
+  const handleCreateExtras = useCallback(
+    (inputValue) => {
+      const newValue = { value: inputValue.toLowerCase(), label: inputValue };
+      setExtrasOptions([...extrasOptions, newValue]);
+    },
+    [extrasOptions]
+  );
+
+  const loadExtrasOptions = (inputValue, callback) =>
+    setTimeout(() => {
+      callback(
+        extrasOptions.filter((item) =>
+          item.label.toLowerCase().includes(inputValue.toLowerCase())
+        )
+      );
+    }, 3000);
+
+  // 저장 버튼 클릭시
+  const submitHandler = (e) => {
+    console.log('submit 발생');
+    e.preventDefault();
+
+    const config = {
+      bucketName: process.env.REACT_APP_S3_BUCKET,
+      region: process.env.REACT_APP_REGION,
+      accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+      secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
+    };
+
+    const byteString = atob(urlSnapshot.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    const blob = new Blob([ia], {
+      type: 'image/png',
+    });
+
+    const file = new File(
+      [blob],
+      `image/${v1().toString().replace('-', '')}.png`
+    );
+
+    uploadFile(file, config)
+      .then((data) => {
+        console.log(data);
+        let saveTime = new Date();
+        let body = {
+          title: title,
+          algo_tag: algorithm.map((algo) => algo.value),
+          announcer: announcer.value,
+          extra_tag: extras.map((extra) => extra.value),
+          is_picture: true,
+          teemMates: announcerOptions.map(
+            (announcerOption) => announcerOption.value
+          ),
+          save_time: saveTime,
+          canvas_data: jsonYLines,
+          image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
+          user_email: 'tmdgus3901@gmail.com',
+          nickname: persistUser,
+          // code_data : codes
+        };
+
+        axios
+          .patch('https://aglio-olio-api.shop/myroom/save', body)
+          .then(function (res) {
+            console.log(res);
+            alert('post 성공');
+            // onCancel();
+          })
+          .catch(function (err) {
+            console.log(err);
+            alert('post 실패');
+            // onCancel();
+          });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  //취소 버튼 클릭시
+  const handleClickCancel = () => {
+    onCancel();
+  };
+  return (
+    <ReactModal isOpen={isOpen}>
+      <div className="category" />
+      <div>저장 화면 입니다.</div>
+      <div className="category" />
+      <form
+        onSubmit={submitHandler}
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
+        <input
+          type="text"
+          placeholder="제목"
+          class="input input-bordered input-primary w-full max-w-xs"
+          value={title}
+          onChange={titleHandler}
+        ></input>
+        <div className="category" />
+        <CreatableSelect
+          placeholder="알고리즘 태그"
+          value={algorithm}
+          options={algorithmOptions}
+          onChange={handleChangeAlgorithm}
+          onCreateOption={handleCreateAlgorithm}
+          isMulti
+        />
+        <div className="category" />
+        <Select
+          placeholder="발표자"
+          value={announcer}
+          options={announcerOptions}
+          onChange={handleChangeAnnouncer}
+        />
+        <div className="category" />
+        <AsyncCreatableSelect
+          value={extras}
+          options={extrasOptions}
+          onChange={handleChangeExtras}
+          onCreateOption={handleCreateExtras}
+          cacheOptions
+          loadOptions={loadExtrasOptions}
+          placeholder="추가 태그"
+          isMulti
+        />
+        <div className="category" />
+        <button type="submit" class="btn btn-success">
+          저장
+        </button>
+      </form>
+      <div className="category" />
+      <button class="btn btn-error" onClick={handleClickCancel}>
+        취소
+      </button>
+    </ReactModal>
+  );
+};
+
+export default UpdateStudy;

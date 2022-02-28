@@ -12,6 +12,7 @@ import { codeContext } from '../Context/ContextProvider';
 import Save from '../Components/Save/Save';
 import Canvas from '../Components/Canvas/Canvas';
 import CodeEditor from '../Components/CodeEditor/Editor';
+import UpdateStudy from '../Components/UpdateStudy/UpdateStudy'
 import { WebrtcProvider } from 'y-webrtc';
 import { v1 as uuid } from 'uuid';
 import axios from 'axios';
@@ -80,7 +81,7 @@ const SelfStudyRoom = () => {
 
     axios({
       method: 'GET',
-      url: 'https://aglio-olio.shop/myroom/preview', // url 변경 해야함
+      url: 'https://aglio-olio-api.shop/myroom/preview', // url 변경 해야함
       params: { post_id: selectedPreviewKey },
     })
       .then((res) => {
@@ -102,7 +103,7 @@ const SelfStudyRoom = () => {
         >
           저장 모달 열기
         </button>
-        <Save isOpen={isOpen} onCancel={handleSaveCancel} yLines={yLines} />
+        <UpdateStudy isOpen={isOpen} onCancel={handleSaveCancel} yLines={yLines} />
         <Canvas
           doc={doc}
           provider={provider}
