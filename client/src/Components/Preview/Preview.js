@@ -14,7 +14,7 @@ function Preview() {
     try {
       const res = await axios({
         method: 'GET',
-        url: 'https://www.aglio-olio-api.shop/myroom/preview',
+        url: 'https://aglio-olio-api.shop/myroom/preview',
         params: { post_id: selectedPreviewKey },
       });
       setMetaData(res.data);
@@ -37,7 +37,7 @@ function Preview() {
             metaData.is_picture ? metaData.image_tn_ref : metaData.video_tn_ref
           }
           alt="thumbnail"
-          onClick={()=> goToSelfstudy}
+          onClick={goToSelfstudy}
         />
       </figure>
       <div class="card-body">

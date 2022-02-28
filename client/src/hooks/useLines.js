@@ -79,7 +79,7 @@ export function useLines({doc, provider, awareness, yLines, undoManager}) {
   // of the line.
   const completeLine = React.useCallback(() => {
     const currentLine = rCurrentLine.current;
-
+    console.log(currentLine.get('points'), "포인츠 찍어보자")
     if (!currentLine) return;
 
     currentLine.set('isComplete', true);
