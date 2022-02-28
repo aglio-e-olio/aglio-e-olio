@@ -16,7 +16,7 @@ function InfoList() {
   useEffect(() => {
     axios({
       method: 'GET',
-      url: 'https://aglio-olio.shop/myroom/metadata',
+      url: 'https://aglio-olio-api.shop/myroom/metadata',
       params: { algo_tag: currentTag, user_email: persistEmail },
     })
       .then((res) => {

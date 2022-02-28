@@ -2,6 +2,7 @@ import React, { useState, useCallback, useContext } from 'react';
 import ReactModal from 'react-modal';
 import './Save.css';
 import axios from 'axios';
+import * as Y from 'yjs';
 // import jsonSize from 'json-size'
 import CreatableSelect from 'react-select/creatable';
 import AsyncCreatableSelect from 'react-select/creatable';
@@ -10,7 +11,7 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
-const Save = ({ isOpen, onCancel, yLines }) => {
+const Save = ({ isOpen, onCancel, yLines, doc }) => {
   dotenv.config();
 
   const [title, setTitle] = useState('');
@@ -23,7 +24,6 @@ const Save = ({ isOpen, onCancel, yLines }) => {
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
 
-  const jsonYLines = yLines.toJSON();
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -90,6 +90,8 @@ const Save = ({ isOpen, onCancel, yLines }) => {
 
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
+    const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
+    console.log(ydocCanvasData, "어떻게 생겼나 보자")
     console.log('submit 발생');
     e.preventDefault();
 
@@ -130,7 +132,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
             (announcerOption) => announcerOption.value
           ),
           save_time: saveTime,
-          canvas_data: jsonYLines,
+          canvas_data: ydocCanvasData,
           image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
           user_email: 'tmdgus3901@gmail.com',
           nickname: persistUser,
@@ -138,7 +140,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
         };
 
         axios
-        .post('https://aglio-olio.shop/myroom/save', body)
+        .post('https://aglio-olio-api.shop/myroom/save', body)
         .then(function (res) {
           console.log(res);
           alert('post 성공');

@@ -94,6 +94,9 @@ const Room = () => {
   const handleSave = () => {
     // 여기서 모달 열어줌
     onCapture();
+    // const jsonYLines = yLines
+    // console.log(yLines, "보내기 직전 ylines")
+    // console.log(jsonYLines, "보내기 직전 yjson")
     setOpen(true);
   };
 
@@ -241,11 +244,11 @@ const Room = () => {
         </button>
         <button
           class="btn btn-success cursor-pointer absolute top-0 right-60"
-          onClick={() => navigate(-1)}
-        >
-          뒤로 가기
-        </button>
-        <Save isOpen={isOpen} onCancel={handleSaveCancel} yLines={yLines} />
+          onClick={() => navigate(-1)}>뒤로 가기</button>
+        <Save isOpen={isOpen} 
+        onCancel={handleSaveCancel} 
+        yLines={yLines} 
+        doc={doc}/>
 
         <Canvas
           doc={doc}
