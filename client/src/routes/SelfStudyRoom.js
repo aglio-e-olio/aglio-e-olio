@@ -22,10 +22,10 @@ let awareness;
 let yLines;
 let undoManager;
 
-const MyOwnStudy = () => {
+const SelfStudyRoom = () => {
   const socketRef = useRef();
   const [isOpen, setOpen] = useState(false);
-  const { codes, compileResult, getCompileResult, getUrl } =
+  const { codes, compileResult, getCompileResult, getUrl} =
     useContext(codeContext);
 //   const { roomID } = useParams();
   const roomID = uuid();
@@ -113,4 +113,4 @@ const MyOwnStudy = () => {
   );
 };
 
-export default MyOwnStudy;
+export default SelfStudyRoom;
