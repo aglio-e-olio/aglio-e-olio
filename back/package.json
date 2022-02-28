@@ -5,10 +5,13 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.26.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "mongoose": "^6.2.3",
     "socket.io": "^2.3.0"
   },
   "scripts": {
+    "start:dev": "nodemon server",
     "start": "node server.js"
   }
 }
