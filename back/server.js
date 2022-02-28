@@ -49,7 +49,9 @@ const socketToRoom = {};
 
 io.on('connection', (socket) => {
   console.log(`${socket.id} 가 서버에 연결됨`);
-  socket.on('join room', (roomID) => {
+  socket.on('join room', ({ roomID, persistUser }) => {
+    console.log('들어온 방은 ', roomID);
+    console.log('들어온 유저는',persistUser);
     if (users[roomID]) {
       const length = users[roomID].length;
       if (length === 4) {
@@ -64,7 +66,7 @@ io.on('connection', (socket) => {
     //socket roomID랑 조인하기
     socket.join(roomID);
     // 같은 방에 있는 소켓들에게 인사하기.
-    socket.to(roomID).emit("hello", socket.id);
+    socket.to(roomID).emit("hello", persistUser);
 
     socketToRoom[socket.id] = roomID;
 

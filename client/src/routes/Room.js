@@ -46,7 +46,7 @@ const Audio = (props) => {
   }, []);
   return (
     <div>
-      <StyledAudio  autoPlay ref={ref} />
+      <StyledAudio autoPlay ref={ref} />
       <button style={{ backgroundColor: color, float: 'left' }}>
         상대방 버튼
       </button>
@@ -68,8 +68,15 @@ const Room = () => {
   const peersRef = useRef([]);
   const { roomID } = useParams();
 
-  const { codes, compileResult, getCompileResult, getRoomInfo, getUrl, addAudioStream } =
-    useContext(codeContext);
+  const {
+    codes,
+    compileResult,
+    getCompileResult,
+    getRoomInfo,
+    getUrl,
+    addAudioStream,
+    persistUser,
+  } = useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
   if (i === 0) {
@@ -107,11 +114,12 @@ const Room = () => {
         let options = {};
         let speechEvents = hark(stream, options);
 
-        speechEvents.on('speaking', function () { });
+        speechEvents.on('speaking', function () {});
 
-        speechEvents.on('stopped_speaking', () => { });
+        speechEvents.on('stopped_speaking', () => {});
         getRoomInfo(roomID);
-        socketRef.current.emit('join room', roomID);
+        console.log(persistUser);
+        socketRef.current.emit('join room', { roomID, persistUser });
         socketRef.current.on('all users', (users) => {
           const peers = [];
           users.forEach((userID) => {
@@ -127,7 +135,8 @@ const Room = () => {
         });
 
         socketRef.current.on('hello', (new_member) => {
-          // alert(`${new_member} 가 입장했습니다.`);
+          console.log(new_member)
+          alert(`${new_member} 가 입장했습니다.`);
         });
 
         socketRef.current.on('bye', (left_user) => {
@@ -213,7 +222,6 @@ const Room = () => {
   /* Render */
   return (
     <div>
-
       <div>
         {peers.map((peer, index) => {
           return <Audio key={index} peer={peer} />;
@@ -231,9 +239,12 @@ const Room = () => {
         >
           저장 모달 열기
         </button>
-        <button 
+        <button
           class="btn btn-success cursor-pointer absolute top-0 right-60"
-          onClick={() => navigate(-1)}>뒤로 가기</button>
+          onClick={() => navigate(-1)}
+        >
+          뒤로 가기
+        </button>
         <Save isOpen={isOpen} onCancel={handleSaveCancel} yLines={yLines} />
 
         <Canvas
