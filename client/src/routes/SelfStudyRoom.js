@@ -13,7 +13,8 @@ import Save from '../Components/Save/Save';
 import Canvas from '../Components/Canvas/Canvas';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { WebrtcProvider } from 'y-webrtc';
-import {v1 as uuid} from 'uuid';
+import { v1 as uuid } from 'uuid';
+import axios from 'axios';
 
 let i = 0;
 let doc;
@@ -25,11 +26,11 @@ let undoManager;
 const SelfStudyRoom = () => {
   const socketRef = useRef();
   const [isOpen, setOpen] = useState(false);
-  const { codes, compileResult, getCompileResult, getUrl} =
+  const { codes, compileResult, getCompileResult, getUrl, selectedPreviewKey } =
     useContext(codeContext);
-//   const { roomID } = useParams();
+  //   const { roomID } = useParams();
   const roomID = uuid();
-  
+
   if (i === 0) {
     doc = new Y.Doc();
     provider = new WebrtcProvider(roomID, doc);
@@ -76,7 +77,18 @@ const SelfStudyRoom = () => {
     socketRef.current.on('code response', (code) => {
       handleCompileResult(code);
     });
-  }, []);
+
+    axios({
+      method: 'GET',
+      url: 'http://18.221.46.146:8000/myroom/preview', // url 변경 해야함
+      params: { post_id: selectedPreviewKey },
+    })
+      .then((res) => {
+        const yLinesFromServer = res.data.canvas_data;
+        yLines.push(yLinesFromServer);
+      })
+      .catch((error) => console.error(error));
+  }, [selectedPreviewKey]);
 
   return (
     <div>
