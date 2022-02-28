@@ -15,7 +15,7 @@ const TagSort = () => {
   useEffect(() => {
     axios({
       method: 'GET',
-      url: 'http://18.221.46.146:8000/myroom/tags/' + persistEmail,
+      url: 'https://aglio-olio.shop/myroom/tags/' + persistEmail,
     })
       .then((res) => {
         let firstSortedData = [...res.data.tags];
