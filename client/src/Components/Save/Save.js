@@ -8,9 +8,11 @@ import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
-import {v1, v3, v4, v5 } from 'uuid';
-
+import { v1 } from 'uuid';
+import dotenv from 'dotenv';
 const Save = ({ isOpen, onCancel, yLines }) => {
+  dotenv.config();
+
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
@@ -91,20 +93,14 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     console.log('submit 발생');
     e.preventDefault();
 
-    //image S3에 저장하기 위함.
-    const S3_BUCKET = 'screen-audio-record';
-    const REGION = 'ap-northeast-2';
-    const ACCESS_KEY = prompt('AWS ACCESS_KEY를 입력해주세요.');
-    const SECRET_ACCESS_KEY = prompt('AWS SECRET_ACCESS_KEY를 입력해주세요.');
-
     const config = {
-      bucketName: S3_BUCKET,
-      region: REGION,
-      accessKeyId: ACCESS_KEY,
-      secretAccessKey: SECRET_ACCESS_KEY,
+      bucketName: process.env.REACT_APP_S3_BUCKET,
+      region: process.env.REACT_APP_REGION,
+      accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+      secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
     };
 
-    const byteString = atob(urlSnapshot.split(",")[1]);
+    const byteString = atob(urlSnapshot.split(',')[1]);
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
     for (let i = 0; i < byteString.length; i++) {
@@ -112,10 +108,13 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     }
 
     const blob = new Blob([ia], {
-      type: "image/png"
+      type: 'image/png',
     });
 
-    const file = new File([blob], `image/${v1().toString().replace("-","")}.png`)
+    const file = new File(
+      [blob],
+      `image/${v1().toString().replace('-', '')}.png`
+    );
 
     uploadFile(file, config)
       .then((data) => {
@@ -139,21 +138,19 @@ const Save = ({ isOpen, onCancel, yLines }) => {
         };
 
         axios
-        .post('http://18.221.46.146:8000/myroom/save', body)
-        .then(function (res) {
-          console.log(res);
-          alert('post 성공');
-          // onCancel();
-        })
-        .catch(function (err) {
-          console.log(err);
-          alert('post 실패');
-          // onCancel();
-        });
-
+          .post('http://18.221.46.146:8000/myroom/save', body)
+          .then(function (res) {
+            console.log(res);
+            alert('post 성공');
+            // onCancel();
+          })
+          .catch(function (err) {
+            console.log(err);
+            alert('post 실패');
+            // onCancel();
+          });
       })
       .catch((err) => console.log(err));
-
   };
 
   //취소 버튼 클릭시
