@@ -139,7 +139,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
         };
 
         axios
-        .post('http://18.221.46.146:8000/myroom/save', body)
+        .post('https://aglio-olio.shop/myroom/save', body)
         .then(function (res) {
           console.log(res);
           alert('post 성공');
