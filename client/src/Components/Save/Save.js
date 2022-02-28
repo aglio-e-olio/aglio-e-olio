@@ -91,7 +91,6 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
     const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
-    console.log(ydocCanvasData, "어떻게 생겼나 보자")
     console.log('submit 발생');
     e.preventDefault();
 
