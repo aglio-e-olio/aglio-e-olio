@@ -37,7 +37,7 @@ function Preview() {
             metaData.is_picture ? metaData.image_tn_ref : metaData.video_tn_ref
           }
           alt="thumbnail"
-          onClick={()=> goToSelfstudy}
+          onClick={goToSelfstudy}
         />
       </figure>
       <div class="card-body">

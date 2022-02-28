@@ -85,6 +85,7 @@ const SelfStudyRoom = () => {
     })
       .then((res) => {
         const yLinesFromServer = res.data.canvas_data;
+        console.log(res.data, "from server");
         yLines.push(yLinesFromServer);
       })
       .catch((error) => console.error(error));
