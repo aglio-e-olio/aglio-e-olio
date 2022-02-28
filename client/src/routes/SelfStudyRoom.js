@@ -80,13 +80,15 @@ const SelfStudyRoom = () => {
 
     axios({
       method: 'GET',
-      url: 'https://aglio-olio.shop/myroom/preview', // url 변경 해야함
+      url: 'https://aglio-olio-api.shop/myroom/preview', // url 변경 해야함
       params: { post_id: selectedPreviewKey },
     })
       .then((res) => {
-        const yLinesFromServer = res.data.canvas_data;
-        console.log(res.data, "from server");
-        yLines.push(yLinesFromServer);
+        const encodedDoc = res.data.canvas_data;
+        console.log(encodedDoc, "제대로 오나")
+        console.log(yLines, "ylines 갱신전")
+        Y.applyUpdateV2(doc, encodedDoc)
+        console.log(yLines, "ylines. selfroom")
       })
       .catch((error) => console.error(error));
   }, [selectedPreviewKey]);

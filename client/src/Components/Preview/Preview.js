@@ -14,7 +14,7 @@ function Preview() {
     try {
       const res = await axios({
         method: 'GET',
-        url: 'https://aglio-olio.shop/myroom/preview',
+        url: 'https://aglio-olio-api.shop/myroom/preview',
         params: { post_id: selectedPreviewKey },
       });
       setMetaData(res.data);
