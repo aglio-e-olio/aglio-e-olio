@@ -7,6 +7,8 @@ import CreatableSelect from 'react-select/creatable';
 import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import { codeContext } from '../../Context/ContextProvider';
+import { uploadFile } from 'react-s3';
+import {v1, v3, v4, v5 } from 'uuid';
 
 const Save = ({ isOpen, onCancel, yLines }) => {
   const [title, setTitle] = useState('');
@@ -14,9 +16,10 @@ const Save = ({ isOpen, onCancel, yLines }) => {
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  const { urlSnapshot } = useContext(codeContext);
+  const { codes, urlSnapshot, email, persistUser } = useContext(codeContext);
 
-  console.log('모달창 안!',urlSnapshot);
+  //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
+  console.log('SAVE 컴포넌트 안!');
 
   const jsonYLines = yLines.toJSON();
 
@@ -57,7 +60,6 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     (inputValue) => {
       const newValue = { value: inputValue.toLowerCase(), label: inputValue };
       setAlgorithmOptions([...algorithmOptions, newValue]);
-      setAlgorithm(newValue);
     },
     [algorithmOptions]
   );
@@ -71,7 +73,6 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     (inputValue) => {
       const newValue = { value: inputValue.toLowerCase(), label: inputValue };
       setExtrasOptions([...extrasOptions, newValue]);
-      setExtras(newValue);
     },
     [extrasOptions]
   );
@@ -90,41 +91,69 @@ const Save = ({ isOpen, onCancel, yLines }) => {
     console.log('submit 발생');
     e.preventDefault();
 
-    let saveTime = new Date();
+    //image S3에 저장하기 위함.
+    const S3_BUCKET = 'screen-audio-record';
+    const REGION = 'ap-northeast-2';
+    const ACCESS_KEY = prompt('AWS ACCESS_KEY를 입력해주세요.');
+    const SECRET_ACCESS_KEY = prompt('AWS SECRET_ACCESS_KEY를 입력해주세요.');
 
-    let body = {
-      email:"test@gmail.com",
-      nickname:"heonil",
-      title: title,
-      algorithm: algorithm.map((algo) =>
-        algo.value
-      ),
-      announcer: announcer.value,
-      extras: new Array(extras.value),
-      isPicture: true,
-      teemMates: announcerOptions.map((announcerOption)=>
-        announcerOption.value
-      ),
-      saveTime: saveTime,
-      doc: jsonYLines,
-      // urlSnapshot : urlSnapshot
+    const config = {
+      bucketName: S3_BUCKET,
+      region: REGION,
+      accessKeyId: ACCESS_KEY,
+      secretAccessKey: SECRET_ACCESS_KEY,
     };
-    
-    console.log('body는 ', body);
-    console.log('JSON으로 바꾸면', JSON.stringify(body));
-    
 
-    axios
-      .post('http://localhost:8000/myroom/save', body)
-      .then(function (res) {
-        console.log(res);
-        onCancel();
+    const byteString = atob(urlSnapshot.split(",")[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    const blob = new Blob([ia], {
+      type: "image/png"
+    });
+
+    const file = new File([blob], `image/${v1().toString().replace("-","")}.png`)
+
+    uploadFile(file, config)
+      .then((data) => {
+        console.log(data);
+        let saveTime = new Date();
+        let body = {
+          title: title,
+          algo_tag: algorithm.map((algo) => algo.value),
+          announcer: announcer.value,
+          extra_tag: extras.map((extra) => extra.value),
+          is_picture: true,
+          teemMates: announcerOptions.map(
+            (announcerOption) => announcerOption.value
+          ),
+          save_time: saveTime,
+          canvas_data: jsonYLines,
+          image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
+          user_email: 'tmdgus3901@gmail.com',
+          nickname: persistUser,
+          // code_data : codes
+        };
+
+        axios
+        .post('https://aglio-olio.shop/myroom/save', body)
+        .then(function (res) {
+          console.log(res);
+          alert('post 성공');
+          // onCancel();
+        })
+        .catch(function (err) {
+          console.log(err);
+          alert('post 실패');
+          // onCancel();
+        });
+
       })
-      .catch(function (err) {
-        console.log(err);
-        alert('post 실패');
-        onCancel();
-      });
+      .catch((err) => console.log(err));
+
   };
 
   //취소 버튼 클릭시
@@ -165,7 +194,6 @@ const Save = ({ isOpen, onCancel, yLines }) => {
         />
         <div className="category" />
         <AsyncCreatableSelect
-          isClearable
           value={extras}
           options={extrasOptions}
           onChange={handleChangeExtras}
@@ -173,6 +201,7 @@ const Save = ({ isOpen, onCancel, yLines }) => {
           cacheOptions
           loadOptions={loadExtrasOptions}
           placeholder="추가 태그"
+          isMulti
         />
         <div className="category" />
         <button type="submit" class="btn btn-success">
