@@ -18,6 +18,7 @@
     "autoprefixer": "^9.8.8",
     "axios": "^0.26.0",
     "daisyui": "^1.25.1",
+    "dotenv": "^16.0.0",
     "hark": "^1.2.3",
     "html2canvas": "^1.4.1",
     "json-size": "^1.0.0",
