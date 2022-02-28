@@ -1,10 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Preview() {
-  const { selectedPreviewKey } = useContext(codeContext);
+  const { selectedPreviewKey, persistEmail } = useContext(codeContext);
   const [metaData, setMetaData] = useState(false);
+  const navigate = useNavigate();
+
 
   /* preview에서 meta data 서버에 요청 */
   useEffect(async () => {
@@ -20,6 +23,11 @@ function Preview() {
     }
   }, [selectedPreviewKey]);
 
+  function goToSelfstudy() {
+    const userID = persistEmail;
+    navigate(`/history/selfstudy/${userID}`)
+  }
+
   return metaData && metaData !== 'error' ? (
     <div class="card w-96 glass">
       <figure>
@@ -29,6 +37,7 @@ function Preview() {
             metaData.is_picture ? metaData.image_tn_ref : metaData.video_tn_ref
           }
           alt="thumbnail"
+          onClick={()=> goToSelfstudy}
         />
       </figure>
       <div class="card-body">
