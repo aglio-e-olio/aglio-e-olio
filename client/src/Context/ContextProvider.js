@@ -86,7 +86,7 @@ const ContextProvider = ({ children }) => {
   const [persistEmail, setPersistEmail] = useState("")
 
   useEffect(() => {
-    const persistUserData = JSON.parse(localStorage.getItem('persisUser'))
+    const persistUserData = JSON.parse(localStorage.getItem('persistUser'))
     if (persistUserData) {
       setPersistUser(persistUserData)
     }
@@ -97,7 +97,7 @@ const ContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('persisUser', JSON.stringify(persistUser))
+    localStorage.setItem('persistUser', JSON.stringify(persistUser))
     localStorage.setItem('persistEmail', JSON.stringify(persistEmail))
   }, [persistUser, persistEmail]);
 

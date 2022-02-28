@@ -1,10 +1,13 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { options } from '../../../../back/routes/myroom';
 import { codeContext } from '../../Context/ContextProvider';
 
 function JoinInput() {
   const [nametext, setNameText] = useState('');
   const [emailtext, setEmailText] = useState('');
+  const [urltext, setUrlText] = useState('');
+
   const { joinUser, getEmail, addEmail, addUser } = useContext(codeContext);
 
   const navigate = useNavigate();
@@ -17,10 +20,14 @@ function JoinInput() {
     setEmailText(e.target.value);
   };
 
+  const onUrlChange = (e) => {
+    setUrlText(e.target.value);
+  };
+
   const submitID = () => {
     addUser(nametext);
     addEmail(emailtext);
-    window.location.reload(); // 허점이 많음. 그냥 submit눌러도 진행된다.
+    
   };
 
   return (
@@ -37,6 +44,14 @@ function JoinInput() {
         class="input input-bordered"
         onChange={onChange}
         value={emailtext}
+      />
+      <label class="label">
+        <span class="label-text">url주소</span>
+      </label>
+      <input
+        class="input input-bordered"
+        onChange={onUrlChange}
+        value={urltext}
       />
       <div class="form-control mt-6">
         <button class="btn btn-primary" onClick={submitID}>

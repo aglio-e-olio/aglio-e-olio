@@ -95,8 +95,7 @@ const Room = () => {
     // 여기서 모달 열어줌
     onCapture();
     // const jsonYLines = yLines
-    // console.log(yLines, "보내기 직전 ylines")
-    // console.log(jsonYLines, "보내기 직전 yjson")
+    
     setOpen(true);
   };
 
@@ -167,7 +166,7 @@ const Room = () => {
       .catch((error) => {
         console.log(`getUserMedia error : ${error}`);
       });
-  }, []);
+  }, [persistUser]);
 
   /* Below are Simple Peer Library Function */
   function createPeer(userToSignal, callerID, stream) {

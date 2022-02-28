@@ -7,6 +7,7 @@ import MyInput from '../Components/Atoms/MyInput';
 
 const CreateRoom = (props) => {
   const { persistUser, joinUser } = useContext(codeContext);
+  console.log('CreateRoom안 persistUser는 ',persistUser);
 
   const navigate = useNavigate();
   function create() {
