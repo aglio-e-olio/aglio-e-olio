@@ -107,7 +107,6 @@ const SelfStudyRoom = () => {
           저장 모달 열기
         </button>
         {data && <UpdateStudy isOpen={isOpen} onCancel={handleSaveCancel} doc={doc} data={data}/>}
-        {console.log("과연", data)}
         <Canvas
           doc={doc}
           provider={provider}
