@@ -16,6 +16,7 @@ import UpdateStudy from '../Components/UpdateStudy/UpdateStudy';
 import { WebrtcProvider } from 'y-webrtc';
 import { v1 as uuid } from 'uuid';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 let i = 0;
 let doc;
@@ -32,6 +33,7 @@ const SelfStudyRoom = () => {
     useContext(codeContext);
   //   const { roomID } = useParams();
   const roomID = uuid();
+  const navigate = useNavigate();
 
   if (i === 0) {
     doc = new Y.Doc();
@@ -100,11 +102,14 @@ const SelfStudyRoom = () => {
         <button className="run-button" onClick={sendCode}>
           Run
         </button>
+        <button 
+          class="btn btn-success cursor-pointer absolute top-0 right-60"
+          onClick={() => navigate(-1)}>리스트돌아가기</button>
         <button
           class="btn btn-success cursor-pointer absolute top-0 right-40"
           onClick={handleSave}
         >
-          저장 모달 열기
+          Update
         </button>
         {data && <UpdateStudy isOpen={isOpen} onCancel={handleSaveCancel} doc={doc} data={data}/>}
         <Canvas

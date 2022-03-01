@@ -200,7 +200,7 @@ const Room = () => {
         </button>
         <button 
           class="btn btn-success cursor-pointer absolute top-0 right-60"
-          onClick={() => navigate(-1)}>뒤로 가기</button>
+          onClick={() => navigate(-1)}>스터디 끝내기</button>
         <Save isOpen={isOpen} 
         onCancel={handleSaveCancel} 
         yLines={yLines} 
