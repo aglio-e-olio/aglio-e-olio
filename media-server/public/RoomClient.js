@@ -66,6 +66,8 @@ class RoomClient {
     await this.socket
       .request('createRoom', {
         room_id
+      }).then((data) => {
+        console.log(`Room "${room_id}" ${data}`)
       })
       .catch((err) => {
         console.log('Create room error:', err)
@@ -79,8 +81,8 @@ class RoomClient {
         room_id
       })
       .then(
-        async function (e) {
-          console.log('Joined to room', e)
+        async function (roomObject) {
+          console.log('Joined the following room: ', roomObject)
           const data = await this.socket.request('getRouterRtpCapabilities')
           let device = await this.loadDevice(data)
           this.device = device
@@ -245,9 +247,9 @@ class RoomClient {
      */
     this.socket.on(
       'newProducers',
-      async function (data) {
-        console.log('New producers', data)
-        for (let { producer_id } of data) {
+      async function (producerList) {
+        console.log('New producers', producerList)
+        for (let { producer_id } of producerList) {
           await this.consume(producer_id)
         }
       }.bind(this)
@@ -317,7 +319,7 @@ class RoomClient {
       stream = screen
         ? await navigator.mediaDevices.getDisplayMedia()
         : await navigator.mediaDevices.getUserMedia(mediaConstraints)
-      console.log(navigator.mediaDevices.getSupportedConstraints())
+      console.log('supportedConstraints: ' + navigator.mediaDevices.getSupportedConstraints())
 
       const track = audio ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0]
       const params = {
