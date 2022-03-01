@@ -145,7 +145,8 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            type: "picture",
+            // type: "picture",
+            is_picture: true,
             teemMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
