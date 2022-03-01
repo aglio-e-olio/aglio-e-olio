@@ -24,7 +24,6 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
 
-
   const titleHandler = (e) => {
     e.preventDefault();
     setTitle(e.target.value);
@@ -117,41 +116,45 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
       `image/${v1().toString().replace('-', '')}.png`
     );
 
-    uploadFile(file, config)
-      .then((data) => {
-        console.log(data);
-        let saveTime = new Date();
-        let body = {
-          title: title,
-          algo_tag: algorithm.map((algo) => algo.value),
-          announcer: announcer.value,
-          extra_tag: extras.map((extra) => extra.value),
-          is_picture: true,
-          teemMates: announcerOptions.map(
-            (announcerOption) => announcerOption.value
-          ),
-          save_time: saveTime,
-          canvas_data: ydocCanvasData,
-          image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
-          user_email: 'tmdgus3901@gmail.com',
-          nickname: persistUser,
-          // code_data : codes
-        };
+    if (!(title && algorithm && announcer)) {
+      alert('빈칸을 입력해 주세요.');
+      return;
+    } else {
+      uploadFile(file, config)
+        .then((data) => {
+          console.log(data);
+          let saveTime = new Date();
+          let body = {
+            title: title,
+            algo_tag: algorithm.map((algo) => algo.value),
+            announcer: announcer.value,
+            extra_tag: extras.map((extra) => extra.value),
+            is_picture: true,
+            teemMates: announcerOptions.map(
+              (announcerOption) => announcerOption.value
+            ),
+            save_time: saveTime,
+            canvas_data: ydocCanvasData,
+            image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
+            user_email: 'tmdgus3901@gmail.com',
+            nickname: persistUser,
+          };
 
-        axios
-        .post('https://aglio-olio-api.shop/myroom/save', body)
-        .then(function (res) {
-          console.log(res);
-          alert('post 성공');
-          // onCancel();
+          axios
+            .post('https://aglio-olio-api.shop/myroom/save', body)
+            .then(function (res) {
+              console.log(res);
+              alert('post 성공');
+              // onCancel();
+            })
+            .catch(function (err) {
+              console.error(err);
+              alert('post 실패');
+              // onCancel();
+            });
         })
-        .catch(function (err) {
-          console.log(err);
-          alert('post 실패');
-          // onCancel();
-        });
-      })
-      .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
+    }
   };
 
   //취소 버튼 클릭시
