@@ -34,12 +34,12 @@ function roomOpen() {
   login.className = 'hidden'
   reveal(startAudioButton)
   hide(stopAudioButton)
-  reveal(startVideoButton)
+  // reveal(startVideoButton)
   hide(stopVideoButton)
   reveal(startScreenButton)
   hide(stopScreenButton)
   reveal(exitButton)
-  reveal(copyButton)
+  // reveal(copyButton)
   // reveal(devicesButton)
   control.className = ''
   reveal(videoMedia)
@@ -74,18 +74,18 @@ function addListeners() {
   })
 
   rc.on(RoomClient.EVENTS.startVideo, () => {
-    hide(startVideoButton)
+    // hide(startVideoButton)
     reveal(stopVideoButton)
   })
   rc.on(RoomClient.EVENTS.stopVideo, () => {
     hide(stopVideoButton)
-    reveal(startVideoButton)
+    // reveal(startVideoButton)
   })
   rc.on(RoomClient.EVENTS.exitRoom, () => {
     hide(control)
     hide(devicesList)
     hide(videoMedia)
-    hide(copyButton)
+    // hide(copyButton)
     // hide(devicesButton)
     reveal(login)
   })

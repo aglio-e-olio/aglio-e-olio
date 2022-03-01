@@ -42,7 +42,7 @@ function roomOpen() {
   reveal(startScreenButton)
   hide(stopScreenButton)
   reveal(exitButton)
-  reveal(copyButton)
+  // reveal(copyButton)
   reveal(devicesButton)
   control.className = ''
   reveal(videoMedia)
@@ -88,7 +88,7 @@ function addListeners() {
     hide(control)
     hide(devicesList)
     hide(videoMedia)
-    hide(copyButton)
+    // hide(copyButton)
     hide(devicesButton)
     reveal(login)
   })
