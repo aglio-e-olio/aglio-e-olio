@@ -75,6 +75,7 @@ function InfoList() {
             >
               <div class="card-body hover:bg-sky-700">
                 <h2 class="card-title">{value.title}</h2>
+                {/* {value.type === "picture" ? <PictureIcon /> : <CameraIcon />} */}
                 {value.is_picture ? <PictureIcon /> : <CameraIcon />}
                 <p>{value.announcer}</p>
                 <p>{value.save_time}</p>
