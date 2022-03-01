@@ -129,7 +129,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            is_picture: true,
+            type: "picture",
             teemMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
