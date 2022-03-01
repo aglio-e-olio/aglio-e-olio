@@ -8,6 +8,7 @@ const StyledAudio = styled.audio`
 `;
 
 const Audio = (props) => {
+  console.log('audio안',props.peer);
   const ref = useRef();
   const { addAudioStream } = useContext(codeContext);
 
@@ -28,10 +29,13 @@ const Audio = (props) => {
         setColor(false);
       });
     });
+
+
   }, []);
   return (
     <div>
       <StyledAudio autoPlay ref={ref} />
+      {/* <button>{props.peer.peerID}</button> */}
       {color ? (
         <div class="avatar placeholder">
           <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">

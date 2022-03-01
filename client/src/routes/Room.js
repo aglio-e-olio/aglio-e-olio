@@ -17,7 +17,6 @@ import UrlCopy from '../Components/UrlCopy';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
 
-
 let i = 0;
 let doc;
 let provider;
@@ -31,6 +30,7 @@ const Room = () => {
   const socketRef = useRef();
   const peersRef = useRef([]);
   const { roomID } = useParams();
+  const myAudioRef = useRef();
 
   const {
     codes,
@@ -55,6 +55,7 @@ const Room = () => {
 
   const [isOpen, setOpen] = useState(false);
   const [muted, setMute] = useState('Mute');
+  const [myAudioColor, setMyAudioColor] = useState(false);
 
   const handleSave = () => {
     // 여기서 모달 열어줌
@@ -73,24 +74,31 @@ const Room = () => {
   }
 
   useEffect(() => {
-    console.log("소켓 커넥트는 몇번 되는가?");
+    console.log('소켓 커넥트는 몇번 되는가?');
     socketRef.current = io.connect('/');
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
         addAudioStream(stream);
+        myAudioRef.current.srcObject = stream;
         let options = {};
         let speechEvents = hark(stream, options);
 
-        speechEvents.on('speaking', function () {});
-
-        speechEvents.on('stopped_speaking', () => { });
-        
+        speechEvents.on('speaking', function () {
+          setMyAudioColor(true);
+        });
+        speechEvents.on('stopped_speaking', () => {
+          setMyAudioColor(false);
+        });
 
         getRoomInfo(roomID);
         console.log('join넘기기전 persistUser : ', persistUser);
         if (!!persistUser) {
-          socketRef.current.emit('join room', { roomID, persistUser, persistEmail });
+          socketRef.current.emit('join room', {
+            roomID,
+            persistUser,
+            persistEmail,
+          });
         }
         socketRef.current.on('all users', (users) => {
           const peers = [];
@@ -99,6 +107,7 @@ const Room = () => {
             peersRef.current.push({
               peerID: userID,
               peer,
+
             });
             peers.push(peer);
           });
@@ -131,6 +140,7 @@ const Room = () => {
         socketRef.current.on('receiving returned signal', (payload) => {
           const item = peersRef.current.find((p) => p.peerID === payload.id);
           item.peer.signal(payload.signal);
+          
         });
       })
       .catch((error) => {
@@ -144,6 +154,7 @@ const Room = () => {
       initiator: true,
       trickle: false,
       stream,
+      
     });
 
     // RTC Connection
@@ -163,6 +174,7 @@ const Room = () => {
       initiator: false,
       trickle: false,
       stream,
+     
     });
 
     peer.on('signal', (signal) => {
@@ -195,8 +207,24 @@ const Room = () => {
 
   return (
     <div>
+      <div>
+        <audio ref={myAudioRef} autoPlay></audio>
+        {myAudioColor ? (
+          <div class="avatar placeholder">
+            <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">
+              <span>{persistUser}</span>
+            </div>
+          </div>
+        ) : (
+          <div class="avatar placeholder ">
+            <div class="bg-neutral-focus text-neutral-content rounded-full w-12 h-12">
+              <span>{persistUser}</span>
+            </div>
+          </div>
+        )}
+      </div>
 
-      <div class='flex justify-start'>
+      <div class="flex justify-start">
         {peers.map((peer, index) => {
           return <Audio key={index} peer={peer} />;
         })}
@@ -249,5 +277,3 @@ const Room = () => {
 };
 
 export default Room;
-
-
