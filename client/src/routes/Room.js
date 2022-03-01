@@ -100,16 +100,19 @@ const Room = () => {
             persistEmail,
           });
         }
-        socketRef.current.on('all users', (users) => {
+        socketRef.current.on('all users', (props) => {
           const peers = [];
-          users.forEach((userID) => {
+          props.users.forEach((userID) => {
+            //createPeer 함수안에서 서버한테 상대방 소켓 id 담아서 sending signal 날린다.
             const peer = createPeer(userID, socketRef.current.id, stream);
             peersRef.current.push({
               peerID: userID,
               peer,
-
             });
-            peers.push(peer);
+            const peerName = props.names[userID];
+            console.log('상대방 이름은', peerName);
+            //내가 만든 peer 와 상대방 이름이 들어있다.
+            peers.push({ peer: peer, peerName: peerName });
           });
           setPeers(peers);
           console.log(peers);
@@ -130,7 +133,9 @@ const Room = () => {
             peerID: payload.callerID,
             peer,
           });
-          setPeers((users) => [...users, peer]);
+          const peerName = payload.names[payload.callerID];
+          console.log('addPeer할때 peerName은', peerName);
+          setPeers((users) => [...users, { peer: peer, peerName: peerName }]);
         });
 
         socketRef.current.on('code response', (code) => {
@@ -140,7 +145,6 @@ const Room = () => {
         socketRef.current.on('receiving returned signal', (payload) => {
           const item = peersRef.current.find((p) => p.peerID === payload.id);
           item.peer.signal(payload.signal);
-          
         });
       })
       .catch((error) => {
@@ -154,7 +158,6 @@ const Room = () => {
       initiator: true,
       trickle: false,
       stream,
-      
     });
 
     // RTC Connection
@@ -174,7 +177,6 @@ const Room = () => {
       initiator: false,
       trickle: false,
       stream,
-     
     });
 
     peer.on('signal', (signal) => {
@@ -225,8 +227,8 @@ const Room = () => {
       </div>
 
       <div class="flex justify-start">
-        {peers.map((peer, index) => {
-          return <Audio key={index} peer={peer} />;
+        {peers.map((peer_info, index) => {
+          return <Audio key={index} peer_info={peer_info} />;
         })}
       </div>
       <div>

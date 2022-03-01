@@ -8,14 +8,15 @@ const StyledAudio = styled.audio`
 `;
 
 const Audio = (props) => {
-  console.log('audio안',props.peer);
+  const peerName = props.peer_info.peerName;
+  console.log('audio 안 peer이름은?', peerName);
   const ref = useRef();
   const { addAudioStream } = useContext(codeContext);
 
   const [color, setColor] = useState(false);
 
   useEffect(() => {
-    props.peer.on('stream', (stream) => {
+    props.peer_info.peer.on('stream', (stream) => {
       addAudioStream(stream);
       ref.current.srcObject = stream;
       let options = {};
@@ -29,8 +30,6 @@ const Audio = (props) => {
         setColor(false);
       });
     });
-
-
   }, []);
   return (
     <div>
@@ -39,13 +38,13 @@ const Audio = (props) => {
       {color ? (
         <div class="avatar placeholder">
           <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">
-            <span>ON</span>
+            <span>{peerName}</span>
           </div>
         </div>
       ) : (
         <div class="avatar placeholder ">
           <div class="bg-neutral-focus text-neutral-content rounded-full w-12 h-12">
-            <span>OFF</span>
+            <span>{peerName}</span>
           </div>
         </div>
       )}

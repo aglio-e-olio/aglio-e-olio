@@ -43,6 +43,7 @@ app.get('*', (req, res) => {
 });
 
 const users = {};
+// const usersName = {};
 const socketToRoom = {};
 const userToRoom = {}; // socket.id로 persistUser 얻기위해.
 
@@ -52,7 +53,6 @@ io.on('connection', (socket) => {
     console.log('들어온 방은 ', roomID);
     console.log('들어온 유저는', persistUser);
     console.log('들어온 메일은', persistEmail);
-    
 
     if (users[roomID]) {
       const length = users[roomID].length;
@@ -65,8 +65,10 @@ io.on('connection', (socket) => {
         return;
       }
       users[roomID].push(socket.id);
+      // usersName[socket.id].push(persistUser);
     } else {
       users[roomID] = [socket.id];
+      // usersName[socket.id] = [persistUser];
     }
 
     //socket roomID랑 조인하기
@@ -84,13 +86,14 @@ io.on('connection', (socket) => {
     // 본인을 제외한 같은 room의 user array
     const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
 
-    socket.emit('all users', usersInThisRoom);
+    socket.emit('all users', { users: usersInThisRoom, names: userToRoom });
   });
 
   socket.on('sending signal', (payload) => {
     io.to(payload.userToSignal).emit('user joined', {
       signal: payload.signal,
       callerID: payload.callerID,
+      names: userToRoom,
     });
   });
   socket.on('returning signal', (payload) => {
