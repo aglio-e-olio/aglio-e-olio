@@ -33,13 +33,13 @@ const Audio = (props) => {
     <div>
       <StyledAudio autoPlay ref={ref} />
       {color ? (
-        <div class="avatar online placeholder">
-          <div class="bg-neutral-focus text-neutral-content rounded-full w-12 h-12">
+        <div class="avatar placeholder">
+          <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">
             <span>ON</span>
           </div>
         </div>
       ) : (
-        <div class="avatar placeholder">
+        <div class="avatar placeholder ">
           <div class="bg-neutral-focus text-neutral-content rounded-full w-12 h-12">
             <span>OFF</span>
           </div>
