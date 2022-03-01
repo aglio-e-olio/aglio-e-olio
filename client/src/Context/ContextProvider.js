@@ -95,6 +95,10 @@ const ContextProvider = ({ children }) => {
     if (persistEmail) {
       setPersistEmail(persistEmail)
     }
+    const persistLogin = JSON.parse(localStorage.getItem('persistLogin'))
+    if (persistLogin) {
+      setPersistLogin(persistLogin)
+    }
   }, []);
 
   useEffect(() => {

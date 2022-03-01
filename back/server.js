@@ -7,7 +7,7 @@ const io = socket(server);
 const axios = require('axios');
 const path = require('path');
 
-const cors = require('cors')
+const cors = require('cors');
 
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -16,42 +16,41 @@ const MONGO_URI = 'mongodb://localhost:27017/mongoose';
 
 /* DB Connection */
 mongoose.Promise = global.Promise;
-mongoose.connect(MONGO_URI)
-  .then(()=>console.log("Successfully connected to mongodb"))
-  .catch(e=>{
-      console.error(e);
-  })
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log('Successfully connected to mongodb'))
+  .catch((e) => {
+    console.error(e);
+  });
 
 /* Cors */
-app.use(cors({
-  origin:'*'
-}))
+app.use(
+  cors({
+    origin: '*',
+  })
+);
 
 /* middleware setting */
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-
 
 /* routing */
 app.use('/myroom', require('./routes/myroom'));
-
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
- 
 
 const users = {};
 
 const socketToRoom = {};
 
 io.on('connection', (socket) => {
-  console.log(`${socket.id} 가 서버에 연결됨`);
+  console.log(`socket.id : ${socket.id}  서버에 연결`);
   socket.on('join room', ({ roomID, persistUser }) => {
     console.log('들어온 방은 ', roomID);
-    console.log('들어온 유저는',persistUser);
+    console.log('들어온 유저는', persistUser);
     if (users[roomID]) {
       const length = users[roomID].length;
       if (length === 4) {
@@ -66,11 +65,13 @@ io.on('connection', (socket) => {
     //socket roomID랑 조인하기
     socket.join(roomID);
     // 같은 방에 있는 소켓들에게 인사하기.
-    socket.to(roomID).emit("hello", persistUser);
+    socket.to(roomID).emit('hello', persistUser);
 
     socketToRoom[socket.id] = roomID;
 
-    console.log(`[roomID: ${socketToRoom[socket.id]}], 신규입장 socketID: ${socket.id}`);
+    console.log(
+      `[roomID: ${socketToRoom[socket.id]}], 신규입장 socketID: ${socket.id}`
+    );
 
     // 본인을 제외한 같은 room의 user array
     const usersInThisRoom = users[roomID].filter((id) => id !== socket.id);
@@ -92,7 +93,9 @@ io.on('connection', (socket) => {
   });
   // user가 연결이 끊겼을 때 처리
   socket.on('disconnect', () => {
-    console.log(`roomID: ${socketToRoom[socket.id]}, 퇴장 socketID: ${socket.id}`);
+    console.log(
+      `roomID: ${socketToRoom[socket.id]}, 퇴장 socketID: ${socket.id}`
+    );
     // disconnect한 user가 포함된 roomID
     const roomID = socketToRoom[socket.id];
     // room에 포함된 유저
@@ -104,7 +107,9 @@ io.on('connection', (socket) => {
       users[roomID] = room;
       // room 에 아무도 없다면 방 지우기.
       if (room.length === 0) {
+        console.log(`방에 아무도 없어서 ${users[roomID]}가 삭제합니다.`);
         delete users[roomID];
+        console.log(users[roomID]);
         return;
       }
     }

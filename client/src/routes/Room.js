@@ -76,6 +76,7 @@ const Room = () => {
     getUrl,
     addAudioStream,
     persistUser,
+    
   } = useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
@@ -222,6 +223,7 @@ const Room = () => {
   };
 
   /* Render */
+
   return (
     <div>
       <div>
