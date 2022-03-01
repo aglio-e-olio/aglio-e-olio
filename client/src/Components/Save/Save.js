@@ -22,8 +22,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   const { codes, urlSnapshot, email, persistUser } = useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  console.log('SAVE 컴포넌트 안!');
-
+  console.log('여기 렌더링 왜되는거지? SAVE 컴포넌트 안!');
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -139,17 +138,17 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
         };
 
         axios
-        .post('https://aglio-olio-api.shop/myroom/save', body)
-        .then(function (res) {
-          console.log(res);
-          alert('post 성공');
-          // onCancel();
-        })
-        .catch(function (err) {
-          console.log(err);
-          alert('post 실패');
-          // onCancel();
-        });
+          .post('https://aglio-olio-api.shop/myroom/save', body)
+          .then(function (res) {
+            console.log(res);
+            alert('post 성공');
+            // onCancel();
+          })
+          .catch(function (err) {
+            console.log(err);
+            alert('post 실패');
+            // onCancel();
+          });
       })
       .catch((err) => console.log(err));
   };

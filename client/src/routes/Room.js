@@ -76,7 +76,7 @@ const Room = () => {
     getUrl,
     addAudioStream,
     persistUser,
-    
+    persistEmail,
   } = useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
@@ -96,7 +96,7 @@ const Room = () => {
     // 여기서 모달 열어줌
     onCapture();
     // const jsonYLines = yLines
-    
+
     setOpen(true);
   };
 
@@ -109,6 +109,7 @@ const Room = () => {
   }
 
   useEffect(() => {
+    console.log("소켓 커넥트는 몇번 되는가?");
     socketRef.current = io.connect('/');
     navigator.mediaDevices
       .getUserMedia({ audio: true })
@@ -119,10 +120,14 @@ const Room = () => {
 
         speechEvents.on('speaking', function () {});
 
-        speechEvents.on('stopped_speaking', () => {});
+        speechEvents.on('stopped_speaking', () => { });
+        
+
         getRoomInfo(roomID);
-        console.log(persistUser);
-        socketRef.current.emit('join room', { roomID, persistUser });
+        console.log('join넘기기전 persistUser : ', persistUser);
+        if (!!persistUser) {
+          socketRef.current.emit('join room', { roomID, persistUser, persistEmail });
+        }
         socketRef.current.on('all users', (users) => {
           const peers = [];
           users.forEach((userID) => {
@@ -138,12 +143,12 @@ const Room = () => {
         });
 
         socketRef.current.on('hello', (new_member) => {
-          console.log(new_member)
-          alert(`${new_member} 가 입장했습니다.`);
+          console.log(new_member);
+          alert(`${new_member} 님이 입장했습니다.`);
         });
 
         socketRef.current.on('bye', (left_user) => {
-          // alert(`${left_user}가 떠났습니다.`);
+          alert(`${left_user} 님이 떠났습니다.`);
         });
 
         socketRef.current.on('user joined', (payload) => {
@@ -245,11 +250,16 @@ const Room = () => {
         </button>
         <button
           class="btn btn-success cursor-pointer absolute top-0 right-60"
-          onClick={() => navigate(-1)}>뒤로 가기</button>
-        <Save isOpen={isOpen} 
-        onCancel={handleSaveCancel} 
-        yLines={yLines} 
-        doc={doc}/>
+          onClick={() => navigate(-1)}
+        >
+          뒤로 가기
+        </button>
+        <Save
+          isOpen={isOpen}
+          onCancel={handleSaveCancel}
+          yLines={yLines}
+          doc={doc}
+        />
 
         <Canvas
           doc={doc}

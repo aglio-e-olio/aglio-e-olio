@@ -43,18 +43,25 @@ app.get('*', (req, res) => {
 });
 
 const users = {};
-
 const socketToRoom = {};
+const userToRoom = {}; // socket.id로 persistUser 얻기위해.
 
 io.on('connection', (socket) => {
   console.log(`socket.id : ${socket.id}  서버에 연결`);
-  socket.on('join room', ({ roomID, persistUser }) => {
+  socket.on('join room', ({ roomID, persistUser, persistEmail }) => {
     console.log('들어온 방은 ', roomID);
     console.log('들어온 유저는', persistUser);
+    console.log('들어온 메일은', persistEmail);
+    
+
     if (users[roomID]) {
       const length = users[roomID].length;
       if (length === 4) {
         socket.emit('room full');
+        return;
+      }
+      if (users[roomID].includes(socket.id)) {
+        socket.emit('already exist');
         return;
       }
       users[roomID].push(socket.id);
@@ -68,6 +75,7 @@ io.on('connection', (socket) => {
     socket.to(roomID).emit('hello', persistUser);
 
     socketToRoom[socket.id] = roomID;
+    userToRoom[socket.id] = persistUser;
 
     console.log(
       `[roomID: ${socketToRoom[socket.id]}], 신규입장 socketID: ${socket.id}`
@@ -98,6 +106,7 @@ io.on('connection', (socket) => {
     );
     // disconnect한 user가 포함된 roomID
     const roomID = socketToRoom[socket.id];
+    const persistUser = userToRoom[socket.id];
     // room에 포함된 유저
     let room = users[roomID];
     // room이 존재한다면(user들이 포함된)
@@ -107,15 +116,14 @@ io.on('connection', (socket) => {
       users[roomID] = room;
       // room 에 아무도 없다면 방 지우기.
       if (room.length === 0) {
-        console.log(`방에 아무도 없어서 ${users[roomID]}가 삭제합니다.`);
+        console.log(`방에 아무도 없어서 ${users[roomID]} 를 삭제합니다.`);
         delete users[roomID];
-        console.log(users[roomID]);
         return;
       }
     }
-    socket.to(roomID).emit('bye', socket.id);
+    socket.to(roomID).emit('bye', persistUser);
     //방에 남아있는 사람 콘솔.
-    console.log(users);
+    console.log(users[roomID]);
   });
 
   socket.on('code compile', (payload) => {
