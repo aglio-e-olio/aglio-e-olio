@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { options } from '../../../../back/routes/myroom';
 import { codeContext } from '../../Context/ContextProvider';
 
 function JoinInput() {
@@ -27,6 +26,10 @@ function JoinInput() {
   const submitID = () => {
     addUser(nametext);
     addEmail(emailtext);
+    console.log(urltext);
+    console.log(urltext.split('/').splice(3).join('/'));
+    const url = urltext.split('/').splice(3).join('/');
+    navigate(`/${url}`);
     
   };
 

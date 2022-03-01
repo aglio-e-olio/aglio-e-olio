@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import CreateRoom from './routes/CreateRoom';
 import Room from './routes/Room';
@@ -6,12 +6,14 @@ import History from './routes/History';
 import './App.css';
 import ContextProvider, { codeContext } from './Context/ContextProvider';
 import SelfStudyRoom from './routes/SelfStudyRoom';
-import isLogin from './utils/isLogin';
+import {isLogin} from './utils/isLogin';
 import JoinRoom from './routes/JoinRoom';
 
 function App() {
-  const email = isLogin;
-
+  useEffect(() => {
+    
+  }, []);
+  
   return (
     <div className="App">
       <ContextProvider>
@@ -20,7 +22,7 @@ function App() {
             <Route path="/" element={<CreateRoom />} />
             <Route
               path="/room/:roomID"
-              element={email ? <Room /> : <Navigate replace to="/join" />}
+              element={isLogin ? <Room /> : <Navigate replace to="/join" />}
             />
             <Route path="/join" element={<JoinRoom />} />
 
