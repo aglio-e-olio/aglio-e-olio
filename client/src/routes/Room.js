@@ -181,7 +181,7 @@ const Room = () => {
   return (
     <div>
 
-      <div>
+      <div class='flex justify-start'>
         {peers.map((peer, index) => {
           return <Audio key={index} peer={peer} />;
         })}
