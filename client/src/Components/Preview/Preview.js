@@ -46,12 +46,11 @@ function Preview() {
   return metaData && metaData !== 'error' ? (
     <div class="card w-96 glass">
       <figure>
-        {/* {metaData.type === 'picture' ? ( */}
-          {metaData.is_picture ? (
+        {metaData.is_picture ? (
           <img
             class="object-scale-down h-60 w-96"
             src={
-              metaData.type
+              metaData.is_picture
                 ? metaData.image_tn_ref
                 : metaData.video_tn_ref
             }
