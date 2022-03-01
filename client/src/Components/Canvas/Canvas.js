@@ -119,7 +119,6 @@ export default function Canvas({
   // On pointer up, complete the current line
   const handlePointerUp = React.useCallback(
     (e) => {
-      console.log(yLines, "yline이 궁금하다")
       e.currentTarget.releasePointerCapture(e.pointerId);
       if (ERASER_FLAG) {
         completeErase();
