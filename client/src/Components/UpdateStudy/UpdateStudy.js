@@ -2,6 +2,7 @@ import React, { useState, useCallback, useContext, useEffect } from 'react';
 import ReactModal from 'react-modal';
 import '../Save/Save.css';
 import axios from 'axios';
+import * as Y from 'yjs';
 // import jsonSize from 'json-size'
 import CreatableSelect from 'react-select/creatable';
 import AsyncCreatableSelect from 'react-select/creatable';
@@ -11,42 +12,39 @@ import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 
-const UpdateStudy = ({ isOpen, onCancel, yLines }) => {
+const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   dotenv.config();
 
-  const [metaData, setMetaData] = useState([]);
-  const [title, setTitle] = useState(metaData.title);
-  const [announcer, setAnnouncer] = useState(metaData.announcer);
-  const [algorithm, setAlgorithm] = useState(
-    metaData.algo_tag && [...metaData.algo_tag]
-  );
-  const [extras, setExtras] = useState(
-    metaData.extra_tag && [...metaData.extra_tag]
-  );
+  const [title, setTitle] = useState(data.title);
+  const [announcer, setAnnouncer] = useState(data.announcer);
+
+  let algo_array = [];
+  if (data.algo_tag) {
+    data.algo_tag.map((tag) => {
+      let algo_object = {};
+      algo_object.label = tag.tag;
+      algo_object.value = tag.tag;
+      algo_array.push(algo_object);
+    });
+  }
+  const [algorithm, setAlgorithm] = useState(algo_array && [...algo_array]);
+
+  let extra_array = [];
+  if (data.extra_tag) {
+    data.extra_tag.map((tag) => {
+      let extra_object = {};
+      extra_object.label = tag;
+      extra_object.value = tag;
+      extra_array.push(extra_object);
+    });
+  }
+  const [extras, setExtras] = useState(extra_array && [...extra_array]);
 
   const { codes, urlSnapshot, persistEmail, persistUser, selectedPreviewKey } =
     useContext(codeContext);
 
-  useEffect(async () => {
-    try {
-      const res = await axios({
-        method: 'GET',
-        url: 'https://aglio-olio-api.shop/myroom/preview',
-        params: { user_email: persistEmail },
-      });
-      console.log("persistEmail", persistEmail)
-      setMetaData(res.data);
-      console.log('error??', res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
-  console.log('metaData', metaData);
-
-  const jsonYLines = yLines.toJSON();
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -60,21 +58,24 @@ const UpdateStudy = ({ isOpen, onCancel, yLines }) => {
 
   //나중에 쓰일 듯.
   const [announcerOptions, setAnnouncerOptions] = useState([
-    metaData.announcer,
+    { label: '박현우', value: '박현우' },
+    { label: '최준영', value: '최준영' },
+    { label: '김도경', value: '김도경' },
+    { label: '조헌일', value: '조헌일' },
+    { label: '진승현', value: '진승현' },
   ]);
 
-  const [algorithmOptions, setAlgorithmOptions] = useState(
-    metaData.algo_tag && [...metaData.algo_tag]
-  );
+  const [algorithmOptions, setAlgorithmOptions] = useState([
+    { label: 'BFS', value: 'BFS' },
+    { label: 'DFS', value: 'DFS' },
+    { label: 'STACK', value: 'STACK' },
+    { label: 'QUEUE', value: 'QUEUE' },
+  ]);
 
-  const [extrasOptions, setExtrasOptions] = useState(
-    metaData.extra_tag && [...metaData.extra_tag]
-  );
+  const [extrasOptions, setExtrasOptions] = useState([]);
 
-  const handleChangeAlgorithm = useCallback(
-    (inputValue) => setAlgorithm(defaultValue => [...defaultValue, inputValue]),
-    []
-  );
+  const handleChangeAlgorithm = useCallback(setAlgorithm, []);
+  const handleChangeExtras = useCallback(setExtras, []);
 
   const handleCreateAlgorithm = useCallback(
     (inputValue) => {
@@ -82,11 +83,6 @@ const UpdateStudy = ({ isOpen, onCancel, yLines }) => {
       setAlgorithmOptions([...algorithmOptions, newValue]);
     },
     [algorithmOptions]
-  );
-
-  const handleChangeExtras = useCallback(
-    (inputValue) => setExtras(defaultValue => [...defaultValue, inputValue]),
-    []
   );
 
   const handleCreateExtras = useCallback(
@@ -108,6 +104,7 @@ const UpdateStudy = ({ isOpen, onCancel, yLines }) => {
 
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
+    const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
     console.log('submit 발생');
     e.preventDefault();
 
@@ -134,47 +131,53 @@ const UpdateStudy = ({ isOpen, onCancel, yLines }) => {
       `image/${v1().toString().replace('-', '')}.png`
     );
 
-    uploadFile(file, config)
-      .then((data) => {
-        console.log(data);
-        let saveTime = new Date();
-        let body = {
-          title: title,
-          algo_tag: algorithm.map((algo) => algo.value),
-          announcer: announcer.value,
-          extra_tag: extras.map((extra) => extra.value),
-          is_picture: true,
-          teemMates: announcerOptions.map(
-            (announcerOption) => announcerOption.value
-          ),
-          save_time: saveTime,
-          canvas_data: jsonYLines,
-          image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
-          user_email: 'tmdgus3901@gmail.com',
-          nickname: persistUser,
-          // code_data : codes
-        };
+    if (!(title && algorithm && announcer)) {
+      alert('빈칸을 입력해 주세요.');
+      return;
+    } else {
+      uploadFile(file, config)
+        .then((data) => {
+          console.log('uploadfile', data);
+          let updateTime = new Date();
+          let body = {
+            post_id: selectedPreviewKey,
+            title: title,
+            algo_tag: algorithm.map((algo) => algo.value),
+            announcer: announcer.value,
+            extra_tag: extras.map((extra) => extra.value),
+            is_picture: true,
+            teemMates: announcerOptions.map(
+              (announcerOption) => announcerOption.value
+            ),
+            update_time: updateTime,
+            canvas_data: ydocCanvasData,
+            image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
+            user_email: 'tmdgus3901@gmail.com',
+            nickname: persistUser,
+          };
 
-        axios
-          .patch('https://aglio-olio-api.shop/myroom/save', body)
-          .then(function (res) {
-            console.log(res);
-            alert('post 성공');
-            // onCancel();
-          })
-          .catch(function (err) {
-            console.log(err);
-            alert('post 실패');
-            // onCancel();
-          });
-      })
-      .catch((err) => console.log(err));
+          axios
+            .put('https://aglio-olio-api.shop/myroom/save', body)
+            .then(function (res) {
+              console.log(res);
+              alert('post 성공');
+              // onCancel();
+            })
+            .catch(function (err) {
+              console.error(err);
+              alert('post 실패');
+              // onCancel();
+            });
+        })
+        .catch((err) => console.log(err));
+    }
   };
 
   //취소 버튼 클릭시
   const handleClickCancel = () => {
     onCancel();
   };
+
   return (
     <ReactModal isOpen={isOpen}>
       <div className="category" />
@@ -186,7 +189,7 @@ const UpdateStudy = ({ isOpen, onCancel, yLines }) => {
       >
         <input
           type="text"
-          placeholder="제목"
+          placeholder={data.title}
           class="input input-bordered input-primary w-full max-w-xs"
           value={title}
           onChange={titleHandler}
@@ -202,7 +205,7 @@ const UpdateStudy = ({ isOpen, onCancel, yLines }) => {
         />
         <div className="category" />
         <Select
-          placeholder="발표자"
+          placeholder={data.announcer}
           value={announcer}
           options={announcerOptions}
           onChange={handleChangeAnnouncer}

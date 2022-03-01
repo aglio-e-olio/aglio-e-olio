@@ -24,7 +24,6 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
 
-
   const titleHandler = (e) => {
     e.preventDefault();
     setTitle(e.target.value);
@@ -135,11 +134,10 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
               (announcerOption) => announcerOption.value
             ),
             save_time: saveTime,
-            canvas_data: jsonYLines,
+            canvas_data: ydocCanvasData,
             image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
             user_email: 'tmdgus3901@gmail.com',
             nickname: persistUser,
-            // code_data : codes
           };
 
           axios
@@ -150,12 +148,12 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
               // onCancel();
             })
             .catch(function (err) {
-              console.log(err);
+              console.error(err);
               alert('post 실패');
               // onCancel();
             });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
     }
   };
 

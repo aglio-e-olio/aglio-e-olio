@@ -12,7 +12,7 @@ import { codeContext } from '../Context/ContextProvider';
 import Save from '../Components/Save/Save';
 import Canvas from '../Components/Canvas/Canvas';
 import CodeEditor from '../Components/CodeEditor/Editor';
-import UpdateStudy from '../Components/UpdateStudy/UpdateStudy'
+import UpdateStudy from '../Components/UpdateStudy/UpdateStudy';
 import { WebrtcProvider } from 'y-webrtc';
 import { v1 as uuid } from 'uuid';
 import axios from 'axios';
@@ -23,6 +23,7 @@ let provider;
 let awareness;
 let yLines;
 let undoManager;
+let data;
 
 const SelfStudyRoom = () => {
   const socketRef = useRef();
@@ -85,9 +86,10 @@ const SelfStudyRoom = () => {
       params: { post_id: selectedPreviewKey },
     })
       .then((res) => {
+        data = res.data
         const encodedDoc = res.data.canvas_data;
         const docToUint8 = Uint8Array.from(Object.values(encodedDoc[0]));
-        Y.applyUpdateV2(doc, docToUint8)
+        Y.applyUpdateV2(doc, docToUint8);
       })
       .catch((error) => console.error(error));
   }, [selectedPreviewKey]);
@@ -104,7 +106,8 @@ const SelfStudyRoom = () => {
         >
           저장 모달 열기
         </button>
-        <UpdateStudy isOpen={isOpen} onCancel={handleSaveCancel} yLines={yLines} />
+        {data && <UpdateStudy isOpen={isOpen} onCancel={handleSaveCancel} doc={doc} data={data}/>}
+        {console.log("과연", data)}
         <Canvas
           doc={doc}
           provider={provider}
