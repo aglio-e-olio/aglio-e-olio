@@ -1,19 +1,15 @@
 import React, { useState, useCallback, useContext } from 'react';
-import ReactModal from 'react-modal';
-import './Save.css';
-import axios from 'axios';
-import * as Y from 'yjs';
-// import jsonSize from 'json-size'
+import Modal from 'react-modal';
+import { codeContext } from '../../Context/ContextProvider';
 import CreatableSelect from 'react-select/creatable';
 import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
-import { codeContext } from '../../Context/ContextProvider';
-import { uploadFile } from 'react-s3';
-import { v1 } from 'uuid';
 import dotenv from 'dotenv';
-const Save = ({ isOpen, onCancel, yLines, doc }) => {
-  dotenv.config();
+import axios from 'axios';
 
+const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
+  dotenv.config();
+  console.log(isOpen, 'isopen in recordmodal');
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
@@ -87,84 +83,47 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
       );
     }, 3000);
 
-  // 저장 버튼 클릭시
-  const submitHandler = (e) => {
-    const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
-    console.log('submit 발생');
-    e.preventDefault();
-
-    const config = {
-      bucketName: process.env.REACT_APP_S3_BUCKET,
-      region: process.env.REACT_APP_REGION,
-      accessKeyId: process.env.REACT_APP_ACCESS_KEY,
-      secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
-    };
-
-    const byteString = atob(urlSnapshot.split(',')[1]);
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-
-    const blob = new Blob([ia], {
-      type: 'image/png',
-    });
-
-    const file = new File(
-      [blob],
-      `image/${v1().toString().replace('-', '')}.png`
-    );
-
-    if (!(title && algorithm && announcer)) {
-      alert('빈칸을 입력해 주세요.');
-      return;
-    } else {
-      uploadFile(file, config)
-        .then((data) => {
-          console.log(data);
-          let saveTime = new Date();
-          let body = {
-            title: title,
-            algo_tag: algorithm.map((algo) => algo.value),
-            announcer: announcer.value,
-            extra_tag: extras.map((extra) => extra.value),
-            is_picture: true,
-            teemMates: announcerOptions.map(
-              (announcerOption) => announcerOption.value
-            ),
-            save_time: saveTime,
-            canvas_data: ydocCanvasData,
-            image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
-            user_email: 'tmdgus3901@gmail.com',
-            nickname: persistUser,
-          };
-
-          axios
-            .post('https://aglio-olio-api.shop/myroom/save', body)
-            .then(function (res) {
-              console.log(res);
-              alert('post 성공');
-              // onCancel();
-            })
-            .catch(function (err) {
-              console.error(err);
-              alert('post 실패');
-              // onCancel();
-            });
-        })
-        .catch((err) => console.error(err));
-    }
-  };
-
-  //취소 버튼 클릭시
   const handleClickCancel = () => {
     onCancel();
   };
+
+  const submitHandler = (e) => {
+    console.log(videoUrl, 'videoUrl!!');
+    e.preventDefault();
+    let saveTime = new Date();
+    let body = {
+      title: title,
+      algo_tag: algorithm.map((algo) => algo.value),
+      announcer: announcer.value,
+      extra_tag: extras.map((extra) => extra.value),
+      is_picture: false,
+      teemMates: announcerOptions.map(
+        (announcerOption) => announcerOption.value
+      ),
+      save_time: saveTime,
+      canvas_data: null,
+      image_tn_ref: videoUrl, // data는 객체고 data.location에 링크 들어있다.
+      user_email: 'tmdgus3901@gmail.com',
+      nickname: persistUser,
+      // code_data : codes
+    };
+
+    axios
+      .post('https://aglio-olio-api.shop/myroom/save', body)
+      .then(function (res) {
+        console.log(res);
+        alert('post 성공');
+      })
+      .catch(function (err) {
+        console.log(err);
+        alert('post실패');
+      });
+  };
+
   return (
-    <ReactModal isOpen={isOpen}>
+    <Modal isOpen={isOpen}>
       <div className="category" />
-      <div>저장 화면 입니다.</div>
+      <div>녹화 저장 화면 입니다.</div>
       <div className="category" />
       <form
         onSubmit={submitHandler}
@@ -213,8 +172,8 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
       <button class="btn btn-error" onClick={handleClickCancel}>
         취소
       </button>
-    </ReactModal>
+    </Modal>
   );
 };
 
-export default Save;
+export default RecordModal;
