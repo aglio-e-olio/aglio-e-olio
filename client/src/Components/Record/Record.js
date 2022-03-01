@@ -94,10 +94,10 @@ const Record = () => {
 
   return (
     <StyledSave>
-      <button class="btn fixed right-1/3" ref={recordRef}>
+      <button class="btn fixed top-0 right-1/3" ref={recordRef}>
         Record
       </button>
-      <button class="btn fixed right-1/4" ref={stopRef} onClick={handleOpen}>
+      <button class="btn fixed top-0 right-1/4" ref={stopRef} onClick={handleOpen}>
         Stop
       </button>
       <RecordModal  isOpen={isOpen} onCancel={handleSaveCancel} videoUrl={videoUrl}/>

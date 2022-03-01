@@ -188,7 +188,7 @@ const Room = () => {
       </div>
       <div>
         <Record />
-        <button className="run-button" onClick={sendCode}>
+        <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
           Run
         </button>
         <UrlCopy />
@@ -196,7 +196,7 @@ const Room = () => {
           class="btn btn-success cursor-pointer absolute top-0 right-40"
           onClick={handleSave}
         >
-          저장 모달 열기
+          Save
         </button>
         <button 
           class="btn btn-success cursor-pointer absolute top-0 right-60"
