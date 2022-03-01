@@ -24,8 +24,23 @@ function Preview() {
   }, [selectedPreviewKey]);
 
   function goToSelfstudy() {
-      const userID = persistEmail;
-      navigate(`/history/selfstudy/${userID}`);
+    const userID = persistEmail;
+    navigate(`/history/selfstudy/${userID}`);
+  }
+
+  async function handleDelete() {
+    try {
+      const res = await axios({
+        method: 'DELETE',
+        url: `https://aglio-olio-api.shop/myroom/delete/${selectedPreviewKey}`,
+        params: { post_id: selectedPreviewKey },
+      });
+      alert('delete 성공');
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert('delete 실패');
+    }
   }
 
   return metaData && metaData !== 'error' ? (
@@ -76,7 +91,10 @@ function Preview() {
             })}
         </div>
         <div class="justify-end card-actions">
-          <button class="btn btn-error sm:btn-sm md:btn-md lg:btn-sm">
+          <button
+            onClick={handleDelete}
+            class="btn btn-error sm:btn-sm md:btn-md lg:btn-sm"
+          >
             삭제
           </button>
         </div>

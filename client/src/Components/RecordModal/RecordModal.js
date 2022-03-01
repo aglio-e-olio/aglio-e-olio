@@ -96,6 +96,7 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
       algo_tag: algorithm.map((algo) => algo.value),
       announcer: announcer.value,
       extra_tag: extras.map((extra) => extra.value),
+    //   type: "video",
       is_picture: false,
       teemMates: announcerOptions.map(
         (announcerOption) => announcerOption.value
