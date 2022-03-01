@@ -1,9 +1,8 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
-import styled from 'styled-components';
 import hark from 'hark';
-
+import Audio from '../Components/Audio/Audio';
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -18,41 +17,6 @@ import UrlCopy from '../Components/UrlCopy';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
 
-const StyledAudio = styled.audio`
-  float: left;
-`;
-
-const Audio = (props) => {
-  const ref = useRef();
-  const { addAudioStream } = useContext(codeContext);
-
-  const [color, setColor] = useState('black');
-
-  useEffect(() => {
-    props.peer.on('stream', (stream) => {
-      addAudioStream(stream);
-      ref.current.srcObject = stream;
-      let options = {};
-      let speechEvents = hark(stream, options);
-
-      speechEvents.on('speaking', function () {
-        setColor('yellow');
-      });
-
-      speechEvents.on('stopped_speaking', function () {
-        setColor('black');
-      });
-    });
-  }, []);
-  return (
-    <div>
-      <StyledAudio  autoPlay ref={ref} />
-      <button style={{ backgroundColor: color, float: 'left' }}>
-        상대방 버튼
-      </button>
-    </div>
-  );
-};
 
 let i = 0;
 let doc;
@@ -217,14 +181,14 @@ const Room = () => {
   return (
     <div>
 
-      <div>
+      <div class='flex justify-start'>
         {peers.map((peer, index) => {
           return <Audio key={index} peer={peer} />;
         })}
       </div>
       <div>
         <Record />
-        <button className="run-button" onClick={sendCode}>
+        <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
           Run
         </button>
         <UrlCopy />
@@ -232,7 +196,7 @@ const Room = () => {
           class="btn btn-success cursor-pointer absolute top-0 right-40"
           onClick={handleSave}
         >
-          저장 모달 열기
+          Save
         </button>
         <button 
           class="btn btn-success cursor-pointer absolute top-0 right-60"
@@ -265,3 +229,5 @@ const Room = () => {
 };
 
 export default Room;
+
+
