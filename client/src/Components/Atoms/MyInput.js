@@ -5,7 +5,7 @@ import { codeContext } from '../../Context/ContextProvider';
 function MyInput() {
   const [nametext, setNameText] = useState('');
   const [emailtext, setEmailText] = useState('');
-  const { joinUser, getEmail, addEmail, addUser } = useContext(codeContext);
+  const { joinUser, getEmail, addEmail, addUser, addLogin } = useContext(codeContext);
 
   const navigate = useNavigate();
 
@@ -20,6 +20,7 @@ function MyInput() {
   const submitID = () => {
     addUser(nametext);
     addEmail(emailtext);
+    addLogin(true);
     navigate('/');
   };
 

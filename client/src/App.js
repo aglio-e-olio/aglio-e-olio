@@ -4,25 +4,22 @@ import CreateRoom from './routes/CreateRoom';
 import Room from './routes/Room';
 import History from './routes/History';
 import './App.css';
-import ContextProvider, { codeContext } from './Context/ContextProvider';
 import SelfStudyRoom from './routes/SelfStudyRoom';
 import {isLogin} from './utils/isLogin';
 import JoinRoom from './routes/JoinRoom';
+import { codeContext } from './Context/ContextProvider';
 
 function App() {
-  useEffect(() => {
-    
-  }, []);
+  const {persistLogin} = useContext(codeContext);
   
   return (
     <div className="App">
-      <ContextProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<CreateRoom />} />
             <Route
               path="/room/:roomID"
-              element={isLogin ? <Room /> : <Navigate replace to="/join" />}
+              element={persistLogin ? <Room /> : <Navigate replace to="/join" />}
             />
             <Route path="/join" element={<JoinRoom />} />
 
@@ -33,7 +30,6 @@ function App() {
             />
           </Routes>
         </BrowserRouter>
-      </ContextProvider>
     </div>
   );
 }

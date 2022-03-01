@@ -7,7 +7,7 @@ function JoinInput() {
   const [emailtext, setEmailText] = useState('');
   const [urltext, setUrlText] = useState('');
 
-  const { joinUser, getEmail, addEmail, addUser } = useContext(codeContext);
+  const { joinUser, getEmail, addEmail, addUser, addLogin } = useContext(codeContext);
 
   const navigate = useNavigate();
 
@@ -26,6 +26,7 @@ function JoinInput() {
   const submitID = () => {
     addUser(nametext);
     addEmail(emailtext);
+    addLogin(true);
     console.log(urltext);
     console.log(urltext.split('/').splice(3).join('/'));
     const url = urltext.split('/').splice(3).join('/');
