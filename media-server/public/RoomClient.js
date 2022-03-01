@@ -623,15 +623,15 @@ class RoomClient {
     console.log('URL copied to clipboard 👍')
   }
 
-  showDevices() {
-    if (!this.isDevicesVisible) {
-      reveal(devicesList)
-      this.isDevicesVisible = true
-    } else {
-      hide(devicesList)
-      this.isDevicesVisible = false
-    }
-  }
+  // showDevices() {
+  //   if (!this.isDevicesVisible) {
+  //     reveal(devicesList)
+  //     this.isDevicesVisible = true
+  //   } else {
+  //     hide(devicesList)
+  //     this.isDevicesVisible = false
+  //   }
+  // }
 
   handleFS(id) {
     let videoPlayer = document.getElementById(id)
