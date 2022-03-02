@@ -194,55 +194,60 @@ const Room = () => {
   /* Render */
 
   return (
-    <div>
-      <MyAudio />
+    <div class="bg-neutral">
       <div class="flex justify-start">
-        {peers.map((peer_info, index) => {
-          return <Audio key={index} peer_info={peer_info} />;
-        })}
-      </div>
-      <div>
-        <Record />
-        <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
-          Run
-        </button>
-        <UrlCopy />
-        <button
-          class="btn btn-success cursor-pointer absolute top-0 right-40"
-          onClick={handleSave}
-        >
-          Save
-        </button>
-        <button
-          class="btn btn-success cursor-pointer absolute top-0 right-60"
-          onClick={() => navigate(-1)}
-        >
-          뒤로 가기
-        </button>
-        <Save
-          isOpen={isOpen}
-          onCancel={handleSaveCancel}
-          yLines={yLines}
-          doc={doc}
-        />
+        <MyAudio />
+        <div class="flex justify-start">
+          {peers.map((peer_info, index) => {
+            return <Audio key={index} peer_info={peer_info} />;
+          })}
+        </div>
+        <div>
+          <Record />
+          <button
+            class="btn absolute bottom-20 right-4 z-30"
+            onClick={sendCode}
+          >
+            Run
+          </button>
+          <UrlCopy />
+          <button
+            class="btn btn-success cursor-pointer absolute top-0 right-40 bg-info"
+            onClick={handleSave}
+          >
+            Save
+          </button>
+          <button
+            class="btn btn-success cursor-pointer absolute top-0 right-60 bg-info"
+            onClick={() => navigate(-1)}
+          >
+            뒤로 가기
+          </button>
+          <Save
+            isOpen={isOpen}
+            onCancel={handleSaveCancel}
+            yLines={yLines}
+            doc={doc}
+          />
 
-        <Canvas
-          doc={doc}
-          provider={provider}
-          awareness={awareness}
-          yLines={yLines}
-          undoManager={undoManager}
-        />
-        <CodeEditor doc={doc} provider={provider} />
-      </div>
-      <div>
-        <textarea
-          className="code-result"
-          value={compileResult}
-          placeholder={
-            '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
-          }
-        />
+          <Canvas
+            doc={doc}
+            provider={provider}
+            awareness={awareness}
+            yLines={yLines}
+            undoManager={undoManager}
+          />
+          <CodeEditor doc={doc} provider={provider} />
+        </div>
+        <div>
+          <textarea
+            className="code-result"
+            value={compileResult}
+            placeholder={
+              '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
+            }
+          />
+        </div>
       </div>
     </div>
   );
