@@ -32,7 +32,7 @@ function changeToPencil() {
 
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
-  return -60;
+  return -52;
 }
 
 function getPoint(x, y) {
@@ -143,8 +143,8 @@ export default function Canvas({
 
   return (
     <div>
-      <div>
-        <ul class="menu bg-base-100 p-2 rounded-box fixed z-50 top-1/3 ">
+      <div >
+        <ul class="menu bg-neutral p-2 rounded-box fixed z-50 top-1/3 ">
           <li onClick={changeToPencil}>
             <a>
               <PenIcon />

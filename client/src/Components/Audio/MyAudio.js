@@ -33,7 +33,7 @@ const MyAudio = () => {
 
       {color ? (
         <div class="avatar placeholder">
-          <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">
+          <div class="bg-neutral-focus text-neutral-content ring ring-secondary ring-offset-0 rounded-full w-12 h-12">
             <span>{persistUser}</span>
           </div>
         </div>

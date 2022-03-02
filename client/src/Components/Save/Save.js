@@ -206,7 +206,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success">
+        <button type="submit" class="btn btn-success bg-neutral">
           저장
         </button>
       </form>

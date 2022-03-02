@@ -194,7 +194,7 @@ const Room = () => {
   /* Render */
 
   return (
-    <div>
+    <div class='bg-neutral'>
       
       <div class="flex justify-start">
       <MyAudio />
@@ -203,20 +203,20 @@ const Room = () => {
           return <Audio key={index} peer_info={peer_info} />;
         })}
       </div>
-      <div>
+      <div >
         <Record />
         <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
           Run
         </button>
         <UrlCopy />
         <button
-          class="btn btn-success cursor-pointer absolute top-0 right-40"
+          class="btn btn-success cursor-pointer absolute top-0 right-40 bg-info"
           onClick={handleSave}
         >
           Save
         </button>
         <button
-          class="btn btn-success cursor-pointer absolute top-0 right-60"
+          class="btn btn-success cursor-pointer absolute top-0 right-60 bg-info"
           onClick={() => navigate(-1)}
         >
           뒤로 가기

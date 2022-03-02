@@ -45,7 +45,7 @@ function UrlCopy() {
 
   return (
     <button
-      class="btn btn-success cursor-pointer absolute top-0 right-10"
+      class="btn btn-success cursor-pointer absolute top-0 right-10 bg-info"
       onClick={() => doCopy(url)}
     >
       URL 복사하기
