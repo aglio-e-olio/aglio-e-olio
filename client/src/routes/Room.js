@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
-import hark from 'hark';
 import Audio from '../Components/Audio/Audio';
+import MyAudio from '../Components/Audio/MyAudio';
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -16,7 +16,6 @@ import Save from '../Components/Save/Save';
 import UrlCopy from '../Components/UrlCopy';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
-
 
 let i = 0;
 let doc;
@@ -32,8 +31,16 @@ const Room = () => {
   const peersRef = useRef([]);
   const { roomID } = useParams();
 
-  const { codes, compileResult, getCompileResult, getRoomInfo, getUrl, addAudioStream } =
-    useContext(codeContext);
+  const {
+    codes,
+    compileResult,
+    getCompileResult,
+    getRoomInfo,
+    getUrl,
+    addAudioStream,
+    persistUser,
+    persistEmail,
+  } = useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
   if (i === 0) {
@@ -46,14 +53,12 @@ const Room = () => {
   i++;
 
   const [isOpen, setOpen] = useState(false);
-  const [muted, setMute] = useState('Mute');
 
   const handleSave = () => {
     // 여기서 모달 열어줌
     onCapture();
     // const jsonYLines = yLines
-    // console.log(yLines, "보내기 직전 ylines")
-    // console.log(jsonYLines, "보내기 직전 yjson")
+
     setOpen(true);
   };
 
@@ -66,39 +71,46 @@ const Room = () => {
   }
 
   useEffect(() => {
+    console.log('소켓 커넥트는 몇번 되는가?');
     socketRef.current = io.connect('/');
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
         addAudioStream(stream);
-        let options = {};
-        let speechEvents = hark(stream, options);
-
-        speechEvents.on('speaking', function () { });
-
-        speechEvents.on('stopped_speaking', () => { });
         getRoomInfo(roomID);
-        socketRef.current.emit('join room', roomID);
-        socketRef.current.on('all users', (users) => {
+        console.log('join넘기기전 persistUser : ', persistUser);
+        if (!!persistUser) {
+          socketRef.current.emit('join room', {
+            roomID,
+            persistUser,
+            persistEmail,
+          });
+        }
+        socketRef.current.on('all users', (props) => {
           const peers = [];
-          users.forEach((userID) => {
+          props.users.forEach((userID) => {
+            //createPeer 함수안에서 서버한테 상대방 소켓 id 담아서 sending signal 날린다.
             const peer = createPeer(userID, socketRef.current.id, stream);
             peersRef.current.push({
               peerID: userID,
               peer,
             });
-            peers.push(peer);
+            const peerName = props.names[userID];
+            console.log('상대방 이름은', peerName);
+            //내가 만든 peer 와 상대방 이름이 들어있다.
+            peers.push({ peer: peer, peerName: peerName });
           });
           setPeers(peers);
           console.log(peers);
         });
 
         socketRef.current.on('hello', (new_member) => {
-          // alert(`${new_member} 가 입장했습니다.`);
+          console.log(new_member);
+          alert(`${new_member} 님이 입장했습니다.`);
         });
 
         socketRef.current.on('bye', (left_user) => {
-          // alert(`${left_user}가 떠났습니다.`);
+          alert(`${left_user} 님이 떠났습니다.`);
         });
 
         socketRef.current.on('user joined', (payload) => {
@@ -107,7 +119,9 @@ const Room = () => {
             peerID: payload.callerID,
             peer,
           });
-          setPeers((users) => [...users, peer]);
+          const peerName = payload.names[payload.callerID];
+          console.log('addPeer할때 peerName은', peerName);
+          setPeers((users) => [...users, { peer: peer, peerName: peerName }]);
         });
 
         socketRef.current.on('code response', (code) => {
@@ -178,12 +192,13 @@ const Room = () => {
   };
 
   /* Render */
+
   return (
     <div>
-
-      <div class='flex justify-start'>
-        {peers.map((peer, index) => {
-          return <Audio key={index} peer={peer} />;
+      <MyAudio />
+      <div class="flex justify-start">
+        {peers.map((peer_info, index) => {
+          return <Audio key={index} peer_info={peer_info} />;
         })}
       </div>
       <div>
@@ -198,13 +213,18 @@ const Room = () => {
         >
           Save
         </button>
-        <button 
+        <button
           class="btn btn-success cursor-pointer absolute top-0 right-60"
-          onClick={() => navigate(-1)}>뒤로 가기</button>
-        <Save isOpen={isOpen} 
-        onCancel={handleSaveCancel} 
-        yLines={yLines} 
-        doc={doc}/>
+          onClick={() => navigate(-1)}
+        >
+          뒤로 가기
+        </button>
+        <Save
+          isOpen={isOpen}
+          onCancel={handleSaveCancel}
+          yLines={yLines}
+          doc={doc}
+        />
 
         <Canvas
           doc={doc}
@@ -229,5 +249,3 @@ const Room = () => {
 };
 
 export default Room;
-
-

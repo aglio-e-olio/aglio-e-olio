@@ -4,13 +4,16 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import ReactModal from 'react-modal';
+import ContextProvider from './Context/ContextProvider';
 
 ReactModal.setAppElement('#root');
 
 ReactDOM.render(
+  <ContextProvider>
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
+  </React.StrictMode>
+  </ContextProvider>,
   document.getElementById('root')
 );
 

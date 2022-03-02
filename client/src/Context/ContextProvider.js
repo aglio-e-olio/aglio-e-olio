@@ -84,9 +84,10 @@ const ContextProvider = ({ children }) => {
 
   const [persistUser, setPersistUser] = useState("")
   const [persistEmail, setPersistEmail] = useState("")
+  const [persistLogin, setPersistLogin] = useState(false);
 
   useEffect(() => {
-    const persistUserData = JSON.parse(localStorage.getItem('persisUser'))
+    const persistUserData = JSON.parse(localStorage.getItem('persistUser'))
     if (persistUserData) {
       setPersistUser(persistUserData)
     }
@@ -94,12 +95,17 @@ const ContextProvider = ({ children }) => {
     if (persistEmail) {
       setPersistEmail(persistEmail)
     }
+    const persistLogin = JSON.parse(localStorage.getItem('persistLogin'))
+    if (persistLogin) {
+      setPersistLogin(persistLogin)
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('persisUser', JSON.stringify(persistUser))
+    localStorage.setItem('persistUser', JSON.stringify(persistUser))
     localStorage.setItem('persistEmail', JSON.stringify(persistEmail))
-  }, [persistUser, persistEmail]);
+    localStorage.setItem('persistLogin', (persistLogin))
+  }, [persistUser, persistEmail, persistLogin]);
 
   function addUser(newUser) {
     setPersistUser(newUser)
@@ -107,6 +113,10 @@ const ContextProvider = ({ children }) => {
 
   function addEmail(newEmail) {
     setPersistEmail(newEmail)
+  }
+
+  function addLogin(newLogin) {
+    setPersistLogin(newLogin)
   }
 
   function extractCode(codes) {
@@ -198,6 +208,8 @@ const ContextProvider = ({ children }) => {
         addUser,
         persistEmail,
         addEmail,
+        persistLogin,
+        addLogin
       }}
     >
       {children}

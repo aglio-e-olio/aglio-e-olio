@@ -6,7 +6,11 @@ import './CreateRoom.css';
 import MyInput from '../Components/Atoms/MyInput';
 
 const CreateRoom = (props) => {
-  const { persistUser, joinUser } = useContext(codeContext);
+  const { persistUser, persistLogin } = useContext(codeContext);
+  const login_info = localStorage.getItem("persistLogin");
+  
+  console.log('CreateRoom안 persistUser는 ',persistUser);
+  console.log('CreateRoom안 persistLogin는 ',persistLogin);
 
   const navigate = useNavigate();
   function create() {
@@ -26,7 +30,7 @@ const CreateRoom = (props) => {
 
   return (
     <div>
-      {persistUser ? (
+      {login_info ? (
         <div class='flex h-screen'>
           <button
             class="btn btn-outline btn-info btn-lg m-auto"
