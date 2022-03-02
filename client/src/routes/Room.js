@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import hark from 'hark';
 import Audio from '../Components/Audio/Audio';
+import MyAudio from '../Components/Audio/MyAudio';
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -30,7 +31,6 @@ const Room = () => {
   const socketRef = useRef();
   const peersRef = useRef([]);
   const { roomID } = useParams();
-  const myAudioRef = useRef();
 
   const {
     codes,
@@ -55,7 +55,6 @@ const Room = () => {
 
   const [isOpen, setOpen] = useState(false);
   const [muted, setMute] = useState('Mute');
-  const [myAudioColor, setMyAudioColor] = useState(false);
 
   const handleSave = () => {
     // 여기서 모달 열어줌
@@ -80,17 +79,6 @@ const Room = () => {
       .getUserMedia({ audio: true })
       .then((stream) => {
         addAudioStream(stream);
-        myAudioRef.current.srcObject = stream;
-        let options = {};
-        let speechEvents = hark(stream, options);
-
-        speechEvents.on('speaking', function () {
-          setMyAudioColor(true);
-        });
-        speechEvents.on('stopped_speaking', () => {
-          setMyAudioColor(false);
-        });
-
         getRoomInfo(roomID);
         console.log('join넘기기전 persistUser : ', persistUser);
         if (!!persistUser) {
@@ -150,7 +138,7 @@ const Room = () => {
       .catch((error) => {
         console.log(`getUserMedia error : ${error}`);
       });
-  }, [persistUser]);
+  }, []);
 
   /* Below are Simple Peer Library Function */
   function createPeer(userToSignal, callerID, stream) {
@@ -209,23 +197,7 @@ const Room = () => {
 
   return (
     <div>
-      <div>
-        <audio ref={myAudioRef} autoPlay></audio>
-        {myAudioColor ? (
-          <div class="avatar placeholder">
-            <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">
-              <span>{persistUser}</span>
-            </div>
-          </div>
-        ) : (
-          <div class="avatar placeholder ">
-            <div class="bg-neutral-focus text-neutral-content rounded-full w-12 h-12">
-              <span>{persistUser}</span>
-            </div>
-          </div>
-        )}
-      </div>
-
+      <MyAudio/>
       <div class="flex justify-start">
         {peers.map((peer_info, index) => {
           return <Audio key={index} peer_info={peer_info} />;
