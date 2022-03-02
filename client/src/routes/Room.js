@@ -225,7 +225,6 @@ const Room = () => {
           yLines={yLines}
           doc={doc}
         />
->>>>>>> main
 
         <Canvas
           doc={doc}
