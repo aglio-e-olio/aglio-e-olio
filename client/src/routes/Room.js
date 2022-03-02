@@ -17,6 +17,7 @@ import UrlCopy from '../Components/UrlCopy';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
 
+import * as mediasoupClient from 'mediasoup-client';
 
 let i = 0;
 let doc;
@@ -25,12 +26,21 @@ let awareness;
 let yLines;
 let undoManager;
 
+let socket;
+let audioId;
+let producer = null;
+let rc = null;
+
+
 const Room = () => {
   const navigate = useNavigate();
   const [peers, setPeers] = useState([]);
   const socketRef = useRef();
   const peersRef = useRef([]);
   const { roomID } = useParams();
+  const remoteAudiosRef = useRef();
+  const startAudioButtonRef = useRef();
+  const stopAudioButtonRef = useRef();
 
   const { codes, compileResult, getCompileResult, getRoomInfo, getUrl, addAudioStream } =
     useContext(codeContext);
@@ -66,168 +76,875 @@ const Room = () => {
   }
 
   useEffect(() => {
-    socketRef.current = io.connect('/');
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then((stream) => {
-        addAudioStream(stream);
-        let options = {};
-        let speechEvents = hark(stream, options);
 
-        speechEvents.on('speaking', function () { });
+    socket = io.connect('https://3.39.27.19:8000', {
+      withCredentials: false,
+    });
+    console.log(socket);
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => audioId = stream.id)
 
-        speechEvents.on('stopped_speaking', () => { });
-        getRoomInfo(roomID);
-        socketRef.current.emit('join room', roomID);
-        socketRef.current.on('all users', (users) => {
-          const peers = [];
-          users.forEach((userID) => {
-            const peer = createPeer(userID, socketRef.current.id, stream);
-            peersRef.current.push({
-              peerID: userID,
-              peer,
-            });
-            peers.push(peer);
-          });
-          setPeers(peers);
-          console.log(peers);
-        });
-
-        socketRef.current.on('hello', (new_member) => {
-          // alert(`${new_member} 가 입장했습니다.`);
-        });
-
-        socketRef.current.on('bye', (left_user) => {
-          // alert(`${left_user}가 떠났습니다.`);
-        });
-
-        socketRef.current.on('user joined', (payload) => {
-          const peer = addPeer(payload.signal, payload.callerID, stream);
-          peersRef.current.push({
-            peerID: payload.callerID,
-            peer,
-          });
-          setPeers((users) => [...users, peer]);
-        });
-
-        socketRef.current.on('code response', (code) => {
-          handleCompileResult(code);
-        });
-
-        socketRef.current.on('receiving returned signal', (payload) => {
-          const item = peersRef.current.find((p) => p.peerID === payload.id);
-          item.peer.signal(payload.signal);
-        });
+    socket.request = function request(type, data = {}) {
+      return new Promise((resolve, reject) => {
+        socket.emit(type, data, (data) => {
+          if (data.error) {
+            reject(data.error)
+          } else {
+            resolve(data)
+          }
+        })
       })
-      .catch((error) => {
-        console.log(`getUserMedia error : ${error}`);
-      });
+    }
+
+
+    function joinRoom(name, room_id) {
+      if (rc && rc.isOpen()) {
+        console.log('Already connected to a room')
+      } else {
+        rc = new RoomClient(remoteAudiosRef.current, mediasoupClient, socket, room_id, name)
+      }
+    }
+
+    joinRoom("TEST_NAME", "123");
+
+    startAudioButtonRef.current.addEventListener('click', () => {
+      rc.produce(RoomClient.mediaType.audio, audioId)
+    })
+    stopAudioButtonRef.current.addEventListener('click', () => {
+      rc.closeProducer(RoomClient.mediaType.audio)
+    })
   }, []);
 
-  /* Below are Simple Peer Library Function */
-  function createPeer(userToSignal, callerID, stream) {
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream,
+// useEffect(() => {
+//   socketRef.current = io.connect('/');
+//   navigator.mediaDevices
+//     .getUserMedia({ audio: true })
+//     .then((stream) => {
+//       addAudioStream(stream);
+//       let options = {};
+//       let speechEvents = hark(stream, options);
+
+//       speechEvents.on('speaking', function () { });
+
+//       speechEvents.on('stopped_speaking', () => { });
+//       getRoomInfo(roomID);
+//       socketRef.current.emit('join room', roomID);
+//       socketRef.current.on('all users', (users) => {
+//         const peers = [];
+//         users.forEach((userID) => {
+//           const peer = createPeer(userID, socketRef.current.id, stream);
+//           peersRef.current.push({
+//             peerID: userID,
+//             peer,
+//           });
+//           peers.push(peer);
+//         });
+//         setPeers(peers);
+//         console.log(peers);
+//       });
+
+//       socketRef.current.on('hello', (new_member) => {
+//         // alert(`${new_member} 가 입장했습니다.`);
+//       });
+
+//       socketRef.current.on('bye', (left_user) => {
+//         // alert(`${left_user}가 떠났습니다.`);
+//       });
+
+//       socketRef.current.on('user joined', (payload) => {
+//         const peer = addPeer(payload.signal, payload.callerID, stream);
+//         peersRef.current.push({
+//           peerID: payload.callerID,
+//           peer,
+//         });
+//         setPeers((users) => [...users, peer]);
+//       });
+
+//       socketRef.current.on('code response', (code) => {
+//         handleCompileResult(code);
+//       });
+
+//       socketRef.current.on('receiving returned signal', (payload) => {
+//         const item = peersRef.current.find((p) => p.peerID === payload.id);
+//         item.peer.signal(payload.signal);
+//       });
+//     })
+//     .catch((error) => {
+//       console.log(`getUserMedia error : ${error}`);
+//     });
+// }, []);
+
+/* Below are Simple Peer Library Function */
+function createPeer(userToSignal, callerID, stream) {
+  const peer = new Peer({
+    initiator: true,
+    trickle: false,
+    stream,
+  });
+
+  // RTC Connection
+  peer.on('signal', (signal) => {
+    socketRef.current.emit('sending signal', {
+      userToSignal, // 상대방 소켓 id
+      callerID, // 내 소켓 id
+      signal,
     });
+  });
 
-    // RTC Connection
-    peer.on('signal', (signal) => {
-      socketRef.current.emit('sending signal', {
-        userToSignal, // 상대방 소켓 id
-        callerID, // 내 소켓 id
-        signal,
-      });
+  return peer;
+}
+
+function addPeer(incomingSignal, callerID, stream) {
+  const peer = new Peer({
+    initiator: false,
+    trickle: false,
+    stream,
+  });
+
+  peer.on('signal', (signal) => {
+    socketRef.current.emit('returning signal', { signal, callerID });
+  });
+
+  peer.signal(incomingSignal);
+
+  return peer;
+}
+
+function handleCompileResult(code) {
+  getCompileResult(code);
+}
+
+const onCapture = async () => {
+  let snapshotUrl = '';
+  console.log('onCapture');
+  await html2canvas(document.body)
+    .then(async (canvas) => {
+      snapshotUrl = canvas.toDataURL('image/png');
+      getUrl(snapshotUrl);
+    })
+    .catch((e) => {
+      console.log(e);
     });
+};
 
-    return peer;
-  }
+/* Render */
+return (
+  <div>
 
-  function addPeer(incomingSignal, callerID, stream) {
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream,
-    });
-
-    peer.on('signal', (signal) => {
-      socketRef.current.emit('returning signal', { signal, callerID });
-    });
-
-    peer.signal(incomingSignal);
-
-    return peer;
-  }
-
-  function handleCompileResult(code) {
-    getCompileResult(code);
-  }
-
-  const onCapture = async () => {
-    let snapshotUrl = '';
-    console.log('onCapture');
-    await html2canvas(document.body)
-      .then(async (canvas) => {
-        snapshotUrl = canvas.toDataURL('image/png');
-        getUrl(snapshotUrl);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  };
-
-  /* Render */
-  return (
-    <div>
-
-      <div class='flex justify-start'>
-        {peers.map((peer, index) => {
-          return <Audio key={index} peer={peer} />;
-        })}
-      </div>
-      <div>
-        <Record />
-        <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
-          Run
-        </button>
-        <UrlCopy />
-        <button
-          class="btn btn-success cursor-pointer absolute top-0 right-40"
-          onClick={handleSave}
-        >
-          Save
-        </button>
-        <button 
-          class="btn btn-success cursor-pointer absolute top-0 right-60"
-          onClick={() => navigate(-1)}>뒤로 가기</button>
-        <Save isOpen={isOpen} 
-        onCancel={handleSaveCancel} 
-        yLines={yLines} 
-        doc={doc}/>
-
-        <Canvas
-          doc={doc}
-          provider={provider}
-          awareness={awareness}
-          yLines={yLines}
-          undoManager={undoManager}
-        />
-        <CodeEditor doc={doc} provider={provider} />
-      </div>
-      <div>
-        <textarea
-          className="code-result"
-          value={compileResult}
-          placeholder={
-            '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
-          }
-        />
-      </div>
+    <div class='flex justify-start'>
+      {peers.map((peer, index) => {
+        return <Audio key={index} peer={peer} />;
+      })}
     </div>
-  );
+    <div>
+      {/* audio open and close */}
+      <div ref={remoteAudiosRef}></div>
+      <button ref={startAudioButtonRef} >
+        <i class="fas fa-volume-up"></i> Open audio
+      </button>
+      <button ref={stopAudioButtonRef}>
+        <i class="fas fa-volume-up"></i> Close audio
+      </button>
+      {/* audio open and close */}
+
+      <Record />
+      <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
+        Run
+      </button>
+      <UrlCopy />
+      <button
+        class="btn btn-success cursor-pointer absolute top-0 right-40"
+        onClick={handleSave}
+      >
+        Save
+      </button>
+      <button
+        class="btn btn-success cursor-pointer absolute top-0 right-60"
+        onClick={() => navigate(-1)}>뒤로 가기</button>
+      <Save isOpen={isOpen}
+        onCancel={handleSaveCancel}
+        yLines={yLines}
+        doc={doc} />
+
+      <Canvas
+        doc={doc}
+        provider={provider}
+        awareness={awareness}
+        yLines={yLines}
+        undoManager={undoManager}
+      />
+      <CodeEditor doc={doc} provider={provider} />
+    </div>
+    <div>
+      <textarea
+        className="code-result"
+        value={compileResult}
+        placeholder={
+          '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
+        }
+      />
+    </div>
+  </div>
+);
 };
 
 export default Room;
 
 
+const mediaType = {
+  audio: 'audioType',
+  video: 'videoType',
+  screen: 'screenType'
+}
+const _EVENTS = {
+  exitRoom: 'exitRoom',
+  openRoom: 'openRoom',
+  startVideo: 'startVideo',
+  stopVideo: 'stopVideo',
+  startAudio: 'startAudio',
+  stopAudio: 'stopAudio',
+  startScreen: 'startScreen',
+  stopScreen: 'stopScreen'
+}
+
+class RoomClient {
+  constructor(remoteAudioEl, mediasoupClient, socket, room_id, name) {
+    this.name = name
+    this.remoteAudioEl = remoteAudioEl
+    this.mediasoupClient = mediasoupClient
+
+    this.socket = socket
+    this.producerTransport = null
+    this.consumerTransport = null
+    this.device = null
+    this.room_id = room_id
+
+    this.isVideoOnFullScreen = false
+    this.isDevicesVisible = false
+
+    this.consumers = new Map()
+    this.producers = new Map()
+
+    /**
+     * map that contains a mediatype as key and producer_id as value
+     */
+    this.producerLabel = new Map()
+
+    this._isOpen = false
+    this.eventListeners = new Map()
+
+    Object.keys(_EVENTS).forEach(
+      function (evt) {
+        this.eventListeners.set(evt, [])
+      }.bind(this)
+    )
+
+    this.createRoom(room_id).then(
+      async function () {
+        await this.join(name, room_id)
+        this.initSockets()
+        this._isOpen = true
+      }.bind(this)
+    )
+  }
+
+  ////////// INIT /////////
+
+  async createRoom(room_id) {
+    await this.socket
+      .request('createRoom', {
+        room_id
+      }).then((data) => {
+        console.log(`Room "${room_id}" ${data}`)
+      })
+      .catch((err) => {
+        console.log('Create room error:', err)
+      })
+  }
+
+  async join(name, room_id) {
+    socket
+      .request('join', {
+        name,
+        room_id
+      })
+      .then(
+        async function (roomObject) {
+          console.log('Joined the following room: ', roomObject)
+          const data = await this.socket.request('getRouterRtpCapabilities')
+          let device = await this.loadDevice(data)
+          this.device = device
+          await this.initTransports(device)
+          this.socket.emit('getProducers')
+        }.bind(this)
+      )
+      .catch((err) => {
+        console.log('Join error:', err)
+      })
+  }
+
+  async loadDevice(routerRtpCapabilities) {
+    let device
+    try {
+      device = new this.mediasoupClient.Device()
+    } catch (error) {
+      if (error.name === 'UnsupportedError') {
+        console.error('Browser not supported')
+        alert('Browser not supported')
+      }
+      console.error(error)
+    }
+    await device.load({
+      routerRtpCapabilities
+    })
+    return device
+  }
+
+  async initTransports(device) {
+    // init producerTransport
+    {
+      const data = await this.socket.request('createWebRtcTransport', {
+        forceTcp: false,
+        rtpCapabilities: device.rtpCapabilities
+      })
+
+      if (data.error) {
+        console.error(data.error)
+        return
+      }
+
+      this.producerTransport = device.createSendTransport(data)
+
+      this.producerTransport.on(
+        'connect',
+        async function ({ dtlsParameters }, callback, errback) {
+          this.socket
+            .request('connectTransport', {
+              dtlsParameters,
+              transport_id: data.id
+            })
+            .then(callback)
+            .catch(errback)
+        }.bind(this)
+      )
+
+      this.producerTransport.on(
+        'produce',
+        async function ({ kind, rtpParameters }, callback, errback) {
+          try {
+            const { producer_id } = await this.socket.request('produce', {
+              producerTransportId: this.producerTransport.id,
+              kind,
+              rtpParameters
+            })
+            callback({
+              id: producer_id
+            })
+          } catch (err) {
+            errback(err)
+          }
+        }.bind(this)
+      )
+
+      this.producerTransport.on(
+        'connectionstatechange',
+        function (state) {
+          switch (state) {
+            case 'connecting':
+              break
+
+            case 'connected':
+              //localVideo.srcObject = stream
+              break
+
+            case 'failed':
+              this.producerTransport.close()
+              break
+
+            default:
+              break
+          }
+        }.bind(this)
+      )
+    }
+
+    // init consumerTransport
+    {
+      const data = await this.socket.request('createWebRtcTransport', {
+        forceTcp: false
+      })
+
+      if (data.error) {
+        console.error(data.error)
+        return
+      }
+
+      // only one needed
+      this.consumerTransport = device.createRecvTransport(data)
+      this.consumerTransport.on(
+        'connect',
+        function ({ dtlsParameters }, callback, errback) {
+          this.socket
+            .request('connectTransport', {
+              transport_id: this.consumerTransport.id,
+              dtlsParameters
+            })
+            .then(callback)
+            .catch(errback)
+        }.bind(this)
+      )
+
+      this.consumerTransport.on(
+        'connectionstatechange',
+        async function (state) {
+          switch (state) {
+            case 'connecting':
+              break
+
+            case 'connected':
+              //remoteVideo.srcObject = await stream;
+              //await socket.request('resume');
+              break
+
+            case 'failed':
+              this.consumerTransport.close()
+              break
+
+            default:
+              break
+          }
+        }.bind(this)
+      )
+    }
+  }
+
+  initSockets() {
+    this.socket.on(
+      'consumerClosed',
+      function ({ consumer_id }) {
+        console.log('Closing consumer:', consumer_id)
+        this.removeConsumer(consumer_id)
+      }.bind(this)
+    )
+
+    /**
+     * data: [ {
+     *  producer_id:
+     *  producer_socket_id:
+     * }]
+     */
+    this.socket.on(
+      'newProducers',
+      async function (producerList) {
+        console.log('New producers', producerList)
+        for (let { producer_id } of producerList) {
+          await this.consume(producer_id)
+        }
+      }.bind(this)
+    )
+
+    this.socket.on(
+      'disconnect',
+      function () {
+        this.exit(true)
+      }.bind(this)
+    )
+  }
+
+  //////// MAIN FUNCTIONS /////////////
+
+  async produce(type, deviceId = null) {
+    let mediaConstraints = {}
+    let audio = false
+    let screen = false
+    switch (type) {
+      case mediaType.audio:
+        mediaConstraints = {
+          audio: {
+            deviceId: deviceId
+          },
+          video: false
+        }
+        audio = true
+        break
+      case mediaType.video:
+        mediaConstraints = {
+          audio: false,
+          video: {
+            width: {
+              min: 640,
+              ideal: 1920
+            },
+            height: {
+              min: 400,
+              ideal: 1080
+            },
+            deviceId: deviceId
+            /*aspectRatio: {
+                            ideal: 1.7777777778
+                        }*/
+          }
+        }
+        break
+      case mediaType.screen:
+        mediaConstraints = false
+        screen = true
+        break
+      default:
+        return
+    }
+    if (!this.device.canProduce('video') && !audio) {
+      console.error('Cannot produce video')
+      return
+    }
+    if (this.producerLabel.has(type)) {
+      console.log('Producer already exists for this type ' + type)
+      return
+    }
+    console.log('Mediacontraints:', mediaConstraints)
+    let stream
+    try {
+      stream = screen
+        ? await navigator.mediaDevices.getDisplayMedia()
+        : await navigator.mediaDevices.getUserMedia(mediaConstraints)
+      console.log('supportedConstraints: ' + navigator.mediaDevices.getSupportedConstraints())
+
+      const track = audio ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0]
+      const params = {
+        track
+      }
+      if (!audio && !screen) {
+        params.encodings = [
+          {
+            rid: 'r0',
+            maxBitrate: 100000,
+            //scaleResolutionDownBy: 10.0,
+            scalabilityMode: 'S1T3'
+          },
+          {
+            rid: 'r1',
+            maxBitrate: 300000,
+            scalabilityMode: 'S1T3'
+          },
+          {
+            rid: 'r2',
+            maxBitrate: 900000,
+            scalabilityMode: 'S1T3'
+          }
+        ]
+        params.codecOptions = {
+          videoGoogleStartBitrate: 1000
+        }
+      }
+      producer = await this.producerTransport.produce(params)
+
+      console.log('Producer', producer)
+
+      this.producers.set(producer.id, producer)
+
+      let elem
+
+      producer.on('trackended', () => {
+        this.closeProducer(type)
+      })
+
+      producer.on('transportclose', () => {
+        console.log('Producer transport close')
+        if (!audio) {
+          elem.srcObject.getTracks().forEach(function (track) {
+            track.stop()
+          })
+          elem.parentNode.removeChild(elem)
+        }
+        this.producers.delete(producer.id)
+      })
+
+      producer.on('close', () => {
+        console.log('Closing producer')
+        if (!audio) {
+          elem.srcObject.getTracks().forEach(function (track) {
+            track.stop()
+          })
+          elem.parentNode.removeChild(elem)
+        }
+        this.producers.delete(producer.id)
+      })
+
+      this.producerLabel.set(type, producer.id)
+
+      switch (type) {
+        case mediaType.audio:
+          this.event(_EVENTS.startAudio)
+          break
+        case mediaType.video:
+          this.event(_EVENTS.startVideo)
+          break
+        case mediaType.screen:
+          this.event(_EVENTS.startScreen)
+          break
+        default:
+          return
+      }
+    } catch (err) {
+      console.log('Produce error:', err)
+    }
+  }
+
+  async consume(producer_id) {
+    //let info = await this.roomInfo()
+
+    this.getConsumeStream(producer_id).then(
+      function ({ consumer, stream, kind }) {
+        this.consumers.set(consumer.id, consumer)
+
+        let elem
+        if (kind === 'video') {
+          /* Nothing yet */
+        } else {
+          elem = document.createElement('audio')
+          elem.srcObject = stream
+          elem.id = consumer.id
+          elem.playsinline = false
+          elem.autoplay = true
+          this.remoteAudioEl.appendChild(elem)
+        }
+
+        consumer.on(
+          'trackended',
+          function () {
+            this.removeConsumer(consumer.id)
+          }.bind(this)
+        )
+
+        consumer.on(
+          'transportclose',
+          function () {
+            this.removeConsumer(consumer.id)
+          }.bind(this)
+        )
+      }.bind(this)
+    )
+  }
+
+  async getConsumeStream(producerId) {
+    const { rtpCapabilities } = this.device
+    const data = await this.socket.request('consume', {
+      rtpCapabilities,
+      consumerTransportId: this.consumerTransport.id, // might be
+      producerId
+    })
+    const { id, kind, rtpParameters } = data
+
+    let codecOptions = {}
+    const consumer = await this.consumerTransport.consume({
+      id,
+      producerId,
+      kind,
+      rtpParameters,
+      codecOptions
+    })
+
+    const stream = new MediaStream()
+    stream.addTrack(consumer.track)
+
+    return {
+      consumer,
+      stream,
+      kind
+    }
+  }
+
+  closeProducer(type) {
+    if (!this.producerLabel.has(type)) {
+      console.log('There is no producer for this type ' + type)
+      return
+    }
+
+    let producer_id = this.producerLabel.get(type)
+    console.log('Close producer', producer_id)
+
+    this.socket.emit('producerClosed', {
+      producer_id
+    })
+
+    this.producers.get(producer_id).close()
+    this.producers.delete(producer_id)
+    this.producerLabel.delete(type)
+
+    if (type !== mediaType.audio) {
+      let elem = document.getElementById(producer_id)
+      elem.srcObject.getTracks().forEach(function (track) {
+        track.stop()
+      })
+      elem.parentNode.removeChild(elem)
+    }
+
+    switch (type) {
+      case mediaType.audio:
+        this.event(_EVENTS.stopAudio)
+        break
+      case mediaType.video:
+        this.event(_EVENTS.stopVideo)
+        break
+      case mediaType.screen:
+        this.event(_EVENTS.stopScreen)
+        break
+      default:
+        return
+    }
+  }
+
+  pauseProducer(type) {
+    if (!this.producerLabel.has(type)) {
+      console.log('There is no producer for this type ' + type)
+      return
+    }
+
+    let producer_id = this.producerLabel.get(type)
+    this.producers.get(producer_id).pause()
+  }
+
+  resumeProducer(type) {
+    if (!this.producerLabel.has(type)) {
+      console.log('There is no producer for this type ' + type)
+      return
+    }
+
+    let producer_id = this.producerLabel.get(type)
+    this.producers.get(producer_id).resume()
+  }
+
+  removeConsumer(consumer_id) {
+    let elem = document.getElementById(consumer_id)
+    elem.srcObject.getTracks().forEach(function (track) {
+      track.stop()
+    })
+    elem.parentNode.removeChild(elem)
+
+    this.consumers.delete(consumer_id)
+  }
+
+  exit(offline = false) {
+    let clean = function () {
+      this._isOpen = false
+      this.consumerTransport.close()
+      this.producerTransport.close()
+      this.socket.off('disconnect')
+      this.socket.off('newProducers')
+      this.socket.off('consumerClosed')
+    }.bind(this)
+
+    if (!offline) {
+      this.socket
+        .request('exitRoom')
+        .then((e) => console.log(e))
+        .catch((e) => console.warn(e))
+        .finally(
+          function () {
+            clean()
+          }.bind(this)
+        )
+    } else {
+      clean()
+    }
+
+    this.event(_EVENTS.exitRoom)
+  }
+
+  ///////  HELPERS //////////
+
+  async roomInfo() {
+    let info = await this.socket.request('getMyRoomInfo')
+    return info
+  }
+
+  static get mediaType() {
+    return mediaType
+  }
+
+  event(evt) {
+    if (this.eventListeners.has(evt)) {
+      this.eventListeners.get(evt).forEach((callback) => callback())
+    }
+  }
+
+  on(evt, callback) {
+    this.eventListeners.get(evt).push(callback)
+  }
+
+  //////// GETTERS ////////
+
+  isOpen() {
+    return this._isOpen
+  }
+
+  static get EVENTS() {
+    return _EVENTS
+  }
+
+  //////// UTILITY ////////
+
+  // copyURL() {
+  //   let tmpInput = document.createElement('input')
+  //   document.body.appendChild(tmpInput)
+  //   tmpInput.value = window.location.href
+  //   tmpInput.select()
+  //   document.execCommand('copy')
+  //   document.body.removeChild(tmpInput)
+  //   console.log('URL copied to clipboard 👍')
+  // }
+
+  // showDevices() {
+  //   if (!this.isDevicesVisible) {
+  //     reveal(devicesList)
+  //     this.isDevicesVisible = true
+  //   } else {
+  //     hide(devicesList)
+  //     this.isDevicesVisible = false
+  //   }
+  // }
+
+  handleFS(id) {
+    let videoPlayer = document.getElementById(id)
+    videoPlayer.addEventListener('fullscreenchange', (e) => {
+      if (videoPlayer.controls) return
+      let fullscreenElement = document.fullscreenElement
+      if (!fullscreenElement) {
+        videoPlayer.style.pointerEvents = 'auto'
+        this.isVideoOnFullScreen = false
+      }
+    })
+    videoPlayer.addEventListener('webkitfullscreenchange', (e) => {
+      if (videoPlayer.controls) return
+      let webkitIsFullScreen = document.webkitIsFullScreen
+      if (!webkitIsFullScreen) {
+        videoPlayer.style.pointerEvents = 'auto'
+        this.isVideoOnFullScreen = false
+      }
+    })
+    videoPlayer.addEventListener('click', (e) => {
+      if (videoPlayer.controls) return
+      if (!this.isVideoOnFullScreen) {
+        if (videoPlayer.requestFullscreen) {
+          videoPlayer.requestFullscreen()
+        } else if (videoPlayer.webkitRequestFullscreen) {
+          videoPlayer.webkitRequestFullscreen()
+        } else if (videoPlayer.msRequestFullscreen) {
+          videoPlayer.msRequestFullscreen()
+        }
+        this.isVideoOnFullScreen = true
+        videoPlayer.style.pointerEvents = 'none'
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen()
+        } else if (document.webkitCancelFullScreen) {
+          document.webkitCancelFullScreen()
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen()
+        }
+        this.isVideoOnFullScreen = false
+        videoPlayer.style.pointerEvents = 'auto'
+      }
+    })
+  }
+}
