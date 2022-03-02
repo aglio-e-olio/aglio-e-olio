@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
-import hark from 'hark';
 import Audio from '../Components/Audio/Audio';
 import MyAudio from '../Components/Audio/MyAudio';
 import Canvas from '../Components/Canvas/Canvas';
@@ -54,7 +53,6 @@ const Room = () => {
   i++;
 
   const [isOpen, setOpen] = useState(false);
-  const [muted, setMute] = useState('Mute');
 
   const handleSave = () => {
     // 여기서 모달 열어줌
@@ -197,7 +195,7 @@ const Room = () => {
 
   return (
     <div>
-      <MyAudio/>
+      <MyAudio />
       <div class="flex justify-start">
         {peers.map((peer_info, index) => {
           return <Audio key={index} peer_info={peer_info} />;
