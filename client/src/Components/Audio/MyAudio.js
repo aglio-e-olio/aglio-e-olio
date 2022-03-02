@@ -1,23 +1,19 @@
-import React, { useRef, useContext, useState, useEffect } from 'react';
-import { codeContext } from '../../Context/ContextProvider';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import hark from 'hark';
+import { codeContext } from '../../Context/ContextProvider';
 
 const StyledAudio = styled.audio`
   float: left;
 `;
 
-const Audio = (props) => {
-  const peerName = props.peer_info.peerName;
-  console.log('audio 안 peer이름은?', peerName);
+const MyAudio = () => {
+  const { persistUser } = useContext(codeContext);
   const ref = useRef();
-  const { addAudioStream } = useContext(codeContext);
-
   const [color, setColor] = useState(false);
 
   useEffect(() => {
-    props.peer_info.peer.on('stream', (stream) => {
-      addAudioStream(stream);
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       ref.current.srcObject = stream;
       let options = {};
       let speechEvents = hark(stream, options);
@@ -34,17 +30,17 @@ const Audio = (props) => {
   return (
     <div>
       <StyledAudio autoPlay ref={ref} />
-      {/* <button>{props.peer.peerID}</button> */}
+
       {color ? (
         <div class="avatar placeholder">
           <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">
-            <span>{peerName}</span>
+            <span>{persistUser}</span>
           </div>
         </div>
       ) : (
         <div class="avatar placeholder ">
           <div class="bg-neutral-focus text-neutral-content rounded-full w-12 h-12">
-            <span>{peerName}</span>
+            <span>{persistUser}</span>
           </div>
         </div>
       )}
@@ -52,4 +48,4 @@ const Audio = (props) => {
   );
 };
 
-export default Audio;
+export default MyAudio;
