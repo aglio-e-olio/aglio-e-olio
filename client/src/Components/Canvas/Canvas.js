@@ -144,7 +144,7 @@ export default function Canvas({
   return (
     <div>
       <div >
-        <ul class="menu bg-neutral p-2 rounded-box fixed left-1 z-50 top-1/3 ">
+        {/* <ul class="menu bg-neutral p-2 rounded-box fixed left-1 z-50 top-1/3 ">
           <li onClick={changeToPencil}>
             <a>
               <PenIcon />
@@ -160,7 +160,7 @@ export default function Canvas({
               <TrashIcon />
             </a>
           </li>
-        </ul>
+        </ul> */}
       </div>
       <div className="canvas-container" style={{ zIndex: zIndex }}>
         <svg

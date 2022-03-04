@@ -8,6 +8,7 @@ import './Room.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
+import PinchZoomPan from 'react-responsive-pinch-zoom-pan';
 
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
@@ -16,6 +17,7 @@ import Save from '../Components/Save/Save';
 import UrlCopy from '../Components/UrlCopy';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
+import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
 
 let i = 0;
 let doc;
@@ -194,7 +196,9 @@ const Room = () => {
   /* Render */
 
   return (
-    <div class="bg-neutral">
+    <div>
+      <AbsoluteUI />
+    <div>
       <div class="flex justify-start">
         <MyAudio />
         <div class="flex justify-start">
@@ -203,14 +207,14 @@ const Room = () => {
           })}
         </div>
         <div>
-          <Record />
-          <button
+          {/* <Record /> */}
+          {/* <button
             class="btn absolute bottom-20 right-4 z-30"
             onClick={sendCode}
           >
             Run
-          </button>
-          <UrlCopy />
+          </button> */}
+          {/* <UrlCopy />
           <button
             class="btn btn-success cursor-pointer absolute top-0 right-40 bg-info"
             onClick={handleSave}
@@ -228,27 +232,27 @@ const Room = () => {
             onCancel={handleSaveCancel}
             yLines={yLines}
             doc={doc}
-          />
-
-          <Canvas
+          /> */}
+          {/* <Canvas
             doc={doc}
             provider={provider}
             awareness={awareness}
             yLines={yLines}
             undoManager={undoManager}
           />
-          <CodeEditor doc={doc} provider={provider} />
+          <CodeEditor doc={doc} provider={provider} /> */}
         </div>
         <div>
-          <textarea
+          {/* <textarea
             className="code-result"
             value={compileResult}
             placeholder={
               '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
             }
-          />
+          /> */}
         </div>
       </div>
+    </div>
     </div>
   );
 };
