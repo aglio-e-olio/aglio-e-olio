@@ -48,7 +48,7 @@ const HeaderNav = ({ peers, handleSave }) => {
         </ul>
       </div>
       <div class="navbar-center lg:flex">
-        <a class="btn btn-primary normal-case text-xl">AO</a>
+        <a class="btn btn-ghost normal-case text-xl">AO</a>
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
