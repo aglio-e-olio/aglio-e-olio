@@ -213,15 +213,6 @@ const Room = () => {
           >
             Run
           </button> */}
-          {/* <UrlCopy />
-          
-          <button
-            class="btn btn-success cursor-pointer absolute top-0 right-60 bg-info"
-            onClick={() => navigate(-1)}
-          >
-            뒤로 가기
-          </button>
-           */}
           {/* <Canvas
             doc={doc}
             provider={provider}

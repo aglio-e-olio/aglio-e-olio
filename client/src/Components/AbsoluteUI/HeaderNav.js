@@ -2,12 +2,17 @@ import React from 'react';
 import MyAudio from '../Audio/MyAudio';
 import Audio from '../Audio/Audio';
 import UrlCopy from '../UrlCopy';
+import { useNavigate } from 'react-router-dom';
 
 const HeaderNav = ({peers, handleSave}) => {
+  const navigate = useNavigate();
   return (
     <div class="navbar bg-neutral z-111 rounded-box m-1">
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
+          <li>
+            <button class='btn btn-info' onClick={() => navigate(-1)}>X</button>
+          </li>
           <li>
             <MyAudio />
           </li>
