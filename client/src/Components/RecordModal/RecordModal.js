@@ -15,7 +15,7 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  const { codes, urlSnapshot, email, persistUser } = useContext(codeContext);
+  const { codes, urlSnapshot, email, persistUser, persistEmail } = useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
@@ -96,15 +96,14 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
       algo_tag: algorithm.map((algo) => algo.value),
       announcer: announcer.value,
       extra_tag: extras.map((extra) => extra.value),
-    //   type: "video",
-      is_picture: false,
+      type: "video",
       teemMates: announcerOptions.map(
         (announcerOption) => announcerOption.value
       ),
       save_time: saveTime,
       canvas_data: null,
       image_tn_ref: videoUrl, // data는 객체고 data.location에 링크 들어있다.
-      user_email: 'tmdgus3901@gmail.com',
+      user_email: persistEmail,
       nickname: persistUser,
       // code_data : codes
     };
@@ -112,11 +111,9 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
     axios
       .post('https://aglio-olio-api.shop/myroom/save', body)
       .then(function (res) {
-        console.log(res);
         alert('post 성공');
       })
       .catch(function (err) {
-        console.log(err);
         alert('post실패');
       });
   };

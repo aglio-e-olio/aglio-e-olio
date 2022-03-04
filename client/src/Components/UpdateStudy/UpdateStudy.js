@@ -15,12 +15,31 @@ import dotenv from 'dotenv';
 const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   dotenv.config();
 
-  const [title, setTitle] = useState(data.title);
-  const [announcer, setAnnouncer] = useState(data.announcer);
+  const [title, setTitle] = useState(metaData.title);
+  const [announcer, setAnnouncer] = useState(metaData.announcer);
+
+  const [metaData, setMetaData] = useState([]);
+
+  const getData = async (selectedPreviewKey) => {
+    try {
+      const res = await axios({
+        method: "GET",
+        url: 'https://aglio-olio-api.shop/myroom/preview',
+        params: { post_id: selectedPreviewKey },
+      })
+      setMetaData(prev => prev = res.data)
+    } catch(err) {
+      console.error(err)
+    }
+  }
+ 
+  useEffect(() => {
+    getData(selectedPreviewKey)
+  }, [])
 
   let algo_array = [];
-  if (data.algo_tag) {
-    data.algo_tag.map((tag) => {
+  if (metaData && metaData.algo_tag) {
+    metaData.algo_tag.map((tag) => {
       let algo_object = {};
       algo_object.label = tag.tag;
       algo_object.value = tag.tag;
@@ -30,8 +49,8 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   const [algorithm, setAlgorithm] = useState(algo_array && [...algo_array]);
 
   let extra_array = [];
-  if (data.extra_tag) {
-    data.extra_tag.map((tag) => {
+  if (metaData && metaData.extra_tag) {
+    metaData.extra_tag.map((tag) => {
       let extra_object = {};
       extra_object.label = tag;
       extra_object.value = tag;
@@ -137,7 +156,6 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     } else {
       uploadFile(file, config)
         .then((data) => {
-          console.log('uploadfile', data);
           let updateTime = new Date();
           let body = {
             post_id: selectedPreviewKey,
@@ -145,15 +163,14 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            // type: "picture",
-            is_picture: true,
+            type: "image",
             teemMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
             update_time: updateTime,
             canvas_data: ydocCanvasData,
-            image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
-            user_email: 'tmdgus3901@gmail.com',
+            image_tn_ref: metaData.location, // data는 객체고 data.location에 링크 들어있다.
+            user_email: persistEmail,
             nickname: persistUser,
           };
 
@@ -170,7 +187,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
               // onCancel();
             });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
     }
   };
 

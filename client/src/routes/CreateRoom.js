@@ -9,9 +9,6 @@ const CreateRoom = (props) => {
   const { persistUser, persistLogin } = useContext(codeContext);
   const login_info = localStorage.getItem("persistLogin");
   
-  console.log('CreateRoom안 persistUser는 ',persistUser);
-  console.log('CreateRoom안 persistLogin는 ',persistLogin);
-
   const navigate = useNavigate();
   function create() {
     const id = uuid();
