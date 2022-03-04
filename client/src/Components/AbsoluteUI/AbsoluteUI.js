@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import LeftSideToolbar from './LeftSideToolbar';
 import HeaderNav from './HeaderNav';
 import CodeDrawer from './CodeDrawer';
+import RightSideNav from './RightSideNav';
 
 const AbsoluteUI = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +10,7 @@ const AbsoluteUI = () => {
         <div class='fixed top-0 left-0 right-0 bottom-0'>
             <HeaderNav setIsOpen={setIsOpen}/>
             <LeftSideToolbar />
+            <RightSideNav setIsOpen={setIsOpen}/>
             <CodeDrawer isOpen={isOpen} setIsOpen={setIsOpen}/>
         </div>
     );

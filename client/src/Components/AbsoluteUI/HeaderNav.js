@@ -1,6 +1,6 @@
 import React from 'react';
 
-const HeaderNav = ({setIsOpen}) => {
+const HeaderNav = () => {
   return (
     <div class="navbar bg-neutral z-111 rounded-box m-1">
       <div class="navbar-start">
@@ -22,7 +22,7 @@ const HeaderNav = ({setIsOpen}) => {
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
           <li>
-            <button class="btn btn-secondary mx-3" onClick={() => setIsOpen(true)}>Open</button>
+            <button class="btn btn-secondary mx-3">버튼1</button>
           </li>
           <li>
             <button class="btn btn-secondary mx-3">버튼2</button>

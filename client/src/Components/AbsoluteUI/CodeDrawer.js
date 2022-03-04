@@ -17,7 +17,10 @@ const CodeDrawer = ({isOpen, setIsOpen}) => {
         }
       >
         <article className="relative w-screen max-w-lg pb-10 flex flex-col space-y-6 overflow-y-scroll h-full">
-          <header className="p-4 font-bold text-lg">Header</header>
+          <header className="p-4 font-bold text-lg">
+              Header
+              <button class="btn btn-secondary mx-3" onClick={() => setIsOpen(false)}>close</button>
+              </header>
           <button
             class="btn absolute bottom-20 right-4 z-30"
           >
@@ -31,12 +34,6 @@ const CodeDrawer = ({isOpen, setIsOpen}) => {
           />
         </article>
       </section>
-      <section
-        className=" w-screen h-full cursor-pointer "
-        onClick={() => {
-          setIsOpen(false);
-        }}
-      ></section>
     </main>
   );
 };
