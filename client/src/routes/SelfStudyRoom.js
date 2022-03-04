@@ -57,7 +57,7 @@ const SelfStudyRoom = () => {
         getUrl(snapshotUrl);
       })
       .catch((e) => {
-        console.log(e);
+        console.error(e);
       });
   };
 

@@ -87,7 +87,7 @@ const Record = () => {
 
         uploadFile(recordFile, config)
           .then(data => setVideoUrl(data.location))
-          .catch(err => console.log(err))
+          .catch(err => console.error(err))
       }
     }
   }, [allAudioStreams]);

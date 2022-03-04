@@ -30,7 +30,7 @@ function InfoList() {
         setSearchedData((data) => [...firstSortedData]);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   }, [currentTag]);
 
@@ -75,8 +75,8 @@ function InfoList() {
             >
               <div class="card-body hover:bg-sky-700">
                 <h2 class="card-title">{value.title}</h2>
-                {/* {value.type === "picture" ? <PictureIcon /> : <CameraIcon />} */}
-                {value.is_picture ? <PictureIcon /> : <CameraIcon />}
+                {console.log("value.type", value.type)}
+                {value.type === "image" ? <PictureIcon /> : <CameraIcon />}
                 <p>{value.announcer}</p>
                 <p>{value.save_time}</p>
                 <div class="justify-end card-actions">

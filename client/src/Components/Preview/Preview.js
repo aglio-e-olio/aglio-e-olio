@@ -10,7 +10,7 @@ function Preview() {
   const navigate = useNavigate();
 
   /* preview에서 meta data 서버에 요청 */
-  useEffect(async () => {
+  const getData = async () => {
     try {
       const res = await axios({
         method: 'GET',
@@ -21,6 +21,10 @@ function Preview() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  useEffect(async () => {
+    getData();
   }, [selectedPreviewKey]);
 
   function goToSelfstudy() {
@@ -46,14 +50,10 @@ function Preview() {
   return metaData && metaData !== 'error' ? (
     <div class="card w-96 glass">
       <figure>
-        {metaData.is_picture ? (
+        {metaData.type === 'image' ? (
           <img
             class="object-scale-down h-60 w-96"
-            src={
-              metaData.is_picture
-                ? metaData.image_tn_ref
-                : metaData.video_tn_ref
-            }
+            src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
           />
