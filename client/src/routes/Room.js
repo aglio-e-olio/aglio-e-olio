@@ -68,9 +68,9 @@ const Room = () => {
     setOpen(false);
   };
 
-  function sendCode() {
-    socketRef.current.emit('code compile', { codes, roomID });
-  }
+  // function sendCode() {
+  //   socketRef.current.emit('code compile', { codes, roomID });
+  // }
 
   useEffect(() => {
     console.log('소켓 커넥트는 몇번 되는가?');
@@ -197,7 +197,7 @@ const Room = () => {
 
   return (
     <div>
-      <AbsoluteUI peers={peers} handleSave={handleSave} />
+      <AbsoluteUI peers={peers} handleSave={handleSave} doc={doc} provider={provider}/>
       <div>
         <Save
           isOpen={isOpen}

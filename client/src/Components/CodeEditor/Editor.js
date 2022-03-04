@@ -60,7 +60,7 @@ const CodeEditor = ({ doc, provider }) => {
     });
   }, []);
 
-  return <div className="code-editor" id="editor"></div>;
+  return <div className="w-full text-left" id="editor"></div>;
 };
 
 export default CodeEditor;
