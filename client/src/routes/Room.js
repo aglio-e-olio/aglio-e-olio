@@ -197,15 +197,15 @@ const Room = () => {
 
   return (
     <div>
-      <AbsoluteUI />
+      <AbsoluteUI peers={peers}/>
     <div>
-      <div class="flex justify-start">
+      {/* <div class="flex justify-start">
         <MyAudio />
         <div class="flex justify-start">
           {peers.map((peer_info, index) => {
             return <Audio key={index} peer_info={peer_info} />;
           })}
-        </div>
+        </div> */}
         <div>
           {/* <Record /> */}
           {/* <button
@@ -250,7 +250,7 @@ const Room = () => {
               '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
             }
           /> */}
-        </div>
+        {/* </div> */}
       </div>
     </div>
     </div>

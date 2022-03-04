@@ -129,13 +129,6 @@ export default function Canvas({
     [completeLine, completeErase]
   );
 
-  const [_, forceUpdate] = React.useReducer((s) => !s, false);
-
-  React.useEffect(() => {
-    const timeout = setInterval(forceUpdate, 30);
-    return () => clearInterval(timeout);
-  }, []);
-
   const [zIndex, setZindex] = useState(0);
   const changeZofCanvas = () => {
     setZindex((index) => (index === 10 ? 0 : 10));
