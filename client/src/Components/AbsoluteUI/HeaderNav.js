@@ -1,12 +1,16 @@
 import React from 'react';
 import MyAudio from '../Audio/MyAudio';
 import Audio from '../Audio/Audio';
+import UrlCopy from '../UrlCopy';
 
-const HeaderNav = ({peers}) => {
+const HeaderNav = ({peers, handleSave}) => {
   return (
     <div class="navbar bg-neutral z-111 rounded-box m-1">
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
+          <li>
+            <MyAudio />
+          </li>
           <li>
             <MyAudio />
           </li>
@@ -16,12 +20,6 @@ const HeaderNav = ({peers}) => {
               <Audio key={index} peer_info={peer_info} />
               </li>)
           })}
-          <li>
-            <button class="btn btn-info mx-3">버튼2</button>
-          </li>
-          <li>
-            <button class="btn btn-info mx-3">버튼3</button>
-          </li>
         </ul>
       </div>
       <div class="navbar-center lg:flex">
@@ -30,13 +28,13 @@ const HeaderNav = ({peers}) => {
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
           <li>
-            <button class="btn btn-secondary mx-3">버튼1</button>
+            <button class="btn btn-secondary mx-3">Record</button>
           </li>
           <li>
-            <button class="btn btn-secondary mx-3">버튼2</button>
+            <button class="btn btn-secondary mx-3" onClick={handleSave}>Snap Save</button>
           </li>
           <li>
-            <button class="btn btn-secondary mx-3">버튼3</button>
+            <UrlCopy />
           </li>
         </ul>
       </div>
