@@ -14,11 +14,11 @@ const LobbyCreate = ({ clickAction, buttonName }) => {
         <div class="max-w-md">
           <h1 class="mb-5 text-5xl font-bold">실시간 스터디룸</h1>
           <p class="mb-5 whitespace-pre-line">
-          친구들을 초대해서 함께 코드 에디터와 화이트보드를 이용해서 코딩
+          친구들을 초대해서 함께 코드 에디터와 화이트보드를 <br/>이용해서 코딩
             스터디를 진행해보세요! <br/>코드 실행결과도 이곳에서 바로
             확인가능하답니다.
           </p>
-          <button class="btn btn-info" onClick={clickAction}>{buttonName}</button>
+          <button class="btn btn-active btn-lg btn-info" onClick={clickAction}>{buttonName}</button>
         </div>
       </div>
     </div>
