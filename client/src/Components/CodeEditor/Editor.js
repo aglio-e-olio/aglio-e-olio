@@ -1,3 +1,4 @@
+import * as Y from 'yjs';
 // @ts-ignore
 import { yCollab, yUndoManagerKeymap } from 'y-codemirror.next';
 // import { WebsocketProvider } from 'y-websocket'
@@ -24,13 +25,15 @@ export const usercolors = [
 
 export const userColor = usercolors[random.uint32() % usercolors.length];
 
-const CodeEditor = ({ doc, provider }) => {
-  const { codes, extractCode } = useContext(codeContext);
+const CodeEditor = ({ doc, provider, name }) => {
+  console.log('내이름 ', name);
+  const { codes, extractCode,} = useContext(codeContext);
   useEffect(() => {
     const ytext = doc.getText('codemirror');
+    const undoManager = new Y.UndoManager(ytext);
 
     provider.awareness.setLocalStateField('user', {
-      name: 'Anonymous ' + Math.floor(Math.random() * 100),
+      name: name,
       color: userColor.color,
       colorLight: userColor.light,
     });
@@ -42,14 +45,15 @@ const CodeEditor = ({ doc, provider }) => {
         basicSetup,
         javascript(),
         keymap.of([indentWithTab]),
-        yCollab(ytext, provider.awareness),
-        EditorView.updateListener.of((editorUpdate) => {
-          if (editorUpdate.docChanged) {
-            const doc = editorUpdate.state.doc;
-            const value = doc.toString();
-            extractCode(value);
-          }
-        }),
+        yCollab(ytext, provider.awareness, { undoManager }),
+        // 렌더링 계속 일어나서 뺐다.
+        // EditorView.updateListener.of((editorUpdate) => {
+        //   if (editorUpdate.docChanged) {
+        //     const doc = editorUpdate.state.doc;
+        //     const value = doc.toString();
+        //     extractCode(value);
+        //   }
+        // }),
         // oneDark
       ],
     });

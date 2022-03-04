@@ -47,6 +47,8 @@ const Room = () => {
     doc = new Y.Doc();
     provider = new WebrtcProvider(roomID, doc);
     awareness = provider.awareness;
+    console.log('provider는', provider);
+    console.log('awareness는', awareness);
     yLines = doc.getArray('lines~9');
     undoManager = new Y.UndoManager(yLines);
   }
@@ -154,6 +156,10 @@ const Room = () => {
         signal,
       });
     });
+    peer.on('disconnect', () => {
+      console.log('create 안 peer연결이 끊겼습니다.');
+      peer.destroy();
+    });
 
     return peer;
   }
@@ -167,6 +173,11 @@ const Room = () => {
 
     peer.on('signal', (signal) => {
       socketRef.current.emit('returning signal', { signal, callerID });
+    });
+
+    peer.on('disconnect', () => {
+      console.log('add 안 peer연결이 끊겼습니다.');
+      peer.destroy();
     });
 
     peer.signal(incomingSignal);
@@ -237,7 +248,7 @@ const Room = () => {
             yLines={yLines}
             undoManager={undoManager}
           />
-          <CodeEditor doc={doc} provider={provider} />
+          <CodeEditor doc={doc} provider={provider} name={persistUser} />
         </div>
         <div>
           <textarea

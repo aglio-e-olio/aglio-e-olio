@@ -29,7 +29,7 @@ const MyAudio = () => {
   }, []);
   return (
     <div>
-      <StyledAudio autoPlay ref={ref} />
+      <StyledAudio autoPlay ref={ref} muted />
 
       {color ? (
         <div class="avatar placeholder">

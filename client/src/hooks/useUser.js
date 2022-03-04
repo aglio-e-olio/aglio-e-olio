@@ -1,5 +1,5 @@
 import * as React from 'react';
-// import { awareness } from '../utils/y';
+import { awareness } from '../utils/y';
 
 const USER_COLORS = [
   '#EC5E41',

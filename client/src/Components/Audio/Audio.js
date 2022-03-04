@@ -15,6 +15,11 @@ const Audio = (props) => {
 
   const [color, setColor] = useState(false);
 
+  props.peer_info.peer.on('disconnect', () => {
+    console.log('audio안 peer연결이 끊겼습니다.');
+    props.peer_info.peer.destroy();
+  });
+
   useEffect(() => {
     props.peer_info.peer.on('stream', (stream) => {
       addAudioStream(stream);
@@ -34,7 +39,6 @@ const Audio = (props) => {
   return (
     <div>
       <StyledAudio autoPlay ref={ref} />
-      {/* <button>{props.peer.peerID}</button> */}
       {color ? (
         <div class="avatar placeholder">
           <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">
