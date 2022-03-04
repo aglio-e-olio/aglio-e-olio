@@ -7,7 +7,7 @@ import { useUser } from '../../hooks/useUser';
 import { useUsers } from '../../hooks/useUsers';
 import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
 import './Canvas.css';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useEraser } from '../../hooks/useEraser';
 import PenIcon from '../Atoms/PenIcon';
 import EraserIcon from '../Atoms/EraserIcon';
@@ -20,15 +20,6 @@ date.setUTCHours(0, 0, 0, 0);
 const START_TIME = date.getTime();
 
 let ERASER_FLAG = false;
-
-function changeToEraser() {
-    ERASER_FLAG = true;
-  
-}
-
-function changeToPencil() {
-  ERASER_FLAG = false;
-}
 
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
@@ -75,6 +66,18 @@ export default function Canvas({
   } = useEraser({ doc, provider, awareness, yLines, undoManager });
 
   useKeyboardEvents();
+
+  const curserRef = useRef();
+
+  function changeToEraser() {
+    ERASER_FLAG = true;
+    curserRef.current.style.cursor = 'url("/img/eraser_cursor.cur"), auto';
+  }
+
+  function changeToPencil() {
+    ERASER_FLAG = false;
+    curserRef.current.style.cursor = 'url("/img/pen_cursor.cur"), auto';
+  }
 
   // On pointer down, start a new current line
   const handlePointerDown = React.useCallback(
@@ -143,7 +146,7 @@ export default function Canvas({
 
   return (
     <div>
-      <div >
+      <div>
         <ul class="menu bg-neutral p-2 rounded-box fixed left-1 z-50 top-1/3 ">
           <li onClick={changeToPencil}>
             <a>
@@ -162,7 +165,14 @@ export default function Canvas({
           </li>
         </ul>
       </div>
-      <div className="canvas-container" style={{ zIndex: zIndex }}>
+      <div
+        className="canvas-container"
+        style={{
+          zIndex: zIndex,
+          cursor: 'url("/img/pen_cursor.cur"), auto',
+        }}
+        ref={curserRef}
+      >
         <svg
           width={window.innerWidth}
           height={window.innerHeight}

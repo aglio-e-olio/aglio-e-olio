@@ -1,3 +1,5 @@
+
+
 * {
   box-sizing: border-box;
 }
@@ -18,7 +20,7 @@ svg {
   left: 0px;
   width: 100%;
   height: 100%;
-  border: 5px solid #3D4451;
+  border: 5px solid #3d4451;
 }
 
 .canvas-layer {
@@ -27,7 +29,7 @@ svg {
   left: 0px;
   width: 100%;
   height: 100%;
-  background-color: #E0E1DD;
+  background-color: #e0e1dd;
 }
 
 .canvas-shape {
