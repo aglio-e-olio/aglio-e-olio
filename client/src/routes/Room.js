@@ -32,6 +32,7 @@ const Room = () => {
   const socketRef = useRef();
   const peersRef = useRef([]);
   const { roomID } = useParams();
+  const [isEraser, setIsEraser] = useState(false);
 
   const {
     codes,
@@ -203,6 +204,10 @@ const Room = () => {
           handleSave={handleSave}
           doc={doc}
           provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+          setIsEraser={setIsEraser}
         />
         <Canvas
           doc={doc}
@@ -210,6 +215,7 @@ const Room = () => {
           awareness={awareness}
           yLines={yLines}
           undoManager={undoManager}
+          isEraser={isEraser}
         />
       </div>
       <div>
