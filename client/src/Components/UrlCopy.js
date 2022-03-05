@@ -1,4 +1,5 @@
 import React from 'react';
+import UrlCopyIcon from './Atoms/UrlCopyIcon';
 
 function UrlCopy() {
   console.log('UrlCopy 안');
@@ -44,11 +45,8 @@ function UrlCopy() {
   const url = window.document.location.href;
 
   return (
-    <button
-      class="btn btn-success cursor-pointer absolute top-0 right-10 bg-info"
-      onClick={() => doCopy(url)}
-    >
-      URL 복사하기
+    <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)}>
+      <UrlCopyIcon />
     </button>
   );
 }

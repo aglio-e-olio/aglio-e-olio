@@ -9,9 +9,6 @@ import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
 import './Canvas.css';
 import { useState } from 'react';
 import { useEraser } from '../../hooks/useEraser';
-import PenIcon from '../Atoms/PenIcon';
-import EraserIcon from '../Atoms/EraserIcon';
-import TrashIcon from '../Atoms/TrashIcon';
 
 const date = new Date();
 
@@ -19,20 +16,9 @@ date.setUTCHours(0, 0, 0, 0);
 
 const START_TIME = date.getTime();
 
-let ERASER_FLAG = false;
-
-function changeToEraser() {
-    ERASER_FLAG = true;
-  
-}
-
-function changeToPencil() {
-  ERASER_FLAG = false;
-}
-
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
-  return -52;
+  return -65;
 }
 
 function getPoint(x, y) {
@@ -45,6 +31,7 @@ export default function Canvas({
   awareness,
   yLines,
   undoManager,
+  isEraser,
 }) {
   const {
     user: self,
@@ -81,7 +68,7 @@ export default function Canvas({
     (e) => {
       e.currentTarget.setPointerCapture(e.pointerId);
 
-      if (ERASER_FLAG) {
+      if (isEraser) {
         startErase(
           getPoint(e.clientX / window.innerWidth, e.clientY + window.scrollY)
         );
@@ -91,7 +78,7 @@ export default function Canvas({
         );
       }
     },
-    [startLine, startErase]
+    [startLine, startErase, isEraser]
   );
 
   // On pointer move, update awareness and (if down) update the current line
@@ -104,37 +91,30 @@ export default function Canvas({
 
       updateUserPoint(point);
 
-      if (e.currentTarget.hasPointerCapture(e.pointerId) && !ERASER_FLAG) {
+      if (e.currentTarget.hasPointerCapture(e.pointerId) && !isEraser) {
         addPointToLine(point);
       } else if (
         e.currentTarget.hasPointerCapture(e.pointerId) &&
-        ERASER_FLAG
+        isEraser
       ) {
         addPointToErase(point);
       }
     },
-    [addPointToLine, updateUserPoint, addPointToErase]
+    [addPointToLine, updateUserPoint, addPointToErase, isEraser]
   );
 
   // On pointer up, complete the current line
   const handlePointerUp = React.useCallback(
     (e) => {
       e.currentTarget.releasePointerCapture(e.pointerId);
-      if (ERASER_FLAG) {
+      if (isEraser) {
         completeErase();
       } else {
         completeLine();
       }
     },
-    [completeLine, completeErase]
+    [completeLine, completeErase, isEraser]
   );
-
-  const [_, forceUpdate] = React.useReducer((s) => !s, false);
-
-  React.useEffect(() => {
-    const timeout = setInterval(forceUpdate, 30);
-    return () => clearInterval(timeout);
-  }, []);
 
   const [zIndex, setZindex] = useState(0);
   const changeZofCanvas = () => {
@@ -143,30 +123,12 @@ export default function Canvas({
 
   return (
     <div>
-      <div >
-        <ul class="menu bg-neutral p-2 rounded-box fixed left-1 z-50 top-1/3 ">
-          <li onClick={changeToPencil}>
-            <a>
-              <PenIcon />
-            </a>
-          </li>
-          <li onClick={changeToEraser}>
-            <a>
-              <EraserIcon />
-            </a>
-          </li>
-          <li onClick={clearAllLines}>
-            <a>
-              <TrashIcon />
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div className="canvas-container" style={{ zIndex: zIndex }}>
+      <div className="z-0" style={{ 
+        background: '#E5E5E5'
+        }}>
         <svg
           width={window.innerWidth}
           height={window.innerHeight}
-          className="canvas-layer"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -182,14 +144,14 @@ export default function Canvas({
             {/* Live Cursors */}
           </g>
           {/* User Tokens */}
-          {users.map((user, i) => (
+          {/* {users.map((user, i) => (
             <UserToken
               key={user.id}
               user={user}
               index={i}
               isSelf={user.id === self.id}
             />
-          ))}
+          ))} */}
         </svg>
       </div>
     </div>
