@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import TagSort from '../Components/TagSort/TagSort';
 import Navbar from '../Components/Atoms/Navbar';
 import InfoCards from '../Components/InfoCards/InfoCards';
 import SplitPane from 'react-split-pane';
@@ -16,7 +15,6 @@ const History = () => {
     // <div>
     //   <Navbar />
     //   <SplitPane split="vertical" minSize={100} defaultSize="20%">
-    //     {persistEmail && <TagSort />}
     //     <SplitPane split="vertical" defaultSize="50%">
     //       {(currentTag && persistEmail) && <InfoCards />}
     //       {selectedPreviewKey && <Preview />}
