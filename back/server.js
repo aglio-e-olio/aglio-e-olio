@@ -11,6 +11,11 @@ const cors = require('cors');
 
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const logger = require('./config/winston');
+const morgan = require('morgan');
+
+const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'
+const morganFormat = process.env.NODE_ENV !=="production" ? "dev" : combined;
 
 const MONGO_URI = 'mongodb://localhost:27017/mongoose';
 
@@ -31,16 +36,20 @@ app.use(
 );
 
 /* middleware setting */
+app.use(morgan(combined, {stream: logger.stream}))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 /* routing */
+app.use('/api_test', require('./routes/api_test'));
 app.use('/myroom', require('./routes/myroom'));
 
+/**
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
+ */
 
 const users = {};
 // const usersName = {};

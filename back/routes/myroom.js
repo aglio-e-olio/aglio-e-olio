@@ -1,136 +1,218 @@
 const router = require('express').Router();
-const MetaData = require('../models/meta_data');
 const Post = require('../models/post');
-const TagCollection = require('../models/tag_collection');
 const mongoose = require('mongoose')
-
-
-const metaDataString = 'people_tag extra_tag'
-const changed = "first commit api_server_new"
+const { ObjectId } = mongoose.Types;
+const logger = require('../config/winston');
 
 router.post('/save', (req, res)=>{
     const body = req.body;
-    
-    if(body.length===0){
-        res.status(500).json({success:"fail"})
+    // Error Handling
+    if (!body.hasOwnProperty('user_email') || !body.hasOwnProperty('save_time') ||
+        !body.hasOwnProperty('type')){
+            res.status(400).json({error : "Schema required Fail"});
+            logger.warn("Schema required Fail");
+            return;
     }
-    if(Post.create(body)===true){
-        res.json({success:"success"})
+    if(!(body.type ==="image" || body.type==="video")){
+        res.status(400).json({error:"type must be 'image' or 'video'"});
+        logger.warn("type must be 'image' or 'video'");
+        return;
     }
-    else{
-        res.status(500).json({success:"fail"})
-    }    
-})
-
-
-router.get('/test', (req, res)=>{
-    MetaData.find().populate('post_id', 'user_id algo_tag').exec(function(err, result){
-        // 배열로 저장된다.
-        // delete를 어떻게 하지?
-        // 일단 생각하지 말고 go 해보자.
-    });
-    res.send("s")
-})
-
-
-// tags 정보
-router.get('/tags/:id', (req, res)=>{
-    const user_id = req.params.id;
-    TagCollection.findOne({user_id:user_id}).
-        then(result=>{
-            tags = result.algo_tag;
-            var tags_sorted = Object.keys(tags).sort(function(a,b){return tags[b]-tags[a]}); 
-            var tag_array = [];
-            var prop_key = 0;
-            tags_sorted.forEach(tag=>{
-                const num = tags[tag];
-                temp = {tag_name : tag, count : num, prop:prop_key};
-                prop_key+=1;
-                tag_array.push(temp);
-            });
-            result = { tags : tag_array }            
-            res.json(result)
-        }).
-        catch(err=>res.status(500).send(err))
-})
-
-
-router.delete('/delete/:post_id', async(req, res)=>{
-
-    const post_id = req.params.post_id;
-    Post.findByIdAndDelete(post_id, function(err, result){
-        if(err){
-            res.status(500).send(err);
-        } else{
-            const user_id = result.user_id;
-            const algo_tag = result.algo_tag;
-
-            TagCollection.findOne({user_id:user_id})
-                .select('algo_tag')
-                .exec(function(res, data){
-                    let set_tag = {}
-                    let unset_tag = {}
-                    algo_tag.forEach(tag=>{
-                        if(data.algo_tag[tag] - 1>0)
-                            set_tag["algo_tag."+tag] = data.algo_tag[tag] - 1;
-                        else if(data.algo_tag[tag] - 1 == 0)
-                        unset_tag["algo_tag."+tag] = ""
-                    })
-                    const tag_ = {$set:set_tag, $unset:unset_tag}
-
-                    TagCollection.updateTag({user_id:user_id}, tag_)
-                        .catch(e=>console.error(e))
-                })
-
+    // thumbnail empty error
+    if(body.type==="image"){
+        if(!body.hasOwnProperty("image_tn_ref")){
+            res.status(400).json({error:"Thumbnail doesn't come"});
+            logger.warn("Thumbnail doesn't come");
+            return;
         }
-    });
+    }
+    // user email empty error
+    if(body.user_email===""){
+        res.status(400).json({error : "user_email is empty"});
+        logger.warn("user_email is empty");
+        return; 
+    }
+    // Post Save
+    try{
+        Post.create(body);
+        res.status(200).json({result : "success"});
+    }
+    catch(err){
+        logger.error("DataBase Error : Post Collection create error : ", err);
+        res.status(500).json({error :"DataBase Error : Post Collection create error"});
+    }
+})
 
-    await MetaData.deleteMany({post_id:mongoose.Types.ObjectId(post_id)});
-    res.json({success:"success"})
+router.put('/save', (req,res)=>{
+    if(req.body._id===undefined){
+        res.status(400).json({error : "There's no _id in request body"});
+        logger.warn("There's no _id in request body");
+        return;
+    }
+
+    if(!ObjectId.isValid(req.body._id)){
+        res.status(400).json({error : "_id is not match ObjectId type"});
+        logger.warn("_id is not match ObjectId type");
+        return;
+    }
+
+    const filter = {_id : req.body._id};
+    const update = JSON.parse(JSON.stringify(req.body));
+    delete update._id;
+
+    Post.findByIdAndUpdate(filter, update).
+        then((result)=>{
+            if(result===null){
+                res.status(400).json({error : "There's no matching _id in Post Collection"})
+                logger.warn("There's no matching _id in Post Collection");
+                return;
+            }
+            else{
+                res.status(200).json({result:"success"});
+                return;
+            }
+        }).
+        catch(err=>{
+            res.status(500).json({error : "DataBase Error : Post.findByIdAndUpdate Error"})
+            logger.error("DataBase Error : Post.findByIdAndUpdate Error : ", err);
+            return;
+        })
+})
+
+router.delete('/delete/:_id', (req, res)=>{
+    // Error Handling
+    if(req.params._id===undefined){
+        res.status(400).json({error : "Delete request doesn't have param"});
+        logger.warn("Delete request doesn't have param");
+        return;
+    }
+    if(req.params._id===""){
+        res.status(400).json({error : "Delete request param _id is empty"});
+        logger.warn("Delete request param _id is empty");
+        return;
+    }
+    if(!ObjectId.isValid(req.params._id)){
+        res.status(400).json({error : "Delete request param _id is not match ObjecId Type"});
+        logger.warn("Delete request param _id is not match ObjecId Type");
+        return;
+    }
+    // Delete by Post id
+    Post.findByIdAndDelete(req.params._id, function(err, result){
+        if(err){
+            res.status(500).send("DataBase error : Post.findByIdAndDelete");
+            logger.error({error :"DataBase error : Post.findByIdAndDelete : ", err});
+            return;
+        } 
+        if(result ===null){
+            res.status(400).json({error : "There's no matching post id in Post Collection"});
+            logger.warn("There's no matching post id in Post Collection");
+            return;
+        }
+        else{
+            res.status(200).json({result:"success"});
+        }
+    })
 })
 
 router.get('/metadata', (req, res)=>{
-    const user_id = req.query.id;
-    const algo_tag = req.query.tag;
+    if(req.query.user_email === undefined){
+        res.status(400).json({error : "MetaData request : user_email is not exists"});
+        logger.warn("MetaData request : user_email is not exists");
+        return;
+    }
+    const user_email = req.query.user_email;
+    Post.find({user_email:user_email}).
+        select("-canvas_data -__v").
+        // sort(""). 
+        exec(function(err, result){
+            if(err){
+                // DataBase Error
+                res.status(500).json({error : "DataBase Error : Post.find error" });
+                logger.error("DataBase Error : Post.find error");
+                return;
+            }
+            if(result.length===0){
+                res.status(400).json({error : "There is no user_email in Post Collection"});
+                logger.warn("There is no user_email in Post Collection");
+                return;
+            } else{
+                res.status(200).json(result);
+                return;
+            }
+        })
 
-    MetaData.find({user_id:user_id, algo_tag:algo_tag})
-        .populate('post_id', metaDataString)
-        .select('algo_other_tag post_id -_id')
-        .exec(function(err, result){
-            var res_array = [];
-            var prop = 0;
-            result.forEach(elem=>{
-                var tag_array = new Array();
-                elem.algo_other_tag.forEach(tag=>{
-                    tag_array.push(tag)
-                })
+})
 
-                console.log(tag_array)
-                if (elem.post_id.people_tag)
-                    tag_array.push(elem.post_id.people_tag)
+router.get("/selfstudy", (req, res)=>{
+    if(req.query._id===undefined){
+        res.status(400).json({error : "preview requeset param _id doesn't exists"});
+        logger.warn("preview requeset param _id doesn't exists");
+        return;
+    }
+    if(req.query._id==="preview requeset param _id doesn't exists"){
+        res.status(400).json({error : "preview requeset param _id is empty"});
+        logger.warn("preview requeset param _id is empty");
+        return;
+    }
 
-                elem.post_id.extra_tag.forEach(tag=>{
-                    tag_array.push(tag)
-                })
+    if(!ObjectId.isValid(req.query._id)){
+        res.status(400).json({error : "preview request param _id isn't ObjectId Type"})
+        logger.warn("preview request param _id isn't ObjectId Type");
+        return;
+    }
 
-                const changed_elem = {
-                    primary_key : elem.post_id._id,
-                    tags:tag_array,
-                    prop: prop
-                }
-                prop += 1;
+    Post.findOne({_id:req.query._id}).
+        // select("canvas_data").
+        exec(function(err, result){
+            if(err){
+                res.status(500).json({error : "Database Error : Post.findOne Error"});
+                logger.error("Database Error : Post.findOne Error, ", err);
+                return;
+            }
 
-                res_array.push(changed_elem)
-            })
-            res.json(res_array)
+            if(result===null){
+                res.status(400).json({error : "There's no matching _id in Post Collections"});
+                logger.warn("There's no matching _id in Post Collections");
+            } else{
+                res.status(200).json(result);
+            }
+            
         })
 })
 
 
+router.get("/preview", (req, res)=>{
+    if(req.query._id===undefined){
+        res.status(400).json({error : "preview requeset param _id doesn't exists"});
+        logger.warn("preview requeset param _id doesn't exists");
+        return;
+    }
+    if(req.query._id==="preview requeset param _id doesn't exists"){
+        res.status(400).json({error : "preview requeset param _id is empty"});
+        logger.warn("preview requeset param _id is empty");
+        return;
+    }
 
-// update
-router.put('/update', (req, res)=>{
-    // 이거는 나중에 생각
+    if(!ObjectId.isValid(req.query._id)){
+        res.status(400).json({error : "preview request param _id isn't ObjectId Type"})
+        logger.warn("preview request param _id isn't ObjectId Type");
+        return;
+    }
+
+    Post.findOne({_id:req.query._id}, function(err, result){
+        if(err){
+            res.status(500).json({error:"DataBase Error : Post.findOne Error"});
+            logger.error("DataBase Error : Post.findOne Error : ", err);
+            return;
+        }
+        if(result===null){
+            res.status(400).json({error : "There's no matching _id in Post Collections"});
+            logger.warn("There's no matching _id in Post Collections");
+        } else {
+            res.status(200).json(result);
+            return;
+        }
+    })
 })
 
 module.exports = router;
