@@ -269,7 +269,7 @@ io.on('connection', (socket) => {
     peer.process = getProcess(recordInfo);
 
     setTimeout(async () => {
-      for (const consumer of peer.consumers.values()) {
+      for (const consumer of peer.recordingConsumers.values()) {
         // Sometimes the consumer gets resumed before the GStreamer process has fully started
         // so wait a couple of seconds
         await consumer.resume();
@@ -291,6 +291,7 @@ io.on('connection', (socket) => {
     for (const remotePort of peer.remotePorts) {
       releasePort(remotePort);
     }
+    peer.recordingConsumers.clear();
   });
 })
 
@@ -376,7 +377,7 @@ const publishProducerRtpStream = async (peer, producer, room) => {
     paused: true
   });
 
-  peer.consumers.set(rtpConsumer.id, rtpConsumer);
+  peer.recordingConsumers.set(rtpConsumer.id, rtpConsumer);
 
   return {
     remoteRtpPort,

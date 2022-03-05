@@ -4,6 +4,7 @@ module.exports = class Peer {
     this.name = name
     this.transports = new Map()
     this.consumers = new Map()
+    this.recordingConsumers = new Map();
     this.producers = new Map()
     this.remotePorts = [];
     this.process = undefined;
