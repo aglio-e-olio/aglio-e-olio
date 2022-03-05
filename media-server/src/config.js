@@ -20,15 +20,15 @@ const getLocalIp = () => {
 module.exports = {
   listenIp: '0.0.0.0',
   listenPort: 8000,
-  sslCrt: '../ssl/cert.pem',
-  sslKey: '../ssl/key.pem',
+  sslCrt: '../ssl/fake-cert.pem',
+  sslKey: '../ssl/fake-key.pem',
 
   mediasoup: {
     // Worker settings
     numWorkers: Object.keys(os.cpus()).length,
     worker: {
-      rtcMinPort: 10000,
-      rtcMaxPort: 10200,
+      rtcMinPort: 40000,
+      rtcMaxPort: 49999,
       logLevel: 'warn',
       logTags: [
         'info',
@@ -73,6 +73,11 @@ module.exports = {
       ],
       maxIncomingBitrate: 1500000,
       initialAvailableOutgoingBitrate: 1000000
+    },
+    plainRtpTransport: {
+      listenIp: { ip: '0.0.0.0', announcedIp: '3.39.27.19' }, // TODO: Change announcedIp to your external IP or domain name
+      rtcpMux: true,
+      comedia: false
     }
   }
 }

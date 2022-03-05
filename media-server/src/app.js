@@ -7,7 +7,14 @@ const config = require('./config')
 const path = require('path')
 const Room = require('./Room')
 const Peer = require('./Peer')
+const {
+  getPort,
+  releasePort
+} = require('./port');
+const FFmpeg = require('./ffmpeg');
+const GStreamer = require('./gstreamer');
 
+const PROCESS_NAME = process.env.PROCESS_NAME || 'FFmpeg';
 const options = {
   key: fs.readFileSync(path.join(__dirname, config.sslKey), 'utf-8'),
   cert: fs.readFileSync(path.join(__dirname, config.sslCrt), 'utf-8')
@@ -50,9 +57,9 @@ let nextMediasoupWorkerIdx = 0
  *  }
  * }
  */
-let roomList = new Map()
+let roomList = new Map();
 
-;(async () => {
+(async () => {
   await createWorkers()
 })()
 
@@ -240,6 +247,49 @@ io.on('connection', (socket) => {
 
     callback('successfully exited room')
   })
+
+  socket.on('start-record', async (callback) => {
+    const room = roomList.get(socket.room_id);
+    const peer = room.getPeers().get(socket.id);
+    let recordInfo = {};
+
+    if (peer.producers.size == 1) {
+      callback({
+        error: "최소 한 명 이상의 스피커가 필요합니다."
+      });
+      return;
+    }
+
+    for (const producer of peer.producers.values()) {
+      recordInfo[producer.kind] = await publishProducerRtpStream(peer, producer, room);
+    }
+
+    recordInfo.fileName = Date.now().toString();
+
+    peer.process = getProcess(recordInfo);
+
+    setTimeout(async () => {
+      for (const consumer of peer.consumers.values()) {
+        // Sometimes the consumer gets resumed before the GStreamer process has fully started
+        // so wait a couple of seconds
+        await consumer.resume();
+        await consumer.requestKeyFrame();
+      }
+    }, 1000);
+
+    callback({ success: "녹화 시작합니다." });
+  });
+
+  socket.on('stop-record', () => {
+    const peer = roomList.get(socket.room_id).getPeers().get(socket.id);
+
+    peer.process.kill();
+    peer.process = undefined;
+
+    for (const remotePort of peer.remotePorts) {
+      releasePort(remotePort);
+    }
+  });
 })
 
 // TODO remove - never used?
@@ -267,3 +317,81 @@ function getMediasoupWorker() {
 
   return worker
 }
+
+////// Recording logic ////////
+
+const publishProducerRtpStream = async (peer, producer, room) => {
+  console.log('publishProducerRtpStream()');
+
+  // Create the mediasoup RTP Transport used to send media to the GStreamer process
+  const rtpTransportConfig = config.mediasoup.plainRtpTransport;
+
+  // If the process is set to GStreamer set rtcpMux to false
+  if (PROCESS_NAME === 'GStreamer') {
+    rtpTransportConfig.rtcpMux = false;
+  }
+
+  const rtpTransport = await room.createPlainRtpTransport(peer);
+
+  // Set the receiver RTP ports
+  const remoteRtpPort = await getPort();
+  peer.remotePorts.push(remoteRtpPort);
+
+  let remoteRtcpPort;
+  // If rtpTransport rtcpMux is false also set the receiver RTCP ports
+  if (!rtpTransportConfig.rtcpMux) {
+    remoteRtcpPort = await getPort();
+    peer.remotePorts.push(remoteRtcpPort);
+  }
+
+
+  // Connect the mediasoup RTP transport to the ports used by GStreamer
+  await rtpTransport.connect({
+    ip: '127.0.0.1',
+    port: remoteRtpPort,
+    rtcpPort: remoteRtcpPort
+  });
+
+  peer.addTransport(rtpTransport);
+
+  const codecs = [];
+  // Codec passed to the RTP Consumer must match the codec in the Mediasoup router rtpCapabilities
+  const routerCodec = room.router.rtpCapabilities.codecs.find(
+    codec => codec.kind === producer.kind
+  );
+  codecs.push(routerCodec);
+
+  const rtpCapabilities = {
+    codecs,
+    rtcpFeedback: []
+  };
+
+  // Start the consumer paused
+  // Once the gstreamer process is ready to consume resume and send a keyframe
+  const rtpConsumer = await rtpTransport.consume({
+    producerId: producer.id,
+    rtpCapabilities,
+    paused: true
+  });
+
+  peer.consumers.set(rtpConsumer.id, rtpConsumer);
+
+  return {
+    remoteRtpPort,
+    remoteRtcpPort,
+    localRtcpPort: rtpTransport.rtcpTuple ? rtpTransport.rtcpTuple.localPort : undefined,
+    rtpCapabilities,
+    rtpParameters: rtpConsumer.rtpParameters
+  };
+};
+
+// Returns process command to use (GStreamer/FFmpeg) default is FFmpeg
+const getProcess = (recordInfo) => {
+  switch (PROCESS_NAME) {
+    case 'GStreamer':
+      return new GStreamer(recordInfo);
+    case 'FFmpeg':
+    default:
+      return new FFmpeg(recordInfo);
+  }
+};

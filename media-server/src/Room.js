@@ -79,6 +79,11 @@ module.exports = class Room {
     }
   }
 
+  async createPlainRtpTransport(peer) {
+    console.log('createPlainRtpTransport() [peerName: %s]', peer.name);
+    return await this.router.createPlainRtpTransport(config.mediasoup.plainRtpTransport);
+  }
+
   async connectPeerTransport(socket_id, transport_id, dtlsParameters) {
     if (!this.peers.has(socket_id)) return
 

@@ -22,5 +22,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# cert
-ssl/*.pem
+# video fiels
+*.webm
+*.mp4

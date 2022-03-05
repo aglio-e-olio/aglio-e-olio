@@ -27,9 +27,18 @@ let yLines;
 let undoManager;
 
 let socket;
-let audioId;
 let producer = null;
 let rc = null;
+
+/* Change the values below to adjust video quality. */
+const displayMediaOptions = Object.freeze({
+  video: {
+    width: { max: 1920 },
+    height: { max: 1080 },
+    frameRate: 20
+  },
+  audio: false
+});
 
 
 const Room = () => {
@@ -41,6 +50,8 @@ const Room = () => {
   const remoteAudiosRef = useRef();
   const startAudioButtonRef = useRef();
   const stopAudioButtonRef = useRef();
+  const startRecordButtonRef = useRef();
+  const stopRecordButtonRef = useRef();
 
   const { codes, compileResult, getCompileResult, getRoomInfo, getUrl, addAudioStream } =
     useContext(codeContext);
@@ -81,8 +92,6 @@ const Room = () => {
       withCredentials: false,
     });
     console.log(socket);
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then((stream) => audioId = stream.id)
 
     socket.request = function request(type, data = {}) {
       return new Promise((resolve, reject) => {
@@ -96,7 +105,6 @@ const Room = () => {
       })
     }
 
-
     function joinRoom(name, room_id) {
       if (rc && rc.isOpen()) {
         console.log('Already connected to a room')
@@ -105,187 +113,220 @@ const Room = () => {
       }
     }
 
-    joinRoom("TEST_NAME", "123");
+    joinRoom("peer_name_jun", "room_id_123");
+
 
     startAudioButtonRef.current.addEventListener('click', () => {
-      rc.produce(RoomClient.mediaType.audio, audioId)
-    })
+      rc.produce(RoomClient.mediaType.audio);
+    });
     stopAudioButtonRef.current.addEventListener('click', () => {
       rc.closeProducer(RoomClient.mediaType.audio)
+    });
+    startRecordButtonRef.current.addEventListener('click', async () => {
+      console.log('startRecord()');
+      await rc.produce(RoomClient.mediaType.screen);
+
+      socket.emit(
+        'start-record',
+        (data) => {
+          if (data.error) {
+            alert(data.error);
+            startRecordButtonRef.current.disabled = false;
+            stopRecordButtonRef.current.disabled = true;
+          } else {
+            alert(data.success);
+          }
+        }
+      );
+
+      startRecordButtonRef.current.disabled = true;
+      stopRecordButtonRef.current.disabled = false;
+    })
+    stopRecordButtonRef.current.addEventListener('click', () => {
+      console.log('stopRecord()');
+
+      socket.emit('stop-record');
+      startRecordButtonRef.current.disabled = false;
+      stopRecordButtonRef.current.disabled = true;
     })
   }, []);
 
-// useEffect(() => {
-//   socketRef.current = io.connect('/');
-//   navigator.mediaDevices
-//     .getUserMedia({ audio: true })
-//     .then((stream) => {
-//       addAudioStream(stream);
-//       let options = {};
-//       let speechEvents = hark(stream, options);
+  // useEffect(() => {
+  //   socketRef.current = io.connect('/');
+  //   navigator.mediaDevices
+  //     .getUserMedia({ audio: true })
+  //     .then((stream) => {
+  //       addAudioStream(stream);
+  //       let options = {};
+  //       let speechEvents = hark(stream, options);
 
-//       speechEvents.on('speaking', function () { });
+  //       speechEvents.on('speaking', function () { });
 
-//       speechEvents.on('stopped_speaking', () => { });
-//       getRoomInfo(roomID);
-//       socketRef.current.emit('join room', roomID);
-//       socketRef.current.on('all users', (users) => {
-//         const peers = [];
-//         users.forEach((userID) => {
-//           const peer = createPeer(userID, socketRef.current.id, stream);
-//           peersRef.current.push({
-//             peerID: userID,
-//             peer,
-//           });
-//           peers.push(peer);
-//         });
-//         setPeers(peers);
-//         console.log(peers);
-//       });
+  //       speechEvents.on('stopped_speaking', () => { });
+  //       getRoomInfo(roomID);
+  //       socketRef.current.emit('join room', roomID);
+  //       socketRef.current.on('all users', (users) => {
+  //         const peers = [];
+  //         users.forEach((userID) => {
+  //           const peer = createPeer(userID, socketRef.current.id, stream);
+  //           peersRef.current.push({
+  //             peerID: userID,
+  //             peer,
+  //           });
+  //           peers.push(peer);
+  //         });
+  //         setPeers(peers);
+  //         console.log(peers);
+  //       });
 
-//       socketRef.current.on('hello', (new_member) => {
-//         // alert(`${new_member} 가 입장했습니다.`);
-//       });
+  //       socketRef.current.on('hello', (new_member) => {
+  //         // alert(`${new_member} 가 입장했습니다.`);
+  //       });
 
-//       socketRef.current.on('bye', (left_user) => {
-//         // alert(`${left_user}가 떠났습니다.`);
-//       });
+  //       socketRef.current.on('bye', (left_user) => {
+  //         // alert(`${left_user}가 떠났습니다.`);
+  //       });
 
-//       socketRef.current.on('user joined', (payload) => {
-//         const peer = addPeer(payload.signal, payload.callerID, stream);
-//         peersRef.current.push({
-//           peerID: payload.callerID,
-//           peer,
-//         });
-//         setPeers((users) => [...users, peer]);
-//       });
+  //       socketRef.current.on('user joined', (payload) => {
+  //         const peer = addPeer(payload.signal, payload.callerID, stream);
+  //         peersRef.current.push({
+  //           peerID: payload.callerID,
+  //           peer,
+  //         });
+  //         setPeers((users) => [...users, peer]);
+  //       });
 
-//       socketRef.current.on('code response', (code) => {
-//         handleCompileResult(code);
-//       });
+  //       socketRef.current.on('code response', (code) => {
+  //         handleCompileResult(code);
+  //       });
 
-//       socketRef.current.on('receiving returned signal', (payload) => {
-//         const item = peersRef.current.find((p) => p.peerID === payload.id);
-//         item.peer.signal(payload.signal);
-//       });
-//     })
-//     .catch((error) => {
-//       console.log(`getUserMedia error : ${error}`);
-//     });
-// }, []);
+  //       socketRef.current.on('receiving returned signal', (payload) => {
+  //         const item = peersRef.current.find((p) => p.peerID === payload.id);
+  //         item.peer.signal(payload.signal);
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       console.log(`getUserMedia error : ${error}`);
+  //     });
+  // }, []);
 
-/* Below are Simple Peer Library Function */
-function createPeer(userToSignal, callerID, stream) {
-  const peer = new Peer({
-    initiator: true,
-    trickle: false,
-    stream,
-  });
-
-  // RTC Connection
-  peer.on('signal', (signal) => {
-    socketRef.current.emit('sending signal', {
-      userToSignal, // 상대방 소켓 id
-      callerID, // 내 소켓 id
-      signal,
+  /* Below are Simple Peer Library Function */
+  function createPeer(userToSignal, callerID, stream) {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream,
     });
-  });
 
-  return peer;
-}
-
-function addPeer(incomingSignal, callerID, stream) {
-  const peer = new Peer({
-    initiator: false,
-    trickle: false,
-    stream,
-  });
-
-  peer.on('signal', (signal) => {
-    socketRef.current.emit('returning signal', { signal, callerID });
-  });
-
-  peer.signal(incomingSignal);
-
-  return peer;
-}
-
-function handleCompileResult(code) {
-  getCompileResult(code);
-}
-
-const onCapture = async () => {
-  let snapshotUrl = '';
-  console.log('onCapture');
-  await html2canvas(document.body)
-    .then(async (canvas) => {
-      snapshotUrl = canvas.toDataURL('image/png');
-      getUrl(snapshotUrl);
-    })
-    .catch((e) => {
-      console.log(e);
+    // RTC Connection
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('sending signal', {
+        userToSignal, // 상대방 소켓 id
+        callerID, // 내 소켓 id
+        signal,
+      });
     });
-};
 
-/* Render */
-return (
-  <div>
+    return peer;
+  }
 
-    <div class='flex justify-start'>
-      {peers.map((peer, index) => {
-        return <Audio key={index} peer={peer} />;
-      })}
-    </div>
+  function addPeer(incomingSignal, callerID, stream) {
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream,
+    });
+
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('returning signal', { signal, callerID });
+    });
+
+    peer.signal(incomingSignal);
+
+    return peer;
+  }
+
+  function handleCompileResult(code) {
+    getCompileResult(code);
+  }
+
+  const onCapture = async () => {
+    let snapshotUrl = '';
+    console.log('onCapture');
+    await html2canvas(document.body)
+      .then(async (canvas) => {
+        snapshotUrl = canvas.toDataURL('image/png');
+        getUrl(snapshotUrl);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  /* Render */
+  return (
     <div>
-      {/* audio open and close */}
-      <div ref={remoteAudiosRef}></div>
-      <button ref={startAudioButtonRef} >
-        <i class="fas fa-volume-up"></i> Open audio
-      </button>
-      <button ref={stopAudioButtonRef}>
-        <i class="fas fa-volume-up"></i> Close audio
-      </button>
-      {/* audio open and close */}
+      <div class='flex justify-start'>
+        {peers.map((peer, index) => {
+          return <Audio key={index} peer={peer} />;
+        })}
+      </div>
+      <div>
+        {/* audio open and close */}
+        <div ref={remoteAudiosRef}></div>
+        <button ref={startAudioButtonRef} >
+          <i class="fas fa-volume-up"></i> Open audio
+        </button>
+        <button ref={stopAudioButtonRef}>
+          <i class="fas fa-volume-up"></i> Close audio
+        </button>
+        <button ref={startRecordButtonRef}>
+          <i class="fas fa-volume-up"></i> Record start
+        </button>
+        <button ref={stopRecordButtonRef}>
+          <i class="fas fa-volume-up"></i> Record stop
+        </button>
+        {/* audio open and close */}
 
-      <Record />
-      <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
-        Run
-      </button>
-      <UrlCopy />
-      <button
-        class="btn btn-success cursor-pointer absolute top-0 right-40"
-        onClick={handleSave}
-      >
-        Save
-      </button>
-      <button
-        class="btn btn-success cursor-pointer absolute top-0 right-60"
-        onClick={() => navigate(-1)}>뒤로 가기</button>
-      <Save isOpen={isOpen}
-        onCancel={handleSaveCancel}
-        yLines={yLines}
-        doc={doc} />
+        <Record />
+        <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
+          Run
+        </button>
+        <UrlCopy />
+        <button
+          class="btn btn-success cursor-pointer absolute top-0 right-40"
+          onClick={handleSave}
+        >
+          Save
+        </button>
+        <button
+          class="btn btn-success cursor-pointer absolute top-0 right-60"
+          onClick={() => navigate(-1)}>뒤로 가기</button>
+        <Save isOpen={isOpen}
+          onCancel={handleSaveCancel}
+          yLines={yLines}
+          doc={doc} />
 
-      <Canvas
-        doc={doc}
-        provider={provider}
-        awareness={awareness}
-        yLines={yLines}
-        undoManager={undoManager}
-      />
-      <CodeEditor doc={doc} provider={provider} />
+        <Canvas
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+        />
+        <CodeEditor doc={doc} provider={provider} />
+      </div>
+      <div>
+        <textarea
+          className="code-result"
+          value={compileResult}
+          placeholder={
+            '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
+          }
+        />
+      </div>
     </div>
-    <div>
-      <textarea
-        className="code-result"
-        value={compileResult}
-        placeholder={
-          '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
-        }
-      />
-    </div>
-  </div>
-);
+  );
 };
 
 export default Room;
@@ -553,41 +594,39 @@ class RoomClient {
 
   //////// MAIN FUNCTIONS /////////////
 
-  async produce(type, deviceId = null) {
+  async produce(type) {
     let mediaConstraints = {}
     let audio = false
     let screen = false
     switch (type) {
       case mediaType.audio:
         mediaConstraints = {
-          audio: {
-            deviceId: deviceId
-          },
+          audio: true,
           video: false
         }
         audio = true
         break
-      case mediaType.video:
-        mediaConstraints = {
-          audio: false,
-          video: {
-            width: {
-              min: 640,
-              ideal: 1920
-            },
-            height: {
-              min: 400,
-              ideal: 1080
-            },
-            deviceId: deviceId
-            /*aspectRatio: {
-                            ideal: 1.7777777778
-                        }*/
-          }
-        }
-        break
+      // case mediaType.video:
+      //   mediaConstraints = {
+      //     audio: false,
+      //     video: {
+      //       width: {
+      //         min: 640,
+      //         ideal: 1920
+      //       },
+      //       height: {
+      //         min: 400,
+      //         ideal: 1080
+      //       },
+      //       deviceId: deviceId
+      //       /*aspectRatio: {
+      //                       ideal: 1.7777777778
+      //                   }*/
+      //     }
+      //   }
+      //   break
       case mediaType.screen:
-        mediaConstraints = false
+        mediaConstraints = displayMediaOptions;
         screen = true
         break
       default:
@@ -605,37 +644,37 @@ class RoomClient {
     let stream
     try {
       stream = screen
-        ? await navigator.mediaDevices.getDisplayMedia()
+        ? await navigator.mediaDevices.getDisplayMedia(mediaConstraints)
         : await navigator.mediaDevices.getUserMedia(mediaConstraints)
       console.log('supportedConstraints: ' + navigator.mediaDevices.getSupportedConstraints())
 
       const track = audio ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0]
       const params = {
-        track
+        track: track
       }
-      if (!audio && !screen) {
-        params.encodings = [
-          {
-            rid: 'r0',
-            maxBitrate: 100000,
-            //scaleResolutionDownBy: 10.0,
-            scalabilityMode: 'S1T3'
-          },
-          {
-            rid: 'r1',
-            maxBitrate: 300000,
-            scalabilityMode: 'S1T3'
-          },
-          {
-            rid: 'r2',
-            maxBitrate: 900000,
-            scalabilityMode: 'S1T3'
-          }
-        ]
-        params.codecOptions = {
-          videoGoogleStartBitrate: 1000
-        }
-      }
+      // if (!audio && !screen) {
+      //   params.encodings = [
+      //     {
+      //       rid: 'r0',
+      //       maxBitrate: 100000,
+      //       //scaleResolutionDownBy: 10.0,
+      //       scalabilityMode: 'S1T3'
+      //     },
+      //     {
+      //       rid: 'r1',
+      //       maxBitrate: 300000,
+      //       scalabilityMode: 'S1T3'
+      //     },
+      //     {
+      //       rid: 'r2',
+      //       maxBitrate: 900000,
+      //       scalabilityMode: 'S1T3'
+      //     }
+      //   ]
+      //   params.codecOptions = {
+      //     videoGoogleStartBitrate: 1000
+      //   }
+      // }
       producer = await this.producerTransport.produce(params)
 
       console.log('Producer', producer)
