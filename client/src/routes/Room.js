@@ -156,10 +156,7 @@ const Room = () => {
         signal,
       });
     });
-    peer.on('disconnect', () => {
-      console.log('create 안 peer연결이 끊겼습니다.');
-      peer.destroy();
-    });
+
 
     return peer;
   }
@@ -175,10 +172,6 @@ const Room = () => {
       socketRef.current.emit('returning signal', { signal, callerID });
     });
 
-    peer.on('disconnect', () => {
-      console.log('add 안 peer연결이 끊겼습니다.');
-      peer.destroy();
-    });
 
     peer.signal(incomingSignal);
 

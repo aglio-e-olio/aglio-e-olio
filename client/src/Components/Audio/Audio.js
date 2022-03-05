@@ -15,10 +15,10 @@ const Audio = (props) => {
 
   const [color, setColor] = useState(false);
 
-  props.peer_info.peer.on('disconnect', () => {
-    console.log('audio안 peer연결이 끊겼습니다.');
-    props.peer_info.peer.destroy();
-  });
+  // props.peer_info.peer.on('disconnect', () => {
+  //   console.log('audio안 peer연결이 끊겼습니다.');
+  //   props.peer_info.peer.destroy();
+  // });
 
   useEffect(() => {
     props.peer_info.peer.on('stream', (stream) => {
