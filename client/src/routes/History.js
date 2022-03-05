@@ -30,7 +30,6 @@ const History = () => {
         <div class="divider"></div>
       </div>
       <SplitPane split="vertical" minSize={200} defaultSize="30%">
-        {/* <TagSort /> */}
         <InfoCards />
         <Preview />
       </SplitPane>

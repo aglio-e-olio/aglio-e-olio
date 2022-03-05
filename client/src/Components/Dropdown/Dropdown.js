@@ -4,27 +4,21 @@ import { codeContext } from '../../Context/ContextProvider';
 export default function Dropdown({ title, item }) {
   const { searchedData, setSearchedData, keywords, setKeywords } =
     useContext(codeContext);
-  const [alignedItems, setAlignedItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [dropdownOptions, setDropdownOptions] = useState([]);
 
   useEffect(() => {
     if (title === 'Announcer') item = 'teamMates';
     searchedData.map((data) => {
-      setAlignedItems((prev) => [...new Set([...prev, ...data[item]])]);
+      setDropdownOptions((prev) => [...new Set([...prev, ...data[item]])]);
     });
   }, [searchedData]);
 
-  function itemClick(e) {
-    let value = e.target.innerHTML;
+  function optionClick(e) {
+    let beforeKeyword = keywords
     let keyword = {};
     keyword.key = item;
-    keyword.value = value;
-
-    setKeywords([...new Set([...keywords, keyword])]);
-  }
-
-  function handleItemBtn(e) {
-    let value = e.target.innerHTML;
+    keyword.value = e.target.innerHTML;
+    setKeywords([...new Set([...beforeKeyword, keyword])]);
   }
 
   return (
@@ -37,24 +31,16 @@ export default function Dropdown({ title, item }) {
           tabindex="0"
           class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
         >
-          {alignedItems &&
-            alignedItems.map((item, index) => {
+          {dropdownOptions &&
+            dropdownOptions.map((option, index) => {
               return (
-                <li key={index} onClick={itemClick}>
-                  <a>{item}</a>
+                <li key={index} onClick={optionClick}>
+                  <a>{option}</a>
                 </li>
               );
             })}
         </ul>
       </div>
-      {/* {selectedItems &&
-        selectedItems.map((item, index) => {
-          return (
-            <button key={index} onClick={handleItemBtn} class="btn btn-xs">
-              {item}
-            </button>
-          );
-        })} */}
     </>
   );
 }

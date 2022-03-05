@@ -7,51 +7,7 @@ import CameraIcon from '../Atoms/CameraIcon';
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoCards() {
-  const [dataForRendering, setDataForRendering] = useState([]);
-  // const [searchedData, setSearchedData] = useState(tagData);
-
-  const { currentTag, persistEmail, selectPreview, searchedData, setSearchedData, keywords } = useContext(codeContext);
-
-
-  /* props으로 받은 tag 처리 */
-  // useEffect(() => {
-  //   axios({
-  //     method: 'GET',
-  //     url: 'https://aglio-olio-api.shop/myroom/metadata',
-  //     params: { algo_tag: currentTag, user_email: persistEmail },
-  //   })
-  //     .then((res) => {
-  //       let firstSortedData = [...res.data];
-  //       firstSortedData.sort((a, b) => {
-  //         if (a.save_time > b.save_time) return -1;
-  //         if (a.save_time < b.save_time) return 1;
-  //         return 0;
-  //       });
-  //       setTagData((data) => [...firstSortedData]);
-  //       setSearchedData((data) => [...firstSortedData]);
-  //     })
-  //     .catch((err) => {
-  //       console.error(err);
-  //     });
-  // }, [currentTag]);
-
-  // /* 검색 처리 : filter 이용 */
-  // function handleSearch(e) {
-  //   // setQuery(e.target.value);
-  //   let value = e.target.value;
-  //   let result = [];
-  //   result = tagData.filter((data) => {
-  //     if (
-  //       data.title.search(value) !== -1 ||
-  //       data.announcer.search(value) !== -1
-  //       // (data.extra_tag ? data.extra_tag.find((tag) => tag.value.includes(value)) : true) // 여러 태그 일부만 검색해도 검색 가능
-  //     ) {
-  //       return true;
-  //     }
-  //     return false;
-  //   });
-  //   setSearchedData(result);
-  // }
+  const { selectPreview, searchedData, setSearchedData, keywords } = useContext(codeContext);
 
   function handleCardClick(value) {
     selectPreview(value.post_id);

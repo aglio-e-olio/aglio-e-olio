@@ -5,12 +5,10 @@ import Dropdown from '../Dropdown/Dropdown';
 
 function Search() {
   const [sortedData, setSortedData] = useState([]);
-  const [dataForRendering, setDataForRendering] = useState([]);
   const [bridge, setBridge] = useState([]);
   // const [searchedData, setSearchedData] = useState(receivedData);
 
   const {
-    currentTag,
     persistEmail,
     selectPreview,
     searchedData,
@@ -19,12 +17,12 @@ function Search() {
     setKeywords,
   } = useContext(codeContext);
 
-  /* props으로 받은 tag 처리 */
+  /* 서버에 해당 유저 데이터 받아오기 */
   useEffect(() => {
     axios({
       method: 'GET',
       url: 'https://aglio-olio-api.shop/myroom/metadata',
-      params: { algo_tag: 'BFS', user_email: persistEmail },
+      params: { algo_tag: 'DFS', user_email: persistEmail },
     })
       .then((res) => {
         let receivedData = [...res.data];
@@ -47,10 +45,6 @@ function Search() {
   });
   console.log('renderCount', renderCount.current);
 
-  // let keywords = [
-  //   { key: 'extra_tag', value: '추가' },
-  //   { key: 'announcer', value: '김도경' },
-  // ];
   useEffect(() => {
     let datas = sortedData;
     let result = [];
@@ -72,10 +66,10 @@ function Search() {
       datas = result;
     });
     setSearchedData(datas);
-  }, [dataForRendering, keywords]);
+  }, [keywords]);
 
+  /* 매 input event마다 데이터 필터링 */
   function handleSearch(e) {
-    // setQuery(e.target.value);
     let value = e.target.value;
     let result = [];
     result = sortedData.filter((data) => {
@@ -92,23 +86,20 @@ function Search() {
     });
     setBridge(result);
     setSearchedData(result);
-    setDataForRendering(result);
   }
 
+  /* tag 버튼 누를 시 해당 tag 검색 필터에서 제외. */
   function handleKeywordBtn(e) {
     let temp = keywords;
     let i = 0;
-    console.log('temp[0].value', temp[0].value);
-    console.log('e.target.value', e.target.innerHTML);
-    console.log('before temp', temp);
     for (i = 0; i < temp.length; i++) {
       if (temp[i].value === e.target.innerHTML) {
         temp.splice(i, 1);
         break;
       }
     }
-    console.log('keywords in btn', temp);
-    setKeywords(temp);
+    setKeywords([...temp]);
+    // setKeywords(temp); // 바뀌지 않음.
   }
 
   return (
@@ -127,7 +118,6 @@ function Search() {
       </div>
       <br></br>
       <div class="float-left mx-2.5">
-        {console.log('keywords', keywords)}
         {keywords &&
           keywords.map((keyword) => {
             return (
