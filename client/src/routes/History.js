@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
 import TagSort from '../Components/TagSort/TagSort';
 import Navbar from '../Components/Atoms/Navbar';
-import InfoList from '../Components/InfoList/InfoList';
+import InfoCards from '../Components/InfoCards/InfoCards';
 import SplitPane from 'react-split-pane';
 import './History.css';
 import Preview from '../Components/Preview/Preview';
 import { codeContext } from '../Context/ContextProvider';
+import Search from '../Components/Search/Search';
 
 const History = () => {
   const { persistEmail, currentTag, selectedPreviewKey } =
@@ -17,19 +18,21 @@ const History = () => {
     //   <SplitPane split="vertical" minSize={100} defaultSize="20%">
     //     {persistEmail && <TagSort />}
     //     <SplitPane split="vertical" defaultSize="50%">
-    //       {(currentTag && persistEmail) && <InfoList />}
+    //       {(currentTag && persistEmail) && <InfoCards />}
     //       {selectedPreviewKey && <Preview />}
     //     </SplitPane>
     //   </SplitPane>
     // </div>
     <div>
       <Navbar />
-      <SplitPane split="vertical" minSize={100} defaultSize="20%">
-        <TagSort />
-        <SplitPane split="vertical" defaultSize="50%">
-          <InfoList />
-          <Preview />
-        </SplitPane>
+      <div class="flex flex-col w-full border-opacity-50">
+        <Search />
+        <div class="divider"></div>
+      </div>
+      <SplitPane split="vertical" minSize={100} defaultSize="40%">
+        {/* <TagSort /> */}
+        <InfoCards />
+        <Preview />
       </SplitPane>
     </div>
   );

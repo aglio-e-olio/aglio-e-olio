@@ -86,8 +86,8 @@ function Preview() {
         </div>
         <div class="justify-end card-actions">
           {metaData.extra_tag &&
-            metaData.extra_tag.map((tag) => {
-              return <kbd class="kbd kbd-sm">{tag}</kbd>;
+            metaData.extra_tag.map((tag, index) => {
+              return <kbd key={index} class="kbd kbd-sm">{tag}</kbd>;
             })}
         </div>
         <div class="justify-end card-actions">
