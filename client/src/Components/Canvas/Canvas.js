@@ -129,13 +129,6 @@ export default function Canvas({
     [completeLine, completeErase]
   );
 
-  const [_, forceUpdate] = React.useReducer((s) => !s, false);
-
-  React.useEffect(() => {
-    const timeout = setInterval(forceUpdate, 30);
-    return () => clearInterval(timeout);
-  }, []);
-
   const [zIndex, setZindex] = useState(0);
   const changeZofCanvas = () => {
     setZindex((index) => (index === 10 ? 0 : 10));
@@ -144,7 +137,7 @@ export default function Canvas({
   return (
     <div>
       <div >
-        <ul class="menu bg-neutral p-2 rounded-box fixed left-1 z-50 top-1/3 ">
+        {/* <ul class="menu bg-neutral p-2 rounded-box fixed left-1 z-50 top-1/3 ">
           <li onClick={changeToPencil}>
             <a>
               <PenIcon />
@@ -160,7 +153,7 @@ export default function Canvas({
               <TrashIcon />
             </a>
           </li>
-        </ul>
+        </ul> */}
       </div>
       <div className="canvas-container" style={{ zIndex: zIndex }}>
         <svg
