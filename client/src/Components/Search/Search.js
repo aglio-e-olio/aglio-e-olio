@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { codeContext } from '../../Context/ContextProvider';
 import Dropdown from '../Dropdown/Dropdown';
-import XButton from '../Atoms/XButton';
 
 function Search() {
   const [sortedData, setSortedData] = useState([]);
