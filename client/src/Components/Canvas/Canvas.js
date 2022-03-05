@@ -93,10 +93,7 @@ export default function Canvas({
 
       if (e.currentTarget.hasPointerCapture(e.pointerId) && !isEraser) {
         addPointToLine(point);
-      } else if (
-        e.currentTarget.hasPointerCapture(e.pointerId) &&
-        isEraser
-      ) {
+      } else if (e.currentTarget.hasPointerCapture(e.pointerId) && isEraser) {
         addPointToErase(point);
       }
     },
@@ -123,9 +120,20 @@ export default function Canvas({
 
   return (
     <div>
-      <div className="z-0" style={{ 
-        background: '#E5E5E5'
-        }}>
+      <div
+        className="z-0"
+        style={
+          isEraser
+            ? {
+                background: '#E5E5E5',
+                cursor: 'url("/img/eraser_cursor.cur"), auto',
+              }
+            : {
+                background: '#E5E5E5',
+                cursor: 'url("/img/pen_cursor.cur"), auto',
+              }
+        }
+      >
         <svg
           width={window.innerWidth}
           height={window.innerHeight}
@@ -142,6 +150,11 @@ export default function Canvas({
               <Line key={line.get('id')} line={line} />
             ))}
             {/* Live Cursors */}
+            {users
+              .filter((user) => user.id !== self.id)
+              .map((other) => (
+                <UserCursor key={other.id} user={other} />
+              ))}
           </g>
           {/* User Tokens */}
           {/* {users.map((user, i) => (
