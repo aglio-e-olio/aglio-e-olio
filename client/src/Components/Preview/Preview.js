@@ -15,7 +15,7 @@ function Preview() {
       const res = await axios({
         method: 'GET',
         url: 'https://aglio-olio-api.shop/myroom/preview',
-        params: { post_id: selectedPreviewKey },
+        params: { _id: selectedPreviewKey },
       });
       setMetaData(res.data);
     } catch (err) {
@@ -37,7 +37,7 @@ function Preview() {
       const res = await axios({
         method: 'DELETE',
         url: `https://aglio-olio-api.shop/myroom/delete/${selectedPreviewKey}`,
-        params: { post_id: selectedPreviewKey },
+        params: { _id: selectedPreviewKey },
       });
       alert('delete 성공');
       window.location.reload();
@@ -80,7 +80,7 @@ function Preview() {
           {metaData.algo_tag &&
             metaData.algo_tag.map((tag) => {
               return (
-                <span class="badge badge-outline">{tag.tag}</span> // tag 안에 _id와 value 넣음
+                <span class="badge badge-outline">{tag}</span> // tag 안에 _id와 value 넣음
               );
             })}
         </div>

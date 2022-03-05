@@ -82,8 +82,8 @@ const SelfStudyRoom = () => {
 
     axios({
       method: 'GET',
-      url: 'https://aglio-olio-api.shop/myroom/preview', // url 변경 해야함
-      params: { post_id: selectedPreviewKey },
+      url: 'https://aglio-olio-api.shop/myroom/selfstudy',
+      params: { _id: selectedPreviewKey },
     })
       .then((res) => {
         data = res.data

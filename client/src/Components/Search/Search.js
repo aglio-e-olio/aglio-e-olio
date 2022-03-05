@@ -5,7 +5,6 @@ import Dropdown from '../Dropdown/Dropdown';
 
 function Search() {
   const [sortedData, setSortedData] = useState([]);
-  const [bridge, setBridge] = useState([]);
   // const [searchedData, setSearchedData] = useState(receivedData);
 
   const {
@@ -32,7 +31,7 @@ function Search() {
           return 0;
         });
         setSortedData((data) => [...receivedData]);
-        setSearchedData([...receivedData]);
+        setSearchedData([...receivedData]); // 초기 info에 보여지는 데이터 설정
       })
       .catch((err) => {
         console.error(err);
@@ -45,6 +44,7 @@ function Search() {
   });
   console.log('renderCount', renderCount.current);
 
+  /* 태그 선택 시 데이터 필터링 */
   useEffect(() => {
     let datas = sortedData;
     let result = [];
@@ -72,6 +72,7 @@ function Search() {
   function handleSearch(e) {
     let value = e.target.value;
     let result = [];
+    console.log("검색 중 searchedData", searchedData)
     result = sortedData.filter((data) => {
       if (
         data.title.search(value) !== -1 ||
@@ -84,8 +85,7 @@ function Search() {
       }
       return false;
     });
-    setBridge(result);
-    setSearchedData(result);
+    setSearchedData([...result]);
   }
 
   /* tag 버튼 누를 시 해당 tag 검색 필터에서 제외. */
@@ -112,7 +112,8 @@ function Search() {
           class="input float-left  input-bordered w-full max-w-xs"
           style={{ margin: 10 }}
         ></input>
-        {/* <Dropdown title="Algorithm" item="algo_tag" /> */}
+        {console.log("현재 searchedData", searchedData)}
+        <Dropdown title="Algorithm" item="algo_tag" />
         <Dropdown title="Announcer" item="announcer" />
         <Dropdown title="Extra Tag" item="extra_tag" />
       </div>

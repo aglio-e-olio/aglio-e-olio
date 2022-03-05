@@ -14,7 +14,7 @@ export default function Dropdown({ title, item }) {
   }, [searchedData]);
 
   function optionClick(e) {
-    let beforeKeyword = keywords
+    let beforeKeyword = keywords;
     let keyword = {};
     keyword.key = item;
     keyword.value = e.target.innerHTML;

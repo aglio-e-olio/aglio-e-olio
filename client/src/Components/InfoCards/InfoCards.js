@@ -9,8 +9,9 @@ import CameraIcon from '../Atoms/CameraIcon';
 function InfoCards() {
   const { selectPreview, searchedData, setSearchedData, keywords } = useContext(codeContext);
 
+  /* Preview에서 사용할 _id 만들어주기 */
   function handleCardClick(value) {
-    selectPreview(value.post_id);
+    selectPreview(value._id);
   }
 
   return (
