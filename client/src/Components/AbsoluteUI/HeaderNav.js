@@ -35,9 +35,6 @@ const HeaderNav = ({ peers, handleSave }) => {
           <li>
             <MyAudio />
           </li>
-          <li>
-            <MyAudio />
-          </li>
           {peers.map((peer_info, index) => {
             return (
               <li>
