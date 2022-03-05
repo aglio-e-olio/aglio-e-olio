@@ -197,7 +197,21 @@ const Room = () => {
 
   return (
     <div>
-      <AbsoluteUI peers={peers} handleSave={handleSave} doc={doc} provider={provider}/>
+      <div class="fixed top-0 left-0 right-0 bottom-0 ">
+        <AbsoluteUI
+          peers={peers}
+          handleSave={handleSave}
+          doc={doc}
+          provider={provider}
+        />
+        <Canvas
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+        />
+      </div>
       <div>
         <Save
           isOpen={isOpen}
@@ -205,33 +219,7 @@ const Room = () => {
           yLines={yLines}
           doc={doc}
         />
-        <div>
-          {/* <Record /> */}
-          {/* <button
-            class="btn absolute bottom-20 right-4 z-30"
-            onClick={sendCode}
-          >
-            Run
-          </button> */}
-          {/* <Canvas
-            doc={doc}
-            provider={provider}
-            awareness={awareness}
-            yLines={yLines}
-            undoManager={undoManager}
-          />
-          <CodeEditor doc={doc} provider={provider} /> */}
-        </div>
-        <div>
-          {/* <textarea
-            className="code-result"
-            value={compileResult}
-            placeholder={
-              '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
-            }
-          /> */}
-          {/* </div> */}
-        </div>
+        {/* <Record /> */}
       </div>
     </div>
   );

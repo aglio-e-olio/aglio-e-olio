@@ -32,7 +32,7 @@ function changeToPencil() {
 
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
-  return -52;
+  return -65;
 }
 
 function getPoint(x, y) {
@@ -155,11 +155,10 @@ export default function Canvas({
           </li>
         </ul> */}
       </div>
-      <div className="canvas-container" style={{ zIndex: zIndex }}>
+      <div className="z-0 " style={{ zIndex: zIndex }}>
         <svg
           width={window.innerWidth}
           height={window.innerHeight}
-          className="canvas-layer"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
