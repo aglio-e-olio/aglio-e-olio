@@ -29,7 +29,7 @@ const History = () => {
         <Search />
         <div class="divider"></div>
       </div>
-      <SplitPane split="vertical" minSize={100} defaultSize="40%">
+      <SplitPane split="vertical" minSize={200} defaultSize="30%">
         {/* <TagSort /> */}
         <InfoCards />
         <Preview />

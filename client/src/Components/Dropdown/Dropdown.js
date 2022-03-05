@@ -1,37 +1,30 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 
-export default function Announcer({ title }) {
-  const { searchedData, setSearchedData } = useContext(codeContext);
-  const [beforeItems, setBeforeItems] = useState([]);
+export default function Dropdown({ title, item }) {
+  const { searchedData, setSearchedData, keywords, setKeywords } =
+    useContext(codeContext);
   const [alignedItems, setAlignedItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
-    searchedData.map((item) => {
-      setAlignedItems([...new Set([...item.teamMates])]);
+    if (title === 'Announcer') item = 'teamMates';
+    searchedData.map((data) => {
+      setAlignedItems((prev) => [...new Set([...prev, ...data[item]])]);
     });
   }, [searchedData]);
 
   function itemClick(e) {
-    setBeforeItems(searchedData);
     let value = e.target.innerHTML;
-    setSelectedItems(prev => [...prev, value])
-    let result = [];
-    result = searchedData.filter((data) => {
-      if (data.announcer.search(value) !== -1) {
-        return true;
-      }
-      return false;
-    });
-    setSearchedData(result);
+    let keyword = {};
+    keyword.key = item;
+    keyword.value = value;
+
+    setKeywords([...new Set([...keywords, keyword])]);
   }
 
   function handleItemBtn(e) {
-    let value = e.target.innerHTML
-    setSearchedData(beforeItems)
-    let index = selectedItems.indexOf(value)
-    setSelectedItems(prev => selectedItems.splice(index, 1))
+    let value = e.target.innerHTML;
   }
 
   return (
@@ -54,14 +47,14 @@ export default function Announcer({ title }) {
             })}
         </ul>
       </div>
-      {selectedItems &&
+      {/* {selectedItems &&
         selectedItems.map((item, index) => {
           return (
             <button key={index} onClick={handleItemBtn} class="btn btn-xs">
               {item}
             </button>
           );
-        })}
+        })} */}
     </>
   );
 }

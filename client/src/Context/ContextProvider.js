@@ -15,6 +15,7 @@ const initialState = {
   urlSnapshot: '',
   selectedPreviewKey: '',
   searchedData: [],
+  keywords: [],
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -79,6 +80,12 @@ const reducer = (state, action) => {
         ...state,
         searchedData: action.payload,
       };
+
+    case 'SET_KEYWORDS':
+      return {
+        ...state,
+        keywords: action.payload
+      }
 
     default:
       throw new Error();
@@ -196,6 +203,13 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function setKeywords(keywords) {
+    dispatch({
+      type: 'SET_KEYWORDS',
+      payload: keywords,
+    });
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -226,6 +240,8 @@ const ContextProvider = ({ children }) => {
         addLogin,
         searchedData: state.searchedData,
         setSearchedData,
+        keywords: state.keywords,
+        setKeywords,
       }}
     >
       {children}

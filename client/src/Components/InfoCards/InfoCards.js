@@ -7,10 +7,11 @@ import CameraIcon from '../Atoms/CameraIcon';
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoCards() {
-  const [tagData, setTagData] = useState([]);
+  const [dataForRendering, setDataForRendering] = useState([]);
   // const [searchedData, setSearchedData] = useState(tagData);
 
-  const { currentTag, persistEmail, selectPreview, searchedData, setSearchedData } = useContext(codeContext);
+  const { currentTag, persistEmail, selectPreview, searchedData, setSearchedData, keywords } = useContext(codeContext);
+
 
   /* props으로 받은 tag 처리 */
   // useEffect(() => {
