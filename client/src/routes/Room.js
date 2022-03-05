@@ -1,23 +1,19 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
-import Audio from '../Components/Audio/Audio';
-import MyAudio from '../Components/Audio/MyAudio';
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
 import { useNavigate, useParams } from 'react-router-dom';
-import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
-import PinchZoomPan from 'react-responsive-pinch-zoom-pan';
 
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 
 import Save from '../Components/Save/Save';
-import UrlCopy from '../Components/UrlCopy';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
+
 
 let i = 0;
 let doc;
@@ -32,6 +28,7 @@ const Room = () => {
   const socketRef = useRef();
   const peersRef = useRef([]);
   const { roomID } = useParams();
+  const [isEraser, setIsEraser] = useState(false);
 
   const {
     codes,
@@ -197,7 +194,26 @@ const Room = () => {
 
   return (
     <div>
-      <AbsoluteUI peers={peers} handleSave={handleSave} doc={doc} provider={provider}/>
+      <div class="fixed top-0 left-0 right-0 bottom-0 ">
+        <AbsoluteUI
+          peers={peers}
+          handleSave={handleSave}
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+          setIsEraser={setIsEraser}
+        />
+        <Canvas
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+          isEraser={isEraser}
+        />
+      </div>
       <div>
         <Save
           isOpen={isOpen}
@@ -205,33 +221,7 @@ const Room = () => {
           yLines={yLines}
           doc={doc}
         />
-        <div>
-          {/* <Record /> */}
-          {/* <button
-            class="btn absolute bottom-20 right-4 z-30"
-            onClick={sendCode}
-          >
-            Run
-          </button> */}
-          {/* <Canvas
-            doc={doc}
-            provider={provider}
-            awareness={awareness}
-            yLines={yLines}
-            undoManager={undoManager}
-          />
-          <CodeEditor doc={doc} provider={provider} /> */}
-        </div>
-        <div>
-          {/* <textarea
-            className="code-result"
-            value={compileResult}
-            placeholder={
-              '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
-            }
-          /> */}
-          {/* </div> */}
-        </div>
+        {/* <Record /> */}
       </div>
     </div>
   );

@@ -1,8 +1,12 @@
 import React from 'react';
 
 const RightSideNav = ({ setIsOpen }) => {
+    function handleClick() {
+        setIsOpen(true);
+    }
+
   return (
-    <ul class="menu bg-neutral hover:bg-neutral-focus cursor-pointer rounded-box absolute top-1/3 right-0 w-8">
+    <ul class="menu z-50 bg-neutral hover:bg-neutral-focus cursor-pointer rounded-box absolute top-1/3 right-0 w-8">
       <li>
         <svg
           role="img"
@@ -17,7 +21,7 @@ const RightSideNav = ({ setIsOpen }) => {
           stroke-linejoin="miter"
           fill="none"
           color="#ffffff"
-          onClick={() => setIsOpen(true)}
+          onClick={handleClick}
         >
           {' '}
           <title id="chevronLeftIconTitle">Chevron Left</title>{' '}

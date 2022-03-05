@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const HeaderNav = ({ peers, handleSave }) => {
   const navigate = useNavigate();
   return (
-    <div class="navbar bg-neutral z-111 rounded-box m-1 h-4">
+    <div class="navbar bg-neutral z-10 rounded-box m-1 h-4">
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
           <li>
