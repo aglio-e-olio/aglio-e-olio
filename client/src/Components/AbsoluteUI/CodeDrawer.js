@@ -46,12 +46,12 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
               <polyline points="10 6 16 12 10 18 10 18" />{' '}
             </svg>
           </button>
-          <button class="btn fixed bottom-20 right-4 z-30" onClick={sendCode}>
+          <button class="tab tab-lifted tab-active fixed bottom-32 right-4 z-30" onClick={sendCode}>
             Run
           </button>
           <CodeEditor doc={doc} provider={provider} />
           <textarea
-            className="w-full border-solid border-2 fixed bottom-2"
+            className="w-full border-solid border-2 fixed bottom-20"
             value={compileResult}
             placeholder={
               '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
