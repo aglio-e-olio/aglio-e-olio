@@ -18,7 +18,7 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
   return (
       <section
         className={
-          ' w-screen max-w-lg right-0 absolute bg-white bg-opacity-0 h-full shadow-xl delay-400 duration-500 ease-in-out transition-all transform  ' +
+          ' w-screen max-w-lg right-0 absolute bg-white bg-opacity-50 h-full shadow-xl delay-400 duration-500 ease-in-out transition-all transform  ' +
           (isOpen ? ' translate-x-0 z-50' : ' translate-x-full')
         }
       >
@@ -57,6 +57,7 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
               '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
             }
           />
+          
         </article>
       </section>
   );
