@@ -1,5 +1,7 @@
 import * as React from 'react';
 // import { awareness } from '../utils/y';
+import { useContext } from 'react';
+import { codeContext } from '../Context/ContextProvider';
 
 const USER_COLORS = [
   '#EC5E41',
@@ -23,9 +25,9 @@ const sample = (arr) => arr[Math.floor(Math.random() * arr.length)];
 /**
  * Subscribe to the user's own presence within the provider's awareness API.
  */
-export function useUser({awareness}) {
-
+export function useUser({ awareness }) {
   const [user, setUser] = React.useState();
+  const { persistUser } = useContext(codeContext);
 
   // Set the initial user's state
   React.useEffect(() => {
@@ -34,12 +36,13 @@ export function useUser({awareness}) {
       point: [0, 0],
       color: sample(USER_COLORS),
       isActive: true,
+      name: persistUser,
     };
 
     awareness.setLocalState(user);
 
     setUser(awareness.getLocalState());
-  }, []);
+  }, [persistUser]);
 
   // Activate the user (idle -> active)
   const activateUser = React.useCallback(() => {

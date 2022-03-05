@@ -150,6 +150,11 @@ export default function Canvas({
               <Line key={line.get('id')} line={line} />
             ))}
             {/* Live Cursors */}
+            {users
+              .filter((user) => user.id !== self.id)
+              .map((other) => (
+                <UserCursor key={other.id} user={other} />
+              ))}
           </g>
           {/* User Tokens */}
           {/* {users.map((user, i) => (
