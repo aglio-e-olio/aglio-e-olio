@@ -1,23 +1,19 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
-import Audio from '../Components/Audio/Audio';
-import MyAudio from '../Components/Audio/MyAudio';
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
 import { useNavigate, useParams } from 'react-router-dom';
-import CodeEditor from '../Components/CodeEditor/Editor';
 import { codeContext } from '../Context/ContextProvider';
-import PinchZoomPan from 'react-responsive-pinch-zoom-pan';
 
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 
 import Save from '../Components/Save/Save';
-import UrlCopy from '../Components/UrlCopy';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
+
 
 let i = 0;
 let doc;

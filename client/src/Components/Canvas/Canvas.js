@@ -9,26 +9,12 @@ import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
 import './Canvas.css';
 import { useState } from 'react';
 import { useEraser } from '../../hooks/useEraser';
-import PenIcon from '../Atoms/PenIcon';
-import EraserIcon from '../Atoms/EraserIcon';
-import TrashIcon from '../Atoms/TrashIcon';
 
 const date = new Date();
 
 date.setUTCHours(0, 0, 0, 0);
 
 const START_TIME = date.getTime();
-
-// let ERASER_FLAG = false;
-
-// function changeToEraser() {
-//     ERASER_FLAG = true;
-  
-// }
-
-// function changeToPencil() {
-//   ERASER_FLAG = false;
-// }
 
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
