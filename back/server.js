@@ -131,6 +131,7 @@ io.on('connection', (socket) => {
 
   socket.on('code compile', (payload) => {
     const url = 'https://api.jdoodle.com/v1/execute';
+    console.log(users, "도대체 왜 없지")
 
     const sendData = {
       // put your own client id and client secret of jdoodle
@@ -150,7 +151,8 @@ io.on('connection', (socket) => {
         url,
         data: sendData,
       }).then((response) => {
-        users[payload.roomID].forEach((userID) => {
+        console.log(response.data.output, "response 보자")
+        users[payload.roomInfo].forEach((userID) => {
           io.to(userID).emit('code response', response.data.output);
         });
       });
