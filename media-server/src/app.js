@@ -280,11 +280,13 @@ io.on('connection', (socket) => {
     callback({ success: "녹화 시작합니다." });
   });
 
-  socket.on('stop-record', () => {
+  socket.on('stop-record', (callback) => {
     const peer = roomList.get(socket.room_id).getPeers().get(socket.id);
 
     peer.process.kill();
     peer.process = undefined;
+
+    callback();
 
     for (const remotePort of peer.remotePorts) {
       releasePort(remotePort);

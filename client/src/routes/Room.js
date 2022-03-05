@@ -130,6 +130,7 @@ const Room = () => {
         'start-record',
         (data) => {
           if (data.error) {
+            rc.screenTrackStop();
             alert(data.error);
             startRecordButtonRef.current.disabled = false;
             stopRecordButtonRef.current.disabled = true;
@@ -145,7 +146,9 @@ const Room = () => {
     stopRecordButtonRef.current.addEventListener('click', () => {
       console.log('stopRecord()');
 
-      socket.emit('stop-record');
+      socket.emit('stop-record', () => {
+        rc.closeProducer(RoomClient.mediaType.screen);
+      });
       startRecordButtonRef.current.disabled = false;
       stopRecordButtonRef.current.disabled = true;
     })
@@ -365,6 +368,8 @@ class RoomClient {
 
     this.consumers = new Map()
     this.producers = new Map()
+
+    this.screenTrackHolder = null;
 
     /**
      * map that contains a mediatype as key and producer_id as value
@@ -648,7 +653,14 @@ class RoomClient {
         : await navigator.mediaDevices.getUserMedia(mediaConstraints)
       console.log('supportedConstraints: ' + navigator.mediaDevices.getSupportedConstraints())
 
-      const track = audio ? stream.getAudioTracks()[0] : stream.getVideoTracks()[0]
+      let track;
+      if (audio) {
+        track = stream.getAudioTracks()[0];
+      } else {
+        track = stream.getVideoTracks()[0];
+        this.screenTrackHolder = track;
+      }
+
       const params = {
         track: track
       }
@@ -811,26 +823,22 @@ class RoomClient {
     this.producerLabel.delete(type)
 
     if (type !== mediaType.audio) {
-      let elem = document.getElementById(producer_id)
-      elem.srcObject.getTracks().forEach(function (track) {
-        track.stop()
-      })
-      elem.parentNode.removeChild(elem)
+      this.screenTrackStop();
     }
 
-    switch (type) {
-      case mediaType.audio:
-        this.event(_EVENTS.stopAudio)
-        break
-      case mediaType.video:
-        this.event(_EVENTS.stopVideo)
-        break
-      case mediaType.screen:
-        this.event(_EVENTS.stopScreen)
-        break
-      default:
-        return
-    }
+    // switch (type) {
+    //   case mediaType.audio:
+    //     this.event(_EVENTS.stopAudio)
+    //     break
+    //   case mediaType.video:
+    //     this.event(_EVENTS.stopVideo)
+    //     break
+    //   case mediaType.screen:
+    //     this.event(_EVENTS.stopScreen)
+    //     break
+    //   default:
+    //     return
+    // }
   }
 
   pauseProducer(type) {
@@ -888,6 +896,13 @@ class RoomClient {
     }
 
     this.event(_EVENTS.exitRoom)
+  }
+
+  screenTrackStop() {
+    if (this.screenTrackHolder !== null) {
+      this.screenTrackHolder.stop();
+      this.screenTrackHolder = null;
+    }
   }
 
   ///////  HELPERS //////////
