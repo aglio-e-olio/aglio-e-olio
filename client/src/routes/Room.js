@@ -41,7 +41,8 @@ const displayMediaOptions = {
 const mediaType = {
   audio: 'audioType',
   video: 'videoType',
-  screen: 'screenType'
+  screen: 'screenType',
+  allAudio: 'allAudio'
 }
 
 
@@ -59,11 +60,13 @@ const Room = () => {
   const startRecordButtonRef = useRef();
   const stopRecordButtonRef = useRef();
   const deviceRef = useRef();
+  const isRecordingRef = useRef(false);
 
-  const [audioStreams, setAudioStreams] = useState(new Map());
-  const audioStreamsUpsert = (key, value) => {
-    setAudioStreams((prev) => new Map(prev).set(key, value));
-  };
+  const [audioStreams, setAudioStreams] = useState([]);
+  // const [audioStreams, setAudioStreams] = useState(new Map());
+  // const audioStreamsUpsert = (key, value) => {
+  //   setAudioStreams((prev) => new Map(prev).set(key, value));
+  // };
   let name;
 
   let socket = io.connect('https://3.39.27.19:8000', {
@@ -105,20 +108,25 @@ const Room = () => {
       produce(mediaType.audio);
     });
     stopAudioButtonRef.current.addEventListener('click', () => {
-      closeProducer(mediaType.audio)
+      closeProducer(mediaType.audio, false)
     });
     startRecordButtonRef.current.addEventListener('click', async () => {
       console.log('startRecord()');
+      isRecordingRef.current = true;
       await produce(mediaType.screen);
+      await produce(mediaType.allAudio);
 
       socket.emit(
         'start-record',
         (data) => {
           if (data.error) {
             screenTrackStop();
+            closeProducer(mediaType.screen, true);
+            closeProducer(mediaType.allAudio, true);
             alert(data.error);
             startRecordButtonRef.current.disabled = false;
             stopRecordButtonRef.current.disabled = true;
+            isRecordingRef.current = false;
           } else {
             alert(data.success);
           }
@@ -132,10 +140,13 @@ const Room = () => {
       console.log('stopRecord()');
 
       socket.emit('stop-record', () => {
-        closeProducer(mediaType.screen);
+        closeProducer(mediaType.screen, true);
+        closeProducer(mediaType.allAudio, true);
       });
+      
       startRecordButtonRef.current.disabled = false;
       stopRecordButtonRef.current.disabled = true;
+      isRecordingRef.current = false;
     })
   }, []);
 
@@ -223,14 +234,28 @@ const Room = () => {
         'produce',
         async function ({ kind, rtpParameters }, callback, errback) {
           try {
-            const { producer_id } = await socket.request('produce', {
-              producerTransportId: producerTransport.id,
-              kind,
-              rtpParameters
-            })
-            callback({
-              id: producer_id
-            })
+            if (isRecordingRef.current === true) {
+              const { producer_id } = await socket.request('produce', {
+                producerTransportId: producerTransport.id,
+                kind,
+                rtpParameters,
+                isRecording: true
+              })
+              callback({
+                id: producer_id
+              })
+            } else {
+              const { producer_id } = await socket.request('produce', {
+                producerTransportId: producerTransport.id,
+                kind,
+                rtpParameters,
+                isRecording: false
+              })
+              callback({
+                id: producer_id
+              })
+            }
+
           } catch (err) {
             errback(err)
           }
@@ -348,6 +373,7 @@ const Room = () => {
     let mediaConstraints = {}
     let audio = false
     let screen = false
+    let allAudio = false
     switch (type) {
       case mediaType.audio:
         mediaConstraints = {
@@ -359,6 +385,9 @@ const Room = () => {
       case mediaType.screen:
         mediaConstraints = displayMediaOptions;
         screen = true
+        break
+      case mediaType.allAudio:
+        allAudio = true
         break
       default:
         return
@@ -374,13 +403,30 @@ const Room = () => {
     console.log('Mediacontraints:', mediaConstraints)
     let stream
     try {
-      stream = screen
-        ? await navigator.mediaDevices.getDisplayMedia(mediaConstraints)
-        : await navigator.mediaDevices.getUserMedia(mediaConstraints)
+      if (type === mediaType.allAudio) {
+        // audio Context API로 consumer들에 모은 stream 합치기
+        if (consumers.size === 0 && !producerLabel.has(mediaType.audio)) {
+          return;
+        }
+        const audioContext = new AudioContext();
+        const acDest = audioContext.createMediaStreamDestination();
+        for (const otherStream of consumers.values()) {
+          audioContext.createMediaStreamSource(otherStream).connect(acDest);
+        }
+        if (producerLabel.has(mediaType.audio)) {
+          let myStream = await navigator.mediaDevices.getUserMedia({audio: true});
+          audioContext.createMediaStreamSource(myStream).connect(acDest);
+        }
+        stream = new MediaStream([...acDest.stream.getTracks()]);
+      } else if ( type === mediaType.audio) {
+        stream = await navigator.mediaDevices.getUserMedia(mediaConstraints)
+      } else {
+        stream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints)
+      }
       console.log('supportedConstraints: ' + navigator.mediaDevices.getSupportedConstraints())
 
       let track;
-      if (audio) {
+      if (audio || allAudio) {
         track = stream.getAudioTracks()[0];
       } else {
         track = stream.getVideoTracks()[0];
@@ -399,7 +445,7 @@ const Room = () => {
       let elem
 
       producer.on('trackended', () => {
-        closeProducer(type)
+        closeProducer(type, false)
       })
 
       producer.on('transportclose', () => {
@@ -434,6 +480,7 @@ const Room = () => {
   const consume = async (producer_id) => {
     getConsumeStream(producer_id).then(
       function ({ consumer, stream, kind }) {
+        consumers.set(consumer.id, stream)
 
         let elem
         if (kind === 'video') {
@@ -494,7 +541,7 @@ const Room = () => {
     }
   }
 
-  const closeProducer = (type) => {
+  const closeProducer = async (type, isRecording) => {
     if (!producerLabel.has(type)) {
       console.log('There is no producer for this type ' + type)
       return
@@ -503,15 +550,16 @@ const Room = () => {
     let producer_id = producerLabel.get(type)
     console.log('Close producer', producer_id)
 
-    socket.emit('producerClosed', {
-      producer_id
-    })
+    await socket.request('producerClosed', {
+      producer_id,
+      isRecording: isRecording
+    });
 
     producers.get(producer_id).close()
     producers.delete(producer_id)
     producerLabel.delete(type)
 
-    if (type !== mediaType.audio) {
+    if (type !== mediaType.audio || type !== mediaType.allAudio) {
       screenTrackStop();
     }
   }
@@ -728,13 +776,8 @@ const Room = () => {
   /* Render */
   return (
     <div>
-      {/* <div class='flex justify-start'>
-        {
-          audioStreams.forEach((consumer_id, consumer) => {
-            return <Audio key={consumer_id} consumer={consumer} />
-          })
-        }
-      </div> */}
+      <div class='flex justify-start'>
+      </div>
       <div ref={remoteAudiosRef}></div>
       <div>
         {/* audio open and close */}

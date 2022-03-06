@@ -90,18 +90,24 @@ module.exports = class Room {
     await this.peers.get(socket_id).connectTransport(transport_id, dtlsParameters)
   }
 
-  async produce(socket_id, producerTransportId, rtpParameters, kind) {
+  async produce(socket_id, producerTransportId, rtpParameters, kind, isRecording) {
     // handle undefined errors
     return new Promise(
       async function (resolve, reject) {
-        let producer = await this.peers.get(socket_id).createProducer(producerTransportId, rtpParameters, kind)
-        resolve(producer.id)
-        this.broadCast(socket_id, 'newProducers', [
-          {
-            producer_id: producer.id,
-            producer_socket_id: socket_id
-          }
-        ])
+        let producer;
+        if (isRecording === true) {
+          producer = await this.peers.get(socket_id).createProducer(producerTransportId, rtpParameters, kind, isRecording)
+          resolve(producer.id)
+        } else {
+          producer = await this.peers.get(socket_id).createProducer(producerTransportId, rtpParameters, kind, isRecording)
+          resolve(producer.id)
+          this.broadCast(socket_id, 'newProducers', [
+            {
+              producer_id: producer.id,
+              producer_socket_id: socket_id
+            }
+          ])
+        }
       }.bind(this)
     )
   }
@@ -145,8 +151,8 @@ module.exports = class Room {
     this.peers.delete(socket_id)
   }
 
-  closeProducer(socket_id, producer_id) {
-    this.peers.get(socket_id).closeProducer(producer_id)
+  closeProducer(socket_id, producer_id, isRecording) {
+    this.peers.get(socket_id).closeProducer(producer_id, isRecording)
   }
 
   broadCast(socket_id, name, data) {

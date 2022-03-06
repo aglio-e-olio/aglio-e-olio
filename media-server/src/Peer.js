@@ -6,6 +6,7 @@ module.exports = class Peer {
     this.consumers = new Map()
     this.recordingConsumers = new Map();
     this.producers = new Map()
+    this.recordingProducers = new Map();
     this.remotePorts = [];
     this.process = undefined;
   }
@@ -22,21 +23,29 @@ module.exports = class Peer {
     })
   }
 
-  async createProducer(producerTransportId, rtpParameters, kind) {
+  async createProducer(producerTransportId, rtpParameters, kind, isRecording) {
     //TODO handle null errors
     let producer = await this.transports.get(producerTransportId).produce({
       kind,
       rtpParameters
     })
 
-    this.producers.set(producer.id, producer)
+    if (isRecording === true) {
+      this.recordingProducers.set(producer.id, producer);
+    } else {
+      this.producers.set(producer.id, producer)
+    }
 
     producer.on(
       'transportclose',
       function () {
         console.log('Producer transport close', { name: `${this.name}`, consumer_id: `${producer.id}` })
         producer.close()
-        this.producers.delete(producer.id)
+        if (isRecording === true) {
+          this.producers.delete(producer.id)
+        } else {
+          this.recordingProducers.delete(producer.id);
+        }
       }.bind(this)
     )
 
@@ -88,14 +97,19 @@ module.exports = class Peer {
     }
   }
 
-  closeProducer(producer_id) {
+  closeProducer(producer_id, isRecording) {
     try {
-      this.producers.get(producer_id).close()
+      if (isRecording === true) {
+        this.recordingProducers.get(producer_id).close();
+        this.recordingProducers.delete(producer_id)
+      } else {
+        this.producers.get(producer_id).close();
+        this.producers.delete(producer_id)
+      }
     } catch (e) {
       console.warn(e)
     }
 
-    this.producers.delete(producer_id)
   }
 
   getProducer(producer_id) {

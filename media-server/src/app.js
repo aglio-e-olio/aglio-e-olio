@@ -169,17 +169,20 @@ io.on('connection', (socket) => {
     callback('success')
   })
 
-  socket.on('produce', async ({ kind, rtpParameters, producerTransportId }, callback) => {
+  socket.on('produce', async ({ kind, rtpParameters, producerTransportId, isRecording }, callback) => {
     if (!roomList.has(socket.room_id)) {
       return callback({ error: 'not is a room' })
     }
 
-    let producer_id = await roomList.get(socket.room_id).produce(socket.id, producerTransportId, rtpParameters, kind)
+    let producer_id = await roomList
+      .get(socket.room_id)
+      .produce(socket.id, producerTransportId, rtpParameters, kind, isRecording)
 
     console.log('Produce', {
       type: `${kind}`,
       name: `${roomList.get(socket.room_id).getPeers().get(socket.id).name}`,
-      producer_id: `${producer_id}`
+      producer_id: `${producer_id}`,
+      isRecording: isRecording
     })
 
     callback({
@@ -218,12 +221,15 @@ io.on('connection', (socket) => {
     roomList.get(socket.room_id).removePeer(socket.id)
   })
 
-  socket.on('producerClosed', ({ producer_id }) => {
+  socket.on('producerClosed', ({ producer_id, isRecording }, callback) => {
+    callback({});
     console.log('Producer close', {
-      name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`
+      name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`,
+      producer_id: producer_id,
+      recordingProducer: isRecording
     })
 
-    roomList.get(socket.room_id).closeProducer(socket.id, producer_id)
+    roomList.get(socket.room_id).closeProducer(socket.id, producer_id, isRecording)
   })
 
   socket.on('exitRoom', async (_, callback) => {
@@ -253,14 +259,15 @@ io.on('connection', (socket) => {
     const peer = room.getPeers().get(socket.id);
     let recordInfo = {};
 
-    if (peer.producers.size == 1) {
+    if (peer.recordingProducers.size == 1) {
       callback({
         error: "최소 한 명 이상의 스피커가 필요합니다."
       });
+
       return;
     }
 
-    for (const producer of peer.producers.values()) {
+    for (const producer of peer.recordingProducers.values()) {
       recordInfo[producer.kind] = await publishProducerRtpStream(peer, producer, room);
     }
 
@@ -286,12 +293,12 @@ io.on('connection', (socket) => {
     peer.process.kill();
     peer.process = undefined;
 
-    callback();
 
     for (const remotePort of peer.remotePorts) {
       releasePort(remotePort);
     }
     peer.recordingConsumers.clear();
+    callback();
   });
 })
 
