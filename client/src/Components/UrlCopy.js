@@ -1,5 +1,7 @@
 import React from 'react';
 import UrlCopyIcon from './Atoms/UrlCopyIcon';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function UrlCopy() {
   console.log('UrlCopy 안');
@@ -10,7 +12,11 @@ function UrlCopy() {
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          alert('클립보드에 복사되었습니다.');
+          // alert('클립보드에 복사되었습니다.');
+          toast.success("클립보드 복사 성공!", {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_RIGHT
+          });
         })
         .catch(() => {
           alert('복사를 다시 시도해주세요.');
@@ -38,16 +44,23 @@ function UrlCopy() {
       document.execCommand('copy');
       // 흐름 6.
       document.body.removeChild(textarea);
-      alert('클립보드에 복사되었습니다.');
+      // alert('클립보드에 복사되었습니다.');
+      toast.success("클립보드 복사 성공!", {
+        autoClose: 1000,
+        position: toast.POSITION.TOP_RIGHT
+      });
     }
   };
 
   const url = window.document.location.href;
 
   return (
+    <>
     <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)}>
       <UrlCopyIcon />
     </button>
+    <ToastContainer />
+    </>
   );
 }
 
