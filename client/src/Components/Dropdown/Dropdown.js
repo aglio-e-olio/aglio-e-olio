@@ -33,7 +33,7 @@ export default function Dropdown({ title, item }) {
 
   return (
     <>
-      <div class="dropdown dropdown-hover">
+      <div class="dropdown dropdown-hover dropdown-primary">
         <label tabindex="0" class="btn m-1">
           {title}
         </label>

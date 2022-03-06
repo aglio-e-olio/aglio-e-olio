@@ -6,6 +6,7 @@ import Dropdown from '../Dropdown/Dropdown';
 function Search() {
   const [sortedData, setSortedData] = useState([]);
   const [query, setQuery] = useState('');
+  
   // const [searchedData, setSearchedData] = useState(receivedData);
 
   const {
@@ -96,11 +97,20 @@ function Search() {
       return;
     }
 
-    let beforeKeyword = keywords;
     let keyword = {};
     keyword.key = 'search';
     keyword.value = query;
-    setKeywords([...new Set([...beforeKeyword, keyword])]);
+
+    let newKeywords = [...keywords, keyword].reduce((acc, cur) => {
+      !(
+        acc.find((keyword_obj) => keyword_obj.key === cur.key) &&
+        acc.find((keyword_obj) => keyword_obj.value === cur.value)
+      ) && acc.push(cur);
+
+      return acc;
+    }, []);
+
+    setKeywords([...newKeywords]);
   }
 
   function handleKeyPress(e) {
@@ -140,22 +150,21 @@ function Search() {
         </button>
         <div>
           <Dropdown title="Algorithm" item="algo_tag" />
-        </div>
-        <div>
           <Dropdown title="Announcer" item="announcer" />
-        </div>
-        <div>
           <Dropdown title="Extra Tag" item="extra_tag" />
         </div>
       </div>
       <br></br>
       <div class="mx-2.5">
         {keywords &&
-          keywords.map((keyword) => {
+          keywords.map((keyword, index) => {
             return (
-              <button class="btn btn-sm mx-2.5 no-animation" onClick={handleKeywordBtn}>
-                {keyword.value}
-              </button>
+                <button
+                  class="btn btn-sm m-2.5 no-animation"
+                  onClick={handleKeywordBtn}
+                >
+                  {keyword.value}
+                </button>
             );
           })}
       </div>
