@@ -19,7 +19,8 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  const { codes, urlSnapshot, email, persistUser, persistEmail } = useContext(codeContext);
+  const { codes, urlSnapshot, email, persistUser, persistEmail } =
+    useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
@@ -87,6 +88,18 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
       );
     }, 3000);
 
+  function getTime() {
+    const t = new Date();
+    const date = ('0' + t.getDate()).slice(-2);
+    const month = ('0' + (t.getMonth() + 1)).slice(-2);
+    const year = t.getFullYear();
+    const hours = ('0' + t.getHours()).slice(-2);
+    const minutes = ('0' + t.getMinutes()).slice(-2);
+    const seconds = ('0' + t.getSeconds()).slice(-2);
+    const time = `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+    return time;
+  }
+
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
     const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
@@ -122,13 +135,14 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     } else {
       uploadFile(file, config)
         .then((data) => {
-          let saveTime = new Date();
+          const saveTime = getTime();
+
           let body = {
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            type: "image",
+            type: 'image',
             teamMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),

@@ -23,19 +23,19 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   const getData = async (selectedPreviewKey) => {
     try {
       const res = await axios({
-        method: "GET",
+        method: 'GET',
         url: 'https://aglio-olio-api.shop/myroom/preview',
         params: { _id: selectedPreviewKey },
-      })
-      setMetaData(prev => prev = res.data)
-    } catch(err) {
-      console.error(err)
+      });
+      setMetaData((prev) => (prev = res.data));
+    } catch (err) {
+      console.error(err);
     }
-  }
- 
+  };
+
   useEffect(() => {
-    getData(selectedPreviewKey)
-  }, [])
+    getData(selectedPreviewKey);
+  }, []);
 
   let algo_array = [];
   if (data && data.algo_tag) {
@@ -150,21 +150,34 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
       `image/${v1().toString().replace('-', '')}.png`
     );
 
+    function getTime() {
+      const t = new Date();
+      const date = ('0' + t.getDate()).slice(-2);
+      const month = ('0' + (t.getMonth() + 1)).slice(-2);
+      const year = t.getFullYear();
+      const hours = ('0' + t.getHours()).slice(-2);
+      const minutes = ('0' + t.getMinutes()).slice(-2);
+      const seconds = ('0' + t.getSeconds()).slice(-2);
+      const time = `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+      return time;
+    }
+
     if (!(title && algorithm && announcer)) {
       alert('빈칸을 입력해 주세요.');
       return;
     } else {
       uploadFile(file, config)
         .then((data) => {
-          let updateTime = new Date();
+          const updateTime = getTime();
+
           let body = {
             _id: selectedPreviewKey,
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            type: "image",
-            teemMates: announcerOptions.map(
+            type: 'image',
+            teamMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
             update_time: updateTime,
