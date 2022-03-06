@@ -14,11 +14,21 @@ export default function Dropdown({ title, item }) {
   }, [searchedData]);
 
   function optionClick(e) {
-    let beforeKeyword = keywords;
     let keyword = {};
     keyword.key = item;
     keyword.value = e.target.innerHTML;
-    setKeywords([...new Set([...beforeKeyword, keyword])]);
+
+    /* 중복 제거 */
+    let newKeywords = [...keywords, keyword].reduce((acc, cur) => {
+      !(
+        acc.find((keyword_obj) => keyword_obj.key === cur.key) &&
+        acc.find((keyword_obj) => keyword_obj.value === cur.value)
+      ) && acc.push(cur);
+
+      return acc;
+    }, []);
+
+    setKeywords([...newKeywords]);
   }
 
   return (
