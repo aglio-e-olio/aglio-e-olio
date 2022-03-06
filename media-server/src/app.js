@@ -121,7 +121,7 @@ io.on('connection', (socket) => {
 
   socket.on('getProducers', () => {
     if (!roomList.has(socket.room_id)) return
-    console.log('Get producers', { name: `${roomList.get(socket.room_id).getPeers().get(socket.id).name}` })
+    console.log('Get producers request from', { name: `${roomList.get(socket.room_id).getPeers().get(socket.id).name}` })
 
     // send all the current producer to newly joined member
     let producerList = roomList.get(socket.room_id).getProducerListForPeer()
@@ -179,7 +179,7 @@ io.on('connection', (socket) => {
     console.log('Produce', {
       type: `${kind}`,
       name: `${roomList.get(socket.room_id).getPeers().get(socket.id).name}`,
-      id: `${producer_id}`
+      producer_id: `${producer_id}`
     })
 
     callback({
@@ -194,7 +194,7 @@ io.on('connection', (socket) => {
     console.log('Consuming', {
       name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`,
       producer_id: `${producerId}`,
-      consumer_id: `${params.id}`
+      consumer_id: `${params.consumerId}`
     })
 
     callback(params)

@@ -750,7 +750,7 @@ class RoomClient {
 
         let elem
         if (kind === 'video') {
-          /* Nothing yet */
+          /* No need */
         } else {
           elem = document.createElement('audio')
           elem.srcObject = stream
@@ -784,11 +784,11 @@ class RoomClient {
       consumerTransportId: this.consumerTransport.id, // might be
       producerId
     })
-    const { id, kind, rtpParameters } = data
+    const { consumerId, kind, rtpParameters } = data;
 
     let codecOptions = {}
     const consumer = await this.consumerTransport.consume({
-      id,
+      id: consumerId,
       producerId,
       kind,
       rtpParameters,

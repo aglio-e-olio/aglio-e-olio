@@ -79,7 +79,7 @@ module.exports = class Peer {
       consumer,
       params: {
         producerId: producer_id,
-        id: consumer.id,
+        consumerId: consumer.id,
         kind: consumer.kind,
         rtpParameters: consumer.rtpParameters,
         type: consumer.type,
