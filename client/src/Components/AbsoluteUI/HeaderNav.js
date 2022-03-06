@@ -19,8 +19,7 @@ const HeaderNav = ({ peers, handleSave }) => {
       if (result.isConfirmed) {
         navigate(-1);
       } else if (result.isDenied) {
-        //save모달창 열리게 추가할 것.
-        Swal.fire('Change are not saved', '', 'info');
+        handleSave();
       }
     });
   }
