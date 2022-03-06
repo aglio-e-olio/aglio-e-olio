@@ -63,7 +63,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  console.log('SAVE 컴포넌트 안!');
+  // console.log('SAVE 컴포넌트 안!');
 
   const titleHandler = (e) => {
     e.preventDefault();

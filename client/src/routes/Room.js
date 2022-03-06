@@ -13,6 +13,9 @@ import Save from '../Components/Save/Save';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
+import Swal from 'sweetalert2';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 let i = 0;
@@ -23,12 +26,12 @@ let yLines;
 let undoManager;
 
 const Room = () => {
-  const navigate = useNavigate();
-  const [peers, setPeers] = useState([]);
   const socketRef = useRef();
   const peersRef = useRef([]);
   const { roomID } = useParams();
+  const [peers, setPeers] = useState([]);
   const [isEraser, setIsEraser] = useState(false);
+  const [isOpen, setOpen] = useState(false);
 
   const {
     codes,
@@ -51,23 +54,16 @@ const Room = () => {
   }
   i++;
 
-  const [isOpen, setOpen] = useState(false);
 
   const handleSave = () => {
     // 여기서 모달 열어줌
     onCapture();
-    // const jsonYLines = yLines
-
     setOpen(true);
   };
 
   const handleSaveCancel = () => {
     setOpen(false);
   };
-
-  // function sendCode() {
-  //   socketRef.current.emit('code compile', { codes, roomID });
-  // }
 
   useEffect(() => {
     console.log('소켓 커넥트는 몇번 되는가?');
@@ -86,30 +82,56 @@ const Room = () => {
           });
         }
         socketRef.current.on('all users', (props) => {
-          const peers = [];
-          props.users.forEach((userID) => {
-            //createPeer 함수안에서 서버한테 상대방 소켓 id 담아서 sending signal 날린다.
-            const peer = createPeer(userID, socketRef.current.id, stream);
-            peersRef.current.push({
-              peerID: userID,
-              peer,
+          //props.users 예외 처리
+          if (props.users.length === 0) {
+            return;
+          } else {
+            const peers = [];
+            props.users.forEach((userID) => {
+              //createPeer 함수안에서 서버한테 상대방 소켓 id 담아서 sending signal 날린다.
+              const peer = createPeer(userID, socketRef.current.id, stream);
+              peersRef.current.push({
+                peerID: userID,
+                peer,
+              });
+              const peerName = props.names[userID];
+              console.log('상대방 이름은', peerName);
+              //내가 만든 peer 와 상대방 이름이 들어있다.
+              peers.push({ peer: peer, peerName: peerName });
             });
-            const peerName = props.names[userID];
-            console.log('상대방 이름은', peerName);
-            //내가 만든 peer 와 상대방 이름이 들어있다.
-            peers.push({ peer: peer, peerName: peerName });
+            setPeers(peers);
+            console.log(peers);
+          }
           });
-          setPeers(peers);
-          console.log(peers);
-        });
+        
 
         socketRef.current.on('hello', (new_member) => {
           console.log(new_member);
-          alert(`${new_member} 님이 입장했습니다.`);
+          // Swal.fire({
+          //   position: 'top-right',
+          //   icon: 'success',
+          //   title: `${new_member}님이 입장했습니다`,
+          //   showConfirmButton: false,
+          //   timer : 2000
+          // })
+          toast.success(`${new_member}님이 입장했습니다`,{
+            autoClose: 2000,
+            position: toast.POSITION.TOP_RIGHT
+          });
         });
 
         socketRef.current.on('bye', (left_user) => {
-          alert(`${left_user} 님이 떠났습니다.`);
+          // Swal.fire({
+          //   position: 'top-right',
+          //   icon: 'error',
+          //   title: `${left_user}님이 떠났습니다`,
+          //   showConfirmButton: false,
+          //   timer : 2000
+          // })
+          toast.error(`${left_user}님이 떠났습니다`, {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_RIGHT
+          });
         });
 
         socketRef.current.on('user joined', (payload) => {
@@ -223,6 +245,7 @@ const Room = () => {
         />
         {/* <Record /> */}
       </div>
+      {/* <ToastContainer /> */}
     </div>
   );
 };
