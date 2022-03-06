@@ -242,6 +242,7 @@ const Room = () => {
           onCancel={handleSaveCancel}
           yLines={yLines}
           doc={doc}
+          peers={peers}
         />
         {/* <Record /> */}
       </div>

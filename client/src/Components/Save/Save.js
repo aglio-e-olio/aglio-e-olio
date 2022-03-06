@@ -12,7 +12,7 @@ import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import Swal from 'sweetalert2';
-const Save = ({ isOpen, onCancel, yLines, doc }) => {
+const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
   dotenv.config();
 
   const [title, setTitle] = useState('');
@@ -24,6 +24,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
+  console.log('save안 peers', peers);
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -43,6 +44,8 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     { label: '조헌일', value: '조헌일' },
     { label: '진승현', value: '진승현' },
   ]);
+
+  
 
   const [algorithmOptions, setAlgorithmOptions] = useState([
     { label: 'BFS', value: 'BFS' },
