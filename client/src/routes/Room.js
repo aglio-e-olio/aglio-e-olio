@@ -62,11 +62,17 @@ const Room = () => {
   const deviceRef = useRef();
   const isRecordingRef = useRef(false);
 
-  const [audioStreams, setAudioStreams] = useState([]);
-  // const [audioStreams, setAudioStreams] = useState(new Map());
-  // const audioStreamsUpsert = (key, value) => {
-  //   setAudioStreams((prev) => new Map(prev).set(key, value));
-  // };
+  const [audioStreams, setAudioStreams] = useState(new Map());
+  const audioStreamsUpsert = (key, value) => {
+    setAudioStreams((prev) => new Map(prev).set(key, value));
+  };
+  const audioStreamDelete = (key) => {
+    setAudioStreams((prev) => {
+      const newState = new Map(prev);
+      newState.delete(key);
+      return newState;
+    })
+  }
   let name;
 
   let socket = io.connect('https://3.39.27.19:8000', {
@@ -143,7 +149,7 @@ const Room = () => {
         closeProducer(mediaType.screen, true);
         closeProducer(mediaType.allAudio, true);
       });
-      
+
       startRecordButtonRef.current.disabled = false;
       stopRecordButtonRef.current.disabled = true;
       isRecordingRef.current = false;
@@ -414,11 +420,11 @@ const Room = () => {
           audioContext.createMediaStreamSource(otherStream).connect(acDest);
         }
         if (producerLabel.has(mediaType.audio)) {
-          let myStream = await navigator.mediaDevices.getUserMedia({audio: true});
+          let myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           audioContext.createMediaStreamSource(myStream).connect(acDest);
         }
         stream = new MediaStream([...acDest.stream.getTracks()]);
-      } else if ( type === mediaType.audio) {
+      } else if (type === mediaType.audio) {
         stream = await navigator.mediaDevices.getUserMedia(mediaConstraints)
       } else {
         stream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints)
@@ -486,14 +492,14 @@ const Room = () => {
         if (kind === 'video') {
           /* No need */
         } else {
-          // audioStreamsUpsert(consumer.id, stream)
+          audioStreamsUpsert(consumer.id, stream)
 
-          elem = document.createElement('audio')
-          elem.srcObject = stream
-          elem.id = consumer.id
-          elem.playsinline = false
-          elem.autoplay = true
-          remoteAudiosRef.current.appendChild(elem)
+          // elem = document.createElement('audio')
+          // elem.srcObject = stream
+          // elem.id = consumer.id
+          // elem.playsinline = false
+          // elem.autoplay = true
+          // remoteAudiosRef.current.appendChild(elem)
         }
 
         consumer.on(
@@ -585,13 +591,14 @@ const Room = () => {
   }
 
   const removeConsumer = (consumer_id) => {
-    let elem = document.getElementById(consumer_id)
-    elem.srcObject.getTracks().forEach(function (track) {
-      track.stop()
-    })
-    elem.parentNode.removeChild(elem)
+    audioStreamDelete(consumer_id);
+    // let elem = document.getElementById(consumer_id)
+    // elem.srcObject.getTracks().forEach(function (track) {
+    //   track.stop()
+    // })
+    // elem.parentNode.removeChild(elem)
 
-    consumers.delete(consumer_id)
+    // consumers.delete(consumer_id)
   }
 
   const exit = (offline = false) => {
@@ -777,8 +784,13 @@ const Room = () => {
   return (
     <div>
       <div class='flex justify-start'>
+        {
+          Array.from(audioStreams.keys()).map((consumerId) => {
+            return <Audio key={consumerId} stream={audioStreams.get(consumerId)} />
+          })
+        }
       </div>
-      <div ref={remoteAudiosRef}></div>
+      {/* <div ref={remoteAudiosRef}></div> */}
       <div>
         {/* audio open and close */}
         <button ref={startAudioButtonRef} >
