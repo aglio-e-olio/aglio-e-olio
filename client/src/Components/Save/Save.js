@@ -11,6 +11,7 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
+import Swal from 'sweetalert2';
 const Save = ({ isOpen, onCancel, yLines, doc }) => {
   dotenv.config();
 
@@ -117,7 +118,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     );
 
     if (!(title && algorithm && announcer)) {
-      alert('빈칸을 입력해 주세요.');
+      Swal.fire('빈칸을 입력해 주세요')
       return;
     } else {
       uploadFile(file, config)
@@ -142,12 +143,24 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
           axios
             .post('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
-              alert('post 성공');
-              // onCancel();
+              Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: '저장 성공!',
+                showConfirmButton: false,
+                timer : 2000
+              })
+              onCancel();
             })
             .catch(function (err) {
               console.error(err);
-              alert('post 실패');
+              Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: '저장 실패',
+                showConfirmButton: false,
+                timer : 2000
+              })
               // onCancel();
             });
         })

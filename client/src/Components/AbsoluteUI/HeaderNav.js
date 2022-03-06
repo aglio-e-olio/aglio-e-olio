@@ -3,15 +3,33 @@ import MyAudio from '../Audio/MyAudio';
 import Audio from '../Audio/Audio';
 import UrlCopy from '../UrlCopy';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const HeaderNav = ({ peers, handleSave }) => {
   const navigate = useNavigate();
+  function returnBack() {
+    Swal.fire({
+      title:
+        '처음으로 돌아갑니다. 저장하지 않은 스터디 영상과 스냅샷은 사라집니다. 괜찮습니까?',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: '뒤로가기',
+      denyButtonText: '저장하기',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate(-1);
+      } else if (result.isDenied) {
+        //save모달창 열리게 추가할 것.
+        Swal.fire('Change are not saved', '', 'info');
+      }
+    });
+  }
   return (
     <div class="navbar bg-neutral z-10 rounded-box m-1 h-4">
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
           <li>
-            <button class="btn btn-ghost" onClick={() => navigate(-1)}>
+            <button class="btn btn-ghost" onClick={returnBack}>
               <svg
                 role="img"
                 xmlns="http://www.w3.org/2000/svg"

@@ -3,6 +3,7 @@ import UrlCopyIcon from './Atoms/UrlCopyIcon';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 function UrlCopy() {
   console.log('UrlCopy 안');
   const doCopy = (text) => {
@@ -19,12 +20,18 @@ function UrlCopy() {
           });
         })
         .catch(() => {
-          alert('복사를 다시 시도해주세요.');
+          toast.error("클립보드 복사 실패!", {
+            autoClose: 2000,
+            position: toast.POSITION.TOP_RIGHT
+          });
         });
     } else {
       // 흐름 2.
       if (!document.queryCommandSupported('copy')) {
-        return alert('복사하기가 지원되지 않는 브라우저입니다.');
+        return toast.error("복사하기가 지원되지 않는 브라우저 입니다", {
+          autoClose: 2000,
+          position: toast.POSITION.TOP_RIGHT
+        });
       }
 
       // 흐름 3.
