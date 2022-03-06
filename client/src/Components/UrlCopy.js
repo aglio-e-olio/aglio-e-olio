@@ -13,7 +13,6 @@ function UrlCopy() {
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          // alert('클립보드에 복사되었습니다.');
           toast.success("클립보드 복사 성공!", {
             autoClose: 2000,
             position: toast.POSITION.TOP_RIGHT
@@ -51,7 +50,6 @@ function UrlCopy() {
       document.execCommand('copy');
       // 흐름 6.
       document.body.removeChild(textarea);
-      // alert('클립보드에 복사되었습니다.');
       toast.success("클립보드 복사 성공!", {
         autoClose: 1000,
         position: toast.POSITION.TOP_RIGHT

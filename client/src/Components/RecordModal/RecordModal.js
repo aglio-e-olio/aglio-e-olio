@@ -6,6 +6,7 @@ import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import dotenv from 'dotenv';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
   dotenv.config();
@@ -111,10 +112,24 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
     axios
       .post('https://aglio-olio-api.shop/myroom/save', body)
       .then(function (res) {
-        alert('post 성공');
+        // alert('post 성공');
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: 'post 성공!',
+          showConfirmButton: false,
+          timer : 2000
+        })
       })
       .catch(function (err) {
-        alert('post실패');
+        // alert('post실패');
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'post 실패!',
+          showConfirmButton: false,
+          timer : 2000
+        })
       });
   };
 

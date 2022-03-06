@@ -3,6 +3,8 @@ import { codeContext } from '../../Context/ContextProvider';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReactPlayer from 'react-player';
+import Swal from 'sweetalert2';
+
 
 function Preview() {
   const { selectedPreviewKey, persistEmail } = useContext(codeContext);
@@ -39,11 +41,26 @@ function Preview() {
         url: `https://aglio-olio-api.shop/myroom/delete/${selectedPreviewKey}`,
         params: { _id: selectedPreviewKey },
       });
-      alert('delete 성공');
+      // alert('delete 성공');
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'delete 성공!',
+        showConfirmButton: false,
+        timer : 2000
+      })
+      
       window.location.reload();
     } catch (err) {
       console.error(err);
-      alert('delete 실패');
+      // alert('delete 실패');
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'delete 실패!',
+        showConfirmButton: false,
+        timer : 2000
+      })
     }
   }
 
