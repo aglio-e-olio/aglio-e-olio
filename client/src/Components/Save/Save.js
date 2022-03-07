@@ -11,20 +11,21 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
+const Save = ({ isOpen, onCancel, yLines, doc }) => {
   dotenv.config();
 
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
+  const navigate = useNavigate();
 
-  const { codes, urlSnapshot, email, persistUser, persistEmail } = useContext(codeContext);
+  const { urlSnapshot, persistUser, persistEmail, exitSave } = useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
-  console.log('save안 peers', peers);
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -147,13 +148,15 @@ const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
             .post('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
               Swal.fire({
-                position: 'center',
+                position: 'top',
                 icon: 'success',
-                title: '저장 성공!',
+                title: '저장 성공',
                 showConfirmButton: false,
                 timer : 2000
               })
-              onCancel();
+              if (exitSave === 1) {
+                navigate('/');
+              }
             })
             .catch(function (err) {
               console.error(err);
@@ -164,7 +167,6 @@ const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
                 showConfirmButton: false,
                 timer : 2000
               })
-              // onCancel();
             });
         })
         .catch((err) => console.error(err));

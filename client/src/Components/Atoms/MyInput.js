@@ -38,6 +38,13 @@ function MyInput() {
         class="input input-bordered"
         onChange={onChange}
         value={emailtext}
+        onKeyPress={
+          (e) => {
+            if (e.key === 'Enter') {
+              submitID();
+            }
+          }
+        }
       />
       <div class="form-control mt-6">
         <button class="btn btn-primary" onClick={submitID}>

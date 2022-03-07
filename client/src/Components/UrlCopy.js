@@ -1,8 +1,6 @@
 import React from 'react';
 import UrlCopyIcon from './Atoms/UrlCopyIcon';
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
+import Swal from 'sweetalert2'
 
 function UrlCopy() {
   console.log('UrlCopy 안');
@@ -13,24 +11,33 @@ function UrlCopy() {
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          toast.success("클립보드 복사 성공!", {
-            autoClose: 2000,
-            position: toast.POSITION.TOP_RIGHT
-          });
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '클립보드에 복사되었습니다!',
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
         .catch(() => {
-          toast.error("클립보드 복사 실패!", {
-            autoClose: 2000,
-            position: toast.POSITION.TOP_RIGHT
-          });
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: '다시 복사를 시도하세요',
+            showConfirmButton: false,
+            timer: 1500
+          })
         });
     } else {
       // 흐름 2.
       if (!document.queryCommandSupported('copy')) {
-        return toast.error("복사하기가 지원되지 않는 브라우저 입니다", {
-          autoClose: 2000,
-          position: toast.POSITION.TOP_RIGHT
-        });
+        return Swal.fire({
+          position: 'top-end',
+          icon: 'error',
+          title: '복사를 지원하지 않는 브라우저 입니다.',
+          showConfirmButton: false,
+          timer: 1500
+        })
       }
 
       // 흐름 3.
@@ -50,10 +57,13 @@ function UrlCopy() {
       document.execCommand('copy');
       // 흐름 6.
       document.body.removeChild(textarea);
-      toast.success("클립보드 복사 성공!", {
-        autoClose: 1000,
-        position: toast.POSITION.TOP_RIGHT
-      });
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: '클립보드에 복사되었습니다!',
+        showConfirmButton: false,
+        timer: 1500
+      })
     }
   };
 
@@ -64,7 +74,6 @@ function UrlCopy() {
     <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)}>
       <UrlCopyIcon />
     </button>
-    <ToastContainer />
     </>
   );
 }

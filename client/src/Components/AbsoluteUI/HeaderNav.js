@@ -1,34 +1,44 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import MyAudio from '../Audio/MyAudio';
 import Audio from '../Audio/Audio';
 import UrlCopy from '../UrlCopy';
 import { useNavigate } from 'react-router-dom';
+import { codeContext } from '../../Context/ContextProvider';
 import Swal from 'sweetalert2';
 
 const HeaderNav = ({ peers, handleSave }) => {
   const navigate = useNavigate();
-  function returnBack() {
+  const {setDocGCount, setExitSave} = useContext(codeContext);
+  
+  function endStudy() {
     Swal.fire({
-      title:
-        '처음으로 돌아갑니다. 저장하지 않은 스터디 영상과 스냅샷은 사라집니다. 괜찮습니까?',
+      title: '로비로 이동합니다. 저장하지 않은 스터디 영상과 스냅샷은 사라집니다. 괜찮습니까?',
       showDenyButton: true,
       showCancelButton: true,
-      confirmButtonText: '뒤로가기',
-      denyButtonText: '저장하기',
+      confirmButtonText: 'Save',
+      denyButtonText: `Don't save`,
     }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        navigate(-1);
-      } else if (result.isDenied) {
+        setExitSave(1);
         handleSave();
+        // Swal.fire('Saved!', '', 'success')
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info').then((result) =>{
+          setDocGCount(0);
+          navigate('/');
+        })
       }
-    });
+    })
+    
   }
+
   return (
     <div class="navbar bg-neutral z-10 rounded-box m-1 h-4">
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
           <li>
-            <button class="btn btn-ghost" onClick={returnBack}>
+            <button class="btn btn-ghost" onClick={endStudy}>
               <svg
                 role="img"
                 xmlns="http://www.w3.org/2000/svg"
