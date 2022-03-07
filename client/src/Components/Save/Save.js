@@ -43,15 +43,17 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios}) => {
 
   useEffect(() => {
     console.log('save컴포넌트 만들어짐');
-    console.log('save컴포넌트 안 persistUser는', persistUser);
-    console.log('save컴포넌트 안 peers는', peerAudios);
+    // console.log('save컴포넌트 안 persistUser는', persistUser);
+    // console.log('save컴포넌트 안 peers는', peerAudios);
     const peersName = [];
-
+    
     if (peerAudios.size !== 0) {
-      Array.from(peerAudios.keys()).map((peerAudio) => {
-        peersName.push({ label: peerAudio.name, value: peerAudio.name });
-      })
+      peerAudios.forEach((value, key) => {
+        peersName.push({ label: value.name, value: value.name });
+      });
+
     }
+    // console.log('peersName은?', peersName);
     setAnnouncerOptions((prev) => (prev = peersName));
 
     if (persistUser !== '') {
