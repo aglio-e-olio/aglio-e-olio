@@ -22,7 +22,7 @@ const SelfHeader = ({ handleSave }) => {
         handleSave();
         // Swal.fire('Saved!', '', 'success')
       } else if (result.isDenied) {
-        Swal.fire('Changes are not saved', '', 'info').then((result) => {
+        Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then((result) => {
           setDocGCount(0);
           navigate(-1);
         });
@@ -31,7 +31,7 @@ const SelfHeader = ({ handleSave }) => {
   }
 
   return (
-    <div class="navbar bg-neutral z-10 rounded-box m-1 h-4">
+    <div class="navbar bg-neutral z-10 h-12">
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
           <li>
