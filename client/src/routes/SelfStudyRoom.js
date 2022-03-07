@@ -61,7 +61,7 @@ const SelfStudyRoom = () => {
     let snapshotUrl = '';
     console.log('onCapture');
     await html2canvas(document.body)
-      .then(async (canvas) => {
+      .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
         getUrl(snapshotUrl);
       })
