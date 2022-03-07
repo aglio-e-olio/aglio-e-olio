@@ -31,25 +31,25 @@ const Room = () => {
   const [isEraser, setIsEraser] = useState(false);
 
   const {
-    codes,
-    compileResult,
     getCompileResult,
     getRoomInfo,
     getUrl,
     addAudioStream,
     persistUser,
     persistEmail,
+    docGenerateCount,
+    setDocGCount,
   } = useContext(codeContext);
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
-  if (i === 0) {
+  if (docGenerateCount === 0) {
     doc = new Y.Doc();
     provider = new WebrtcProvider(roomID, doc);
     awareness = provider.awareness;
     yLines = doc.getArray('lines~9');
     undoManager = new Y.UndoManager(yLines);
+    setDocGCount(1);
   }
-  i++;
 
   const [isOpen, setOpen] = useState(false);
 
@@ -70,7 +70,6 @@ const Room = () => {
   // }
 
   useEffect(() => {
-    console.log('소켓 커넥트는 몇번 되는가?');
     socketRef.current = io.connect('/');
     navigator.mediaDevices
       .getUserMedia({ audio: true })
@@ -179,10 +178,10 @@ const Room = () => {
 
   const onCapture = async () => {
     let snapshotUrl = '';
-    console.log('onCapture');
-    await html2canvas(document.body)
-      .then(async (canvas) => {
+    await html2canvas(document.getElementById("onCapture"))
+      .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
+        console.log(snapshotUrl, "snapshot!")
         getUrl(snapshotUrl);
       })
       .catch((e) => {
@@ -194,7 +193,7 @@ const Room = () => {
 
   return (
     <div>
-      <div class="fixed top-0 left-0 right-0 bottom-0 ">
+      <div class="fixed top-0 left-0 right-0 bottom-0 " id='onCapture'>
         <AbsoluteUI
           peers={peers}
           handleSave={handleSave}

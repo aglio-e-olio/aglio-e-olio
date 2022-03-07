@@ -13,7 +13,7 @@ const AbsoluteUI = ({
   undoManager,
   setIsEraser,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div class="z-5 bg-none">

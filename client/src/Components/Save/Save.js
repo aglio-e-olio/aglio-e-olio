@@ -11,6 +11,7 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
+import { useNavigate } from 'react-router-dom';
 const Save = ({ isOpen, onCancel, yLines, doc }) => {
   dotenv.config();
 
@@ -18,9 +19,10 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
+  const navigate = useNavigate();
 
-  const { codes, urlSnapshot, email, persistUser, persistEmail } =
-    useContext(codeContext);
+
+  const { urlSnapshot, persistUser, persistEmail, exitSave } = useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
@@ -157,6 +159,9 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
             .post('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
               alert('post 성공');
+              if (exitSave === 1) {
+                navigate('/');
+              }
               // onCancel();
             })
             .catch(function (err) {

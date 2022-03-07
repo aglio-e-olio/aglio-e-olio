@@ -1,18 +1,16 @@
 import React, { useContext } from 'react';
-import MyAudio from '../Audio/MyAudio';
-import Audio from '../Audio/Audio';
-import UrlCopy from '../UrlCopy';
+import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { codeContext } from '../../Context/ContextProvider';
-import Swal from 'sweetalert2';
 
-const HeaderNav = ({ peers, handleSave }) => {
+const SelfHeader = ({ handleSave }) => {
   const navigate = useNavigate();
-  const {setDocGCount, setExitSave} = useContext(codeContext);
-  
-  function endStudy() {
+  const { setDocGCount, setExitSave } = useContext(codeContext);
+
+  function endSelfStudy() {
     Swal.fire({
-      title: '로비로 이동합니다. 저장하지 않은 스터디 영상과 스냅샷은 사라집니다. 괜찮습니까?',
+      title:
+        '기록페이지로 이동합니다. 저장하지 않은 스냅샷은 사라집니다. 괜찮습니까?',
       showDenyButton: true,
       showCancelButton: true,
       confirmButtonText: 'Save',
@@ -24,13 +22,12 @@ const HeaderNav = ({ peers, handleSave }) => {
         handleSave();
         // Swal.fire('Saved!', '', 'success')
       } else if (result.isDenied) {
-        Swal.fire('Changes are not saved', '', 'info').then((result) =>{
+        Swal.fire('Changes are not saved', '', 'info').then((result) => {
           setDocGCount(0);
-          navigate('/');
-        })
+          navigate(-1);
+        });
       }
-    })
-    
+    });
   }
 
   return (
@@ -38,7 +35,7 @@ const HeaderNav = ({ peers, handleSave }) => {
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
           <li>
-            <button class="btn btn-ghost" onClick={endStudy}>
+            <button class="btn btn-ghost" onClick={endSelfStudy}>
               <svg
                 role="img"
                 xmlns="http://www.w3.org/2000/svg"
@@ -59,16 +56,6 @@ const HeaderNav = ({ peers, handleSave }) => {
               </svg>
             </button>
           </li>
-          <li>
-            <MyAudio />
-          </li>
-          {peers.map((peer_info, index) => {
-            return (
-              <li>
-                <Audio key={index} peer_info={peer_info} />
-              </li>
-            );
-          })}
         </ul>
       </div>
       <div class="navbar-center lg:flex">
@@ -76,9 +63,6 @@ const HeaderNav = ({ peers, handleSave }) => {
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
-          <li>
-            <button class="btn btn-secondary mx-3">Record</button>
-          </li>
           <li>
             <button class="btn btn-ghost mx-3" onClick={handleSave}>
               <svg
@@ -102,13 +86,10 @@ const HeaderNav = ({ peers, handleSave }) => {
               </svg>
             </button>
           </li>
-          <li>
-            <UrlCopy />
-          </li>
         </ul>
       </div>
     </div>
   );
 };
 
-export default HeaderNav;
+export default SelfHeader;
