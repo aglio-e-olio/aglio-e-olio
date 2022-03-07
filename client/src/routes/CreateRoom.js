@@ -8,11 +8,12 @@ import LobbyCreate from '../Components/Atoms/LobbyCreate';
 import LobbyHistory from '../Components/Atoms/LobbyHistory';
 
 const CreateRoom = (props) => {
-  const { persistUser, persistLogin } = useContext(codeContext);
+  const { persistUser, persistLogin, setExitSave } = useContext(codeContext);
   const login_info = localStorage.getItem('persistLogin');
 
   const navigate = useNavigate();
   function create() {
+    setExitSave(0);
     const id = uuid();
     navigate(`/room/${id}`);
   }
