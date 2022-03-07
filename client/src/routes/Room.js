@@ -13,10 +13,8 @@ import Save from '../Components/Save/Save';
 import html2canvas from 'html2canvas';
 import Record from '../Components/Record/Record';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
-import Swal from 'sweetalert2';
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 let i = 0;
 let doc;
@@ -53,7 +51,6 @@ const Room = () => {
     undoManager = new Y.UndoManager(yLines);
     setDocGCount(1);
   }
-
 
   const handleSave = () => {
     // 여기서 모달 열어줌
@@ -101,35 +98,21 @@ const Room = () => {
             setPeers(peers);
             console.log(peers);
           }
-          });
-        
+        });
 
         socketRef.current.on('hello', (new_member) => {
           console.log(new_member);
-          // Swal.fire({
-          //   position: 'top-right',
-          //   icon: 'success',
-          //   title: `${new_member}님이 입장했습니다`,
-          //   showConfirmButton: false,
-          //   timer : 2000
-          // })
-          toast.success(`${new_member}님이 입장했습니다`,{
+
+          toast.success(`${new_member}님이 입장했습니다`, {
             autoClose: 2000,
-            position: toast.POSITION.TOP_RIGHT
+            position: toast.POSITION.TOP_RIGHT,
           });
         });
 
         socketRef.current.on('bye', (left_user) => {
-          // Swal.fire({
-          //   position: 'top-right',
-          //   icon: 'error',
-          //   title: `${left_user}님이 떠났습니다`,
-          //   showConfirmButton: false,
-          //   timer : 2000
-          // })
           toast.error(`${left_user}님이 떠났습니다`, {
             autoClose: 2000,
-            position: toast.POSITION.TOP_RIGHT
+            position: toast.POSITION.TOP_RIGHT,
           });
         });
 
@@ -200,10 +183,10 @@ const Room = () => {
 
   const onCapture = async () => {
     let snapshotUrl = '';
-    await html2canvas(document.getElementById("onCapture"))
+    await html2canvas(document.getElementById('onCapture'))
       .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
-        console.log(snapshotUrl, "snapshot!")
+        console.log(snapshotUrl, 'snapshot!');
         getUrl(snapshotUrl);
       })
       .catch((e) => {
@@ -215,7 +198,7 @@ const Room = () => {
 
   return (
     <div>
-      <div class="fixed top-0 left-0 right-0 bottom-0 " id='onCapture'>
+      <div class="fixed top-0 left-0 right-0 bottom-0 " id="onCapture">
         <AbsoluteUI
           peers={peers}
           handleSave={handleSave}
@@ -245,7 +228,7 @@ const Room = () => {
         />
         {/* <Record /> */}
       </div>
-      {/* <ToastContainer /> */}
+      <ToastContainer />
     </div>
   );
 };
