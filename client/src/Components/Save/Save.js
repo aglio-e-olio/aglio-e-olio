@@ -42,23 +42,24 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios}) => {
     useContext(codeContext);
 
   useEffect(() => {
-    // console.log('save컴포넌트 만들어짐');
-    // console.log('save컴포넌트 안 persistUser는', persistUser);
-    // console.log('save컴포넌트 안 peers는', peers);
-    // const peersName = [];
-    // if (peers.length !== 0) {
-    //   peers.map((peer, index) => {
-    //     peersName.push({ label: peer.peerName, value: peer.peerName });
-    //   });
-    // }
-    // setAnnouncerOptions((prev) => (prev = peersName));
+    console.log('save컴포넌트 만들어짐');
+    console.log('save컴포넌트 안 persistUser는', persistUser);
+    console.log('save컴포넌트 안 peers는', peerAudios);
+    const peersName = [];
 
-    // if (persistUser !== '') {
-    //   setAnnouncerOptions((prev) => [
-    //     ...prev,
-    //     { label: persistUser, value: persistUser },
-    //   ]);
-    // }
+    if (peerAudios.size !== 0) {
+      Array.from(peerAudios.keys()).map((peerAudio) => {
+        peersName.push({ label: peerAudio.name, value: peerAudio.name });
+      })
+    }
+    setAnnouncerOptions((prev) => (prev = peersName));
+
+    if (persistUser !== '') {
+      setAnnouncerOptions((prev) => [
+        ...prev,
+        { label: persistUser, value: persistUser },
+      ]);
+    }
 
     return () => {
       // console.log('save컴포넌트 사라짐');
