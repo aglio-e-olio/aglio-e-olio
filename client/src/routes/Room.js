@@ -336,6 +336,10 @@ const Room = () => {
         exit(true)
       }
     )
+
+    socket.on('code response', (code) => {
+      handleCompileResult(code);
+    });
   }
 
   //////// MAIN FUNCTIONS /////////////
@@ -618,6 +622,10 @@ const Room = () => {
     }
   }
 
+  function handleCompileResult(code) {
+    getCompileResult(code);
+  }
+
 
 
   ////////////////////////////////////////////////
@@ -760,6 +768,7 @@ const Room = () => {
           setIsEraser={setIsEraser}
           startRecord={startRecord}
           stopRecord={stopRecord}
+          socket={socket}
         />
         <Canvas
           doc={doc}

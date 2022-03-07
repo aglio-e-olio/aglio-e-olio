@@ -2,17 +2,13 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import CodeEditor from '../CodeEditor/Editor';
 import io from 'socket.io-client';
+import ReactToolTip from 'react-tooltip';
 
-const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
-  const { codes, roomInfo, compileResult } = useContext(codeContext);
-  const socketRef = useRef();
-
-  useEffect(() => {
-    socketRef.current = io.connect('/');
-  }, []);
+const CodeDrawer = ({ isOpen, setIsOpen, doc, provider, socket }) => {
+  const { codes, compileResult } = useContext(codeContext);
 
   function sendCode() {
-    socketRef.current.emit('code compile', { codes, roomInfo });
+    socket.emit('code compile', { codes });
   }
 
   return (
