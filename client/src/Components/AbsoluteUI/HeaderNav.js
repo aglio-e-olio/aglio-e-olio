@@ -12,7 +12,7 @@ const HeaderNav = ({ peers, handleSave }) => {
   
   function endStudy() {
     Swal.fire({
-      title: 'Do you want to save the changes?',
+      title: '로비로 이동합니다. 저장하지 않은 스터디 영상과 스냅샷은 사라집니다. 괜찮습니까?',
       showDenyButton: true,
       showCancelButton: true,
       confirmButtonText: 'Save',
