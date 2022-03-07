@@ -4,7 +4,6 @@ import Swal from 'sweetalert2'
 import ReactTooltip from "react-tooltip";
 
 function UrlCopy() {
-  console.log('UrlCopy 안');
   const doCopy = (text) => {
     // 흐음 1.
     if (navigator.clipboard) {
@@ -71,7 +70,7 @@ function UrlCopy() {
   const url = window.document.location.href;
 
   return (
-    <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)} data-tip ="클릭시 URL을 복사합니다">
+    <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)} data-tip ="URL을 복사합니다.">
       <UrlCopyIcon />
     </button>
   );
