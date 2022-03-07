@@ -1,7 +1,8 @@
 module.exports = class Peer {
-  constructor(socket_id, name) {
+  constructor(socket_id, name, email) {
     this.id = socket_id
     this.name = name
+    this.email = email;
     this.transports = new Map()
     this.consumers = new Map()
     this.recordingConsumers = new Map();
@@ -33,7 +34,7 @@ module.exports = class Peer {
     if (isRecording === true) {
       this.recordingProducers.set(producer.id, producer);
     } else {
-      this.producers.set(producer.id, producer)
+      this.producers.set(producer.id, { name: this.name, producer: producer })
     }
 
     producer.on(
@@ -52,7 +53,7 @@ module.exports = class Peer {
     return producer
   }
 
-  async createConsumer(consumer_transport_id, producer_id, rtpCapabilities) {
+  async createConsumer(consumer_transport_id, producer_id, rtpCapabilities, peerName) {
     let consumerTransport = this.transports.get(consumer_transport_id)
 
     let consumer = null
@@ -87,6 +88,7 @@ module.exports = class Peer {
     return {
       consumer,
       params: {
+        peerName: peerName,
         producerId: producer_id,
         consumerId: consumer.id,
         kind: consumer.kind,

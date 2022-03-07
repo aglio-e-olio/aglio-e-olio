@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import io from 'socket.io-client';
-import Peer from 'simple-peer';
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -11,13 +10,10 @@ import { WebrtcProvider } from 'y-webrtc';
 
 import Save from '../Components/Save/Save';
 import html2canvas from 'html2canvas';
-import Record from '../Components/Record/Record';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
 
 import * as mediasoupClient from 'mediasoup-client';
 
-
-let i = 0;
 let doc;
 let provider;
 let awareness;
@@ -68,12 +64,12 @@ const Room = () => {
   const deviceRef = useRef();
   const isRecordingRef = useRef(false);
 
-  const [audioStreams, setAudioStreams] = useState(new Map());
-  const audioStreamsUpsert = (key, value) => {
-    setAudioStreams((prev) => new Map(prev).set(key, value));
+  const [peerAudios, setPeerAudios] = useState(new Map());
+  const peerAudioUpsert = (key, value) => {
+    setPeerAudios((prev) => new Map(prev).set(key, value));
   };
-  const audioStreamDelete = (key) => {
-    setAudioStreams((prev) => {
+  const peerAudioDelete = (key) => {
+    setPeerAudios((prev) => {
       const newState = new Map(prev);
       newState.delete(key);
       return newState;
@@ -86,7 +82,6 @@ const Room = () => {
   });;
   let producerTransport;
   let consumerTransport;
-  let room_id;
 
   let consumers = new Map();
   let producers = new Map();
@@ -106,13 +101,8 @@ const Room = () => {
         })
       })
     }
-
-
-
-    name = "TEST_NAME";
-    room_id = "TEST_ROOM_ID_123"
-    createRoom(room_id).then(async () => {
-      await join(name, room_id);
+    createRoom(roomID).then(async () => {
+      await join(persistUser, persistEmail, roomID);
       initSockets();
     })
 
@@ -176,11 +166,12 @@ const Room = () => {
       })
   }
 
-  const join = async (name, room_id) => {
+  const join = async (name, email, room_id) => {
     socket
       .request('join', {
         name,
-        room_id
+        email,
+        room_id,
       })
       .then(
         async function (roomObject) {
@@ -188,7 +179,8 @@ const Room = () => {
           const data = await socket.request('getRouterRtpCapabilities')
           deviceRef.current = await loadDevice(data)
           await initTransports(deviceRef)
-          socket.emit('getProducers')
+          await socket.request('getProducers')
+          produce(mediaType.audio);
         }
       )
       .catch((err) => {
@@ -365,8 +357,8 @@ const Room = () => {
       'newProducers',
       async function (producerList) {
         console.log('New producers', producerList)
-        for (let { producer_id } of producerList) {
-          await consume(producer_id)
+        for (let { producer_id, peer_id } of producerList) {
+          await consume(producer_id, peer_id)
         }
       }
     )
@@ -489,23 +481,15 @@ const Room = () => {
     }
   }
 
-  const consume = async (producer_id) => {
-    getConsumeStream(producer_id).then(
-      function ({ consumer, stream, kind }) {
+  const consume = async (producer_id, peer_id) => {
+    getConsumeStream(producer_id, peer_id).then(
+      function ({ consumer, stream, kind, peerName }) {
         consumers.set(consumer.id, stream)
 
-        let elem
         if (kind === 'video') {
           /* No need */
         } else {
-          audioStreamsUpsert(consumer.id, stream)
-
-          // elem = document.createElement('audio')
-          // elem.srcObject = stream
-          // elem.id = consumer.id
-          // elem.playsinline = false
-          // elem.autoplay = true
-          // remoteAudiosRef.current.appendChild(elem)
+          peerAudioUpsert(consumer.id, {name: peerName, stream: stream})
         }
 
         consumer.on(
@@ -525,14 +509,15 @@ const Room = () => {
     )
   }
 
-  const getConsumeStream = async (producerId) => {
+  const getConsumeStream = async (producerId, peerId) => {
     const { rtpCapabilities } = deviceRef.current;
     const data = await socket.request('consume', {
       rtpCapabilities,
       consumerTransportId: consumerTransport.id, // might be
-      producerId
+      producerId,
+      peerId
     })
-    const { consumerId, kind, rtpParameters } = data;
+    const { consumerId, kind, rtpParameters, peerName } = data;
 
     let codecOptions = {}
     const consumer = await consumerTransport.consume({
@@ -549,7 +534,8 @@ const Room = () => {
     return {
       consumer,
       stream,
-      kind
+      kind,
+      peerName
     }
   }
 
@@ -597,14 +583,7 @@ const Room = () => {
   }
 
   const removeConsumer = (consumer_id) => {
-    audioStreamDelete(consumer_id);
-    // let elem = document.getElementById(consumer_id)
-    // elem.srcObject.getTracks().forEach(function (track) {
-    //   track.stop()
-    // })
-    // elem.parentNode.removeChild(elem)
-
-    // consumers.delete(consumer_id)
+    peerAudioDelete(consumer_id);
   }
 
   const exit = (offline = false) => {
@@ -670,81 +649,81 @@ const Room = () => {
   //   socketRef.current.emit('code compile', { codes, roomID });
   // }
 
-  useEffect(() => {
-    socketRef.current = io.connect('/');
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then((stream) => {
-        addAudioStream(stream);
-        getRoomInfo(roomID);
-        console.log('join넘기기전 persistUser : ', persistUser);
-        if (!!persistUser) {
-          socketRef.current.emit('join room', {
-            roomID,
-            persistUser,
-            persistEmail,
-          });
-        }
-        socketRef.current.on('all users', (props) => {
-          const peers = [];
-          props.users.forEach((userID) => {
-            //createPeer 함수안에서 서버한테 상대방 소켓 id 담아서 sending signal 날린다.
-            const peer = createPeer(userID, socketRef.current.id, stream);
-            peersRef.current.push({
-              peerID: userID,
-              peer,
-            });
-            const peerName = props.names[userID];
-            console.log('상대방 이름은', peerName);
-            //내가 만든 peer 와 상대방 이름이 들어있다.
-            peers.push({ peer: peer, peerName: peerName });
-          });
-          setPeers(peers);
-          console.log(peers);
-        });
+  // useEffect(() => {
+  //   socketRef.current = io.connect('/');
+  //   navigator.mediaDevices
+  //     .getUserMedia({ audio: true })
+  //     .then((stream) => {
+  //       addAudioStream(stream);
+  //       getRoomInfo(roomID);
+  //       console.log('join넘기기전 persistUser : ', persistUser);
+  //       if (!!persistUser) {
+  //         socketRef.current.emit('join room', {
+  //           roomID,
+  //           persistUser,
+  //           persistEmail,
+  //         });
+  //       }
+  //       socketRef.current.on('all users', (props) => {
+  //         const peers = [];
+  //         props.users.forEach((userID) => {
+  //           //createPeer 함수안에서 서버한테 상대방 소켓 id 담아서 sending signal 날린다.
+  //           const peer = createPeer(userID, socketRef.current.id, stream);
+  //           peersRef.current.push({
+  //             peerID: userID,
+  //             peer,
+  //           });
+  //           const peerName = props.names[userID];
+  //           console.log('상대방 이름은', peerName);
+  //           //내가 만든 peer 와 상대방 이름이 들어있다.
+  //           peers.push({ peer: peer, peerName: peerName });
+  //         });
+  //         setPeers(peers);
+  //         console.log(peers);
+  //       });
 
-        socketRef.current.on('hello', (new_member) => {
-          console.log(new_member);
-          alert(`${new_member} 님이 입장했습니다.`);
-        });
+  //       socketRef.current.on('hello', (new_member) => {
+  //         console.log(new_member);
+  //         alert(`${new_member} 님이 입장했습니다.`);
+  //       });
 
-        socketRef.current.on('bye', (left_user) => {
-          alert(`${left_user} 님이 떠났습니다.`);
-        });
+  //       socketRef.current.on('bye', (left_user) => {
+  //         alert(`${left_user} 님이 떠났습니다.`);
+  //       });
 
-        socketRef.current.on('user joined', (payload) => {
-          const peer = addPeer(payload.signal, payload.callerID, stream);
-          peersRef.current.push({
-            peerID: payload.callerID,
-            peer,
-          });
-          const peerName = payload.names[payload.callerID];
-          console.log('addPeer할때 peerName은', peerName);
-          setPeers((users) => [...users, { peer: peer, peerName: peerName }]);
-        });
+  //       socketRef.current.on('user joined', (payload) => {
+  //         const peer = addPeer(payload.signal, payload.callerID, stream);
+  //         peersRef.current.push({
+  //           peerID: payload.callerID,
+  //           peer,
+  //         });
+  //         const peerName = payload.names[payload.callerID];
+  //         console.log('addPeer할때 peerName은', peerName);
+  //         setPeers((users) => [...users, { peer: peer, peerName: peerName }]);
+  //       });
 
-        socketRef.current.on('code response', (code) => {
-          handleCompileResult(code);
-        });
+  //       socketRef.current.on('code response', (code) => {
+  //         handleCompileResult(code);
+  //       });
 
-        socketRef.current.on('receiving returned signal', (payload) => {
-          const item = peersRef.current.find((p) => p.peerID === payload.id);
-          item.peer.signal(payload.signal);
-        });
-      })
-      .catch((error) => {
-        console.log(`getUserMedia error : ${error}`);
-      });
-  }, []);
+  //       socketRef.current.on('receiving returned signal', (payload) => {
+  //         const item = peersRef.current.find((p) => p.peerID === payload.id);
+  //         item.peer.signal(payload.signal);
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       console.log(`getUserMedia error : ${error}`);
+  //     });
+  // }, []);
 
-  /* Below are Simple Peer Library Function */
-  function createPeer(userToSignal, callerID, stream) {
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream,
-    });
-  }
+  // /* Below are Simple Peer Library Function */
+  // function createPeer(userToSignal, callerID, stream) {
+  //   const peer = new Peer({
+  //     initiator: true,
+  //     trickle: false,
+  //     stream,
+  //   });
+  // }
 
 
   const onCapture = async () => {
@@ -764,14 +743,6 @@ const Room = () => {
 
   return (
     <div>
-      <div class='flex justify-start'>
-        {
-          Array.from(audioStreams.keys()).map((consumerId) => {
-            return <Audio key={consumerId} stream={audioStreams.get(consumerId)} />
-          })
-        }
-      </div>
-      {/* <div ref={remoteAudiosRef}></div> */}
       <div>
         {/* audio open and close */}
         <button ref={startAudioButtonRef} >
@@ -789,28 +760,9 @@ const Room = () => {
         {/* audio open and close */}
       </div>
 
-      <Record />
-      <button class="btn absolute bottom-20 right-4 z-30" onClick={sendCode}>
-        Run
-      </button>
-      <UrlCopy />
-      <button
-        class="btn btn-success cursor-pointer absolute top-0 right-40"
-        onClick={handleSave}
-      >
-        Save
-      </button>
-      <button
-        class="btn btn-success cursor-pointer absolute top-0 right-60"
-        onClick={() => navigate(-1)}>뒤로 가기</button>
-      <Save isOpen={isOpen}
-        onCancel={handleSaveCancel}
-        yLines={yLines}
-        doc={doc} />
-
       <div class="fixed top-0 left-0 right-0 bottom-0 ">
         <AbsoluteUI
-          peers={peers}
+          peerAudios={peerAudios}
           handleSave={handleSave}
           doc={doc}
           provider={provider}

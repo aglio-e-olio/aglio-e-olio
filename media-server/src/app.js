@@ -101,10 +101,11 @@ io.on('connection', (socket) => {
     }
   })
 
-  socket.on('join', ({ room_id, name }, cb) => {
+  socket.on('join', ({ room_id, name, email }, cb) => {
     console.log('User joined', {
       room_id: room_id,
-      name: name
+      name: name,
+      email: email
     })
 
     if (!roomList.has(room_id)) {
@@ -113,13 +114,13 @@ io.on('connection', (socket) => {
       })
     }
 
-    roomList.get(room_id).addPeer(new Peer(socket.id, name))
+    roomList.get(room_id).addPeer(new Peer(socket.id, name, email))
     socket.room_id = room_id
 
     cb(roomList.get(room_id).toJson())
   })
 
-  socket.on('getProducers', () => {
+  socket.on('getProducers', (_, callback) => {
     if (!roomList.has(socket.room_id)) return
     console.log('Get producers request from', { name: `${roomList.get(socket.room_id).getPeers().get(socket.id).name}` })
 
@@ -127,6 +128,7 @@ io.on('connection', (socket) => {
     let producerList = roomList.get(socket.room_id).getProducerListForPeer()
 
     socket.emit('newProducers', producerList)
+    callback({});
   })
 
   socket.on('getRouterRtpCapabilities', (_, callback) => {
@@ -190,9 +192,9 @@ io.on('connection', (socket) => {
     })
   })
 
-  socket.on('consume', async ({ consumerTransportId, producerId, rtpCapabilities }, callback) => {
+  socket.on('consume', async ({ consumerTransportId, producerId, rtpCapabilities, peerId }, callback) => {
     //TODO null handling
-    let params = await roomList.get(socket.room_id).consume(socket.id, consumerTransportId, producerId, rtpCapabilities)
+    let params = await roomList.get(socket.room_id).consume(socket.id, consumerTransportId, producerId, rtpCapabilities, peerId)
 
     console.log('Consuming', {
       name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`,

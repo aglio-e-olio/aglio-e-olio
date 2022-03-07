@@ -24,9 +24,10 @@ module.exports = class Room {
   getProducerListForPeer() {
     let producerList = []
     this.peers.forEach((peer) => {
-      peer.producers.forEach((producer) => {
+      peer.producers.forEach((producerInfo) => {
         producerList.push({
-          producer_id: producer.id
+          producer_id: producerInfo.producer.id,
+          peer_id: peer.id
         })
       })
     })
@@ -104,6 +105,7 @@ module.exports = class Room {
           this.broadCast(socket_id, 'newProducers', [
             {
               producer_id: producer.id,
+              peer_id: this.peers.get(socket_id).id,
               producer_socket_id: socket_id
             }
           ])
@@ -112,7 +114,7 @@ module.exports = class Room {
     )
   }
 
-  async consume(socket_id, consumer_transport_id, producer_id, rtpCapabilities) {
+  async consume(socket_id, consumer_transport_id, producer_id, rtpCapabilities, peer_id) {
     // handle nulls
     if (
       !this.router.canConsume({
@@ -124,9 +126,11 @@ module.exports = class Room {
       return
     }
 
+    let peerName = this.peers.get(peer_id).name;
+
     let { consumer, params } = await this.peers
       .get(socket_id)
-      .createConsumer(consumer_transport_id, producer_id, rtpCapabilities)
+      .createConsumer(consumer_transport_id, producer_id, rtpCapabilities, peerName)
 
     consumer.on(
       'producerclose',

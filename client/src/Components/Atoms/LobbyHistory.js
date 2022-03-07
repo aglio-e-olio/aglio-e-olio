@@ -1,5 +1,4 @@
 import React from 'react';
-import url from 'socket.io-client/lib/url';
 
 const LobbyHistory = ({ clickAction, buttonName }) => {
   return (

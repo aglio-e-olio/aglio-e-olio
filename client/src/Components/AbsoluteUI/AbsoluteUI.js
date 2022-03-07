@@ -5,7 +5,7 @@ import CodeDrawer from './CodeDrawer';
 import RightSideNav from './RightSideNav';
 
 const AbsoluteUI = ({
-  peers,
+  peerAudios,
   handleSave,
   doc,
   provider,
@@ -17,7 +17,7 @@ const AbsoluteUI = ({
 
   return (
     <div class="z-5 bg-none">
-      <HeaderNav peers={peers} handleSave={handleSave} />
+      <HeaderNav peerAudios={peerAudios} handleSave={handleSave} />
       <LeftSideToolbar setIsEraser={setIsEraser} yLines={yLines} undoManager={undoManager}/>
       <RightSideNav setIsOpen={setIsOpen} />
       <CodeDrawer

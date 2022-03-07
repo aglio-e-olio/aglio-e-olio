@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { codeContext } from '../../Context/ContextProvider';
 import Swal from 'sweetalert2';
 
-const HeaderNav = ({ peers, handleSave }) => {
+const HeaderNav = ({ peerAudios, handleSave }) => {
   const navigate = useNavigate();
   const {setDocGCount, setExitSave} = useContext(codeContext);
   
@@ -62,10 +62,10 @@ const HeaderNav = ({ peers, handleSave }) => {
           <li>
             <MyAudio />
           </li>
-          {peers.map((peer_info, index) => {
+          {Array.from(peerAudios.keys()).map((id) => {
             return (
               <li>
-                <Audio key={index} peer_info={peer_info} />
+                <Audio key={id} peerAudio={peerAudios.get(id)} />
               </li>
             );
           })}
