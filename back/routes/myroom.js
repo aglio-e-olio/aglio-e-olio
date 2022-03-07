@@ -3,9 +3,57 @@ const Post = require('../models/post');
 const mongoose = require('mongoose')
 const { ObjectId } = mongoose.Types;
 const logger = require('../config/winston');
+const { mutex } = require('../lib/mutex');
+const { redis_test,  redis_save, setAsync, delAsync } = require('../redis/redis')
+
+router.post('/test', redis_save,  (req, res)=>{
+    res.send("myroom.js code");
+    return;
+})
+
+router.get('/test', redis_test, (req,res)=>{
+    res.send("mongo");
+})
+
+
+router.get('/1', (req,res)=>{
+    for(let i = 0; i<10000000000; i++){
+
+    }
+    res.send('1')
+})
+
+router.get('/2', (req, res)=>{
+    res.send("Thank you");
+})
+
+router.post('/save_many', redis_save, (req, res)=>{
+
+    const save_array = req.save_array;
+    let array = [];
+    save_array.forEach(element => {
+        array.push(JSON.parse(element));
+    });
+
+    Post.insertMany(array, async function(err, result){
+        if(err){
+            res.status(500).json({error : "error"})
+            // mutex.release();
+            return;
+        } else{
+            res.status(200).send("insert many success");
+            await delAsync("users");
+            await delAsync("save_list");
+            await setAsync("count", 0);
+            // mutex.release();
+            return;
+        }
+    })    
+})
 
 router.post('/save', (req, res)=>{
     const body = req.body;
+
     // Error Handling
     if (!body.hasOwnProperty('user_email') || !body.hasOwnProperty('save_time') ||
         !body.hasOwnProperty('type')){
@@ -32,14 +80,16 @@ router.post('/save', (req, res)=>{
         logger.warn("user_email is empty");
         return; 
     }
+
     // Post Save
     try{
         Post.create(body);
-        res.status(200).json({result : "success"});
     }
     catch(err){
         logger.error("DataBase Error : Post Collection create error : ", err);
         res.status(500).json({error :"DataBase Error : Post Collection create error"});
+    } finally{
+        res.status(200).json({result : "success"});
     }
 })
 

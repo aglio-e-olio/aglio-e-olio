@@ -38,7 +38,9 @@ app.use(
 /* middleware setting */
 app.use(morgan(combined, {stream: logger.stream}))
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+  limit:'10mb'
+}));
 
 /* routing */
 app.use('/api_test', require('./routes/api_test'));
