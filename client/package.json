@@ -23,6 +23,7 @@
     "hark": "^1.2.3",
     "html2canvas": "^1.4.1",
     "json-size": "^1.0.0",
+    "mediasoup-client": "^3.6.37",
     "perfect-freehand": "^1.0.16",
     "postcss": "^7.0.39",
     "react": "^17.0.2",
@@ -44,8 +45,7 @@
     "uuid": "^8.2.0",
     "y-codemirror.next": "^0.1.1",
     "y-webrtc": "^10.2.2",
-    "yjs": "^13.5.27",
-    "mediasoup-client": "^3.6.37"
+    "yjs": "^13.5.27"
   },
   "scripts": {
     "start": "craco start",

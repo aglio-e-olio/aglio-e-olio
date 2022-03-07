@@ -29,6 +29,7 @@ let data;
 const SelfStudyRoom = () => {
   const socketRef = useRef();
   const [isOpen, setOpen] = useState(false);
+  const [allData, setAllData] = useState({});
   const {
     codes,
     compileResult,
@@ -91,7 +92,7 @@ const SelfStudyRoom = () => {
       params: { _id: selectedPreviewKey },
     })
       .then((res) => {
-        data = res.data;
+        setAllData(res.data);
         const encodedDoc = res.data.canvas_data;
         const docToUint8 = Uint8Array.from(Object.values(encodedDoc[0]));
         Y.applyUpdateV2(doc, docToUint8);
@@ -122,12 +123,12 @@ const SelfStudyRoom = () => {
         />
       </div>
       <div>
-        {data && (
+        {isOpen && (
           <UpdateStudy
             isOpen={isOpen}
             onCancel={handleSaveCancel}
             doc={doc}
-            data={data}
+            data={allData}
           />
         )}
 
