@@ -1,11 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import Navbar from '../Components/Atoms/Navbar';
 import InfoCards from '../Components/InfoCards/InfoCards';
 import InfoTable from '../Components/InfoTable/InfoTable'
 import SplitPane from 'react-split-pane';
 import './History.css';
 import Preview from '../Components/Preview/Preview';
-import { codeContext } from '../Context/ContextProvider';
 import Search from '../Components/Search/Search';
 
 const History = () => {
@@ -34,7 +33,7 @@ const History = () => {
         <Search />
         <div class="divider"></div>
       </div>
-      <SplitPane split="vertical" minSize={200} defaultSize="30%">
+      <SplitPane split="vertical" minSize="500px" maxSize='-200px'>
         <div>
         <button class="btn btn-sm flex-left mb-2.5" onClick={handleView}>{isTable?"Table":" Cards"}</button>
         {isTable?<InfoTable />:<InfoCards />}

@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
+import { ChevronDownIcon } from '@heroicons/react/outline';
 
 export default function Dropdown({ title, item }) {
-  const { searchedData, setSearchedData, keywords, setKeywords } =
-    useContext(codeContext);
+  const { searchedData, keywords, setKeywords } = useContext(codeContext);
   const [dropdownOptions, setDropdownOptions] = useState([]);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function Dropdown({ title, item }) {
     <>
       <div class="dropdown dropdown-hover dropdown-primary">
         <label tabindex="0" class="btn m-1">
-          {title}
+          {title} <ChevronDownIcon class="h-5 w-5 ml-1" />
         </label>
         <ul
           tabindex="0"
