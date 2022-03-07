@@ -31,7 +31,13 @@ function UrlCopy() {
     } else {
       // 흐름 2.
       if (!document.queryCommandSupported('copy')) {
-        return alert('복사하기가 지원되지 않는 브라우저입니다.');
+        return Swal.fire({
+          position: 'top-end',
+          icon: 'error',
+          title: '복사를 지원하지 않는 브라우저 입니다.',
+          showConfirmButton: false,
+          timer: 1500
+        })
       }
 
       // 흐름 3.
@@ -51,7 +57,13 @@ function UrlCopy() {
       document.execCommand('copy');
       // 흐름 6.
       document.body.removeChild(textarea);
-      alert('클립보드에 복사되었습니다.');
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: '클립보드에 복사되었습니다!',
+        showConfirmButton: false,
+        timer: 1500
+      })
     }
   };
 

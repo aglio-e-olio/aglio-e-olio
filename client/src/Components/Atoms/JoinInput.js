@@ -27,8 +27,7 @@ function JoinInput() {
     addUser(nametext);
     addEmail(emailtext);
     addLogin(true);
-    console.log(urltext);
-    console.log(urltext.split('/').splice(3).join('/'));
+    
     const url = urltext.split('/').splice(3).join('/');
     navigate(`/${url}`);
     
