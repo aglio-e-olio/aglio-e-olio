@@ -35,7 +35,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
   }
 
   return (
-    <div class="navbar bg-neutral z-10 rounded-box m-1 h-4">
+    <div class="navbar bg-neutral z-10 h-12">
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
           <li>
@@ -43,9 +43,9 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
               <svg
                 role="img"
                 xmlns="http://www.w3.org/2000/svg"
-                width="32px"
-                height="32px"
-                viewBox="0 2 24 24"
+                width="28px"
+                height="28px"
+                viewBox="0 0 24 24"
                 aria-labelledby="closeIconTitle"
                 stroke="#ffffff"
                 stroke-width="1.5"
@@ -88,8 +88,8 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
               <svg
                 role="img"
                 xmlns="http://www.w3.org/2000/svg"
-                width="32px"
-                height="32px"
+                width="28px"
+                height="28px"
                 viewBox="0 2 24 24"
                 aria-labelledby="downloadIconTitle"
                 stroke="#ffffff"

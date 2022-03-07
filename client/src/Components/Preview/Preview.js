@@ -8,7 +8,7 @@ import PreviewText from '../Atoms/PreviewText';
 import Swal from 'sweetalert2';
 
 function Preview() {
-  const { selectedPreviewKey, persistEmail, setExitSave } = useContext(codeContext);
+  const { selectedPreviewKey, persistEmail, setExitSave, setDocGCount } = useContext(codeContext);
   const [metaData, setMetaData] = useState(false);
   const navigate = useNavigate();
 
@@ -34,6 +34,7 @@ function Preview() {
 
   function goToSelfstudy() {
     setExitSave(0);
+    setDocGCount(0);
     const userID = persistEmail;
     navigate(`/history/selfstudy/${userID}`);
   }

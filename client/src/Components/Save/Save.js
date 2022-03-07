@@ -188,6 +188,7 @@ const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
               if (exitSave === 1) {
                 navigate('/');
               }
+              onCancel();
             })
             .catch(function (err) {
               console.error(err);
