@@ -1,30 +1,45 @@
-import React from "react";
+import React from 'react';
+import UrlCopyIcon from './Atoms/UrlCopyIcon';
+import Swal from 'sweetalert2'
 
 function UrlCopy() {
-  const doCopy = text => {
+  console.log('UrlCopy 안');
+  const doCopy = (text) => {
     // 흐음 1.
     if (navigator.clipboard) {
       // (IE는 사용 못하고, 크롬은 66버전 이상일때 사용 가능합니다.)
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          alert("클립보드에 복사되었습니다.");
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '클립보드에 복사되었습니다!',
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
         .catch(() => {
-          alert("복사를 다시 시도해주세요.");
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: '다시 복사를 시도하세요',
+            showConfirmButton: false,
+            timer: 1500
+          })
         });
     } else {
       // 흐름 2.
-      if (!document.queryCommandSupported("copy")) {
-        return alert("복사하기가 지원되지 않는 브라우저입니다.");
+      if (!document.queryCommandSupported('copy')) {
+        return alert('복사하기가 지원되지 않는 브라우저입니다.');
       }
 
       // 흐름 3.
-      const textarea = document.createElement("textarea");
+      const textarea = document.createElement('textarea');
       textarea.value = text;
       textarea.style.top = 0;
       textarea.style.left = 0;
-      textarea.style.position = "fixed";
+      textarea.style.position = 'fixed';
 
       // 흐름 4.
       document.body.appendChild(textarea);
@@ -33,17 +48,19 @@ function UrlCopy() {
       // select() -> 사용자가 입력한 내용을 영역을 설정할 때 필요
       textarea.select();
       // 흐름 5.
-      document.execCommand("copy");
+      document.execCommand('copy');
       // 흐름 6.
       document.body.removeChild(textarea);
-      alert("클립보드에 복사되었습니다.");
+      alert('클립보드에 복사되었습니다.');
     }
   };
 
   const url = window.document.location.href;
 
   return (
-    <button class="btn btn-success cursor-pointer absolute top-0 right-10" onClick={() => doCopy(url)}>URL 복사하기</button>
+    <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)}>
+      <UrlCopyIcon />
+    </button>
   );
 }
 

@@ -4,12 +4,17 @@ import { v1 as uuid } from 'uuid';
 import { codeContext } from '../Context/ContextProvider';
 import './CreateRoom.css';
 import MyInput from '../Components/Atoms/MyInput';
+import LobbyCreate from '../Components/Atoms/LobbyCreate';
+import LobbyHistory from '../Components/Atoms/LobbyHistory';
 
 const CreateRoom = (props) => {
-  const { persistUser, joinUser } = useContext(codeContext);
+  const { persistUser, persistLogin, setExitSave, setDocGCount } = useContext(codeContext);
+  const login_info = localStorage.getItem('persistLogin');
 
   const navigate = useNavigate();
   function create() {
+    setDocGCount(0);
+    setExitSave(0);
     const id = uuid();
     navigate(`/room/${id}`);
   }
@@ -19,27 +24,12 @@ const CreateRoom = (props) => {
     navigate(`/history/${userID}`);
   }
 
-  // 임시 MOstudyRoom
-  // function MOstudy() {
-  //   navigate('/momostudy/test')
-  // }
-
   return (
     <div>
-      {persistUser ? (
-        <div class='flex h-screen'>
-          <button
-            class="btn btn-outline btn-info btn-lg m-auto"
-            onClick={create}
-          >
-            Create Room
-          </button>
-          <button
-            class="btn btn-outline btn-success btn-lg m-auto"
-            onClick={history}
-          >
-            My history
-          </button>
+      {login_info ? (
+        <div class="flex h-screen divide-x divide-solid">
+          <LobbyCreate clickAction={create} buttonName={'CreateRoom'} />
+          <LobbyHistory clickAction={history} buttonName={'History'} />
         </div>
       ) : (
         <div class="hero min-h-screen bg-base-200">

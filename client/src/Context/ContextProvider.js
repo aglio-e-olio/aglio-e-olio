@@ -13,7 +13,11 @@ const initialState = {
   email: '',
   currentTag: '',
   urlSnapshot: '',
-  selectedPreviewKey: ''
+  selectedPreviewKey: '',
+  searchedData: [],
+  keywords: [],
+  docGenerateCount: 0,
+  exitSave: 0,
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -36,44 +40,68 @@ const reducer = (state, action) => {
         ...state,
         roomInfo: action.payload,
       };
-    
+
     case 'USER_JOIN':
       return {
         ...state,
         nickName: action.payload,
-      }
+      };
 
     case 'USER_EMAIL':
       return {
         ...state,
         email: action.payload,
-      }
-    
+      };
+
     case 'SET_TAG':
       return {
         ...state,
         currentTag: action.payload,
-      }
-    
+      };
+
     case 'CAPTURE_URL':
       return {
         ...state,
         urlSnapshot: action.payload,
-      }
+      };
 
     case 'SELECT_PRE':
       return {
         ...state,
         selectedPreviewKey: action.payload,
-      }
+      };
 
     case 'ADD_AUDIO_STREAM':
       return {
         ...state,
         allAudioStreams: [...state.allAudioStreams, action.payload],
+      };
+
+    case 'SEARCH_DATA':
+      return {
+        ...state,
+        searchedData: action.payload,
+      };
+
+    case 'SET_KEYWORDS':
+      return {
+        ...state,
+        keywords: action.payload
+      };
+    
+    case 'DOC_COUNT':
+      return {
+        ...state,
+        docGenerateCount: action.payload
+      }
+    
+    case 'EXIT_SAVE':
+      return {
+        ...state,
+        exitSave: action.payload
       }
 
-      default:
+    default:
       throw new Error();
   }
 };
@@ -82,31 +110,41 @@ const ContextProvider = ({ children }) => {
   // useReducer를 사용해서 state와 dispatch를 생성한다.
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const [persistUser, setPersistUser] = useState("")
-  const [persistEmail, setPersistEmail] = useState("")
+  const [persistUser, setPersistUser] = useState('');
+  const [persistEmail, setPersistEmail] = useState('');
+  const [persistLogin, setPersistLogin] = useState(false);
 
   useEffect(() => {
-    const persistUserData = JSON.parse(localStorage.getItem('persisUser'))
+    const persistUserData = JSON.parse(localStorage.getItem('persistUser'));
     if (persistUserData) {
-      setPersistUser(persistUserData)
+      setPersistUser(persistUserData);
     }
-    const persistEmail = JSON.parse(localStorage.getItem('persistEmail'))
+    const persistEmail = JSON.parse(localStorage.getItem('persistEmail'));
     if (persistEmail) {
-      setPersistEmail(persistEmail)
+      setPersistEmail(persistEmail);
+    }
+    const persistLogin = JSON.parse(localStorage.getItem('persistLogin'));
+    if (persistLogin) {
+      setPersistLogin(persistLogin);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('persisUser', JSON.stringify(persistUser))
-    localStorage.setItem('persistEmail', JSON.stringify(persistEmail))
-  }, [persistUser, persistEmail]);
+    localStorage.setItem('persistUser', JSON.stringify(persistUser));
+    localStorage.setItem('persistEmail', JSON.stringify(persistEmail));
+    localStorage.setItem('persistLogin', persistLogin);
+  }, [persistUser, persistEmail, persistLogin]);
 
   function addUser(newUser) {
-    setPersistUser(newUser)
+    setPersistUser(newUser);
   }
 
   function addEmail(newEmail) {
-    setPersistEmail(newEmail)
+    setPersistEmail(newEmail);
+  }
+
+  function addLogin(newLogin) {
+    setPersistLogin(newLogin);
   }
 
   function extractCode(codes) {
@@ -132,7 +170,7 @@ const ContextProvider = ({ children }) => {
 
   function addAudioStream(audioStream) {
     dispatch({
-      type: "ADD_AUDIO_STREAM",
+      type: 'ADD_AUDIO_STREAM',
       payload: audioStream,
     });
   }
@@ -148,27 +186,55 @@ const ContextProvider = ({ children }) => {
     dispatch({
       type: 'USER_EMAIL',
       payload: email,
-    })
+    });
   }
 
   function getTag(currentTag) {
     dispatch({
       type: 'SET_TAG',
       payload: currentTag,
-    })
+    });
   }
 
   function getUrl(urlSnapshot) {
     dispatch({
       type: 'CAPTURE_URL',
       payload: urlSnapshot,
-    })
+    });
   }
 
   function selectPreview(selectedPreviewKey) {
     dispatch({
       type: 'SELECT_PRE',
       payload: selectedPreviewKey,
+    });
+  }
+
+  function setSearchedData(searchedData) {
+    dispatch({
+      type: 'SEARCH_DATA',
+      payload: searchedData,
+    });
+  }
+
+  function setKeywords(keywords) {
+    dispatch({
+      type: 'SET_KEYWORDS',
+      payload: keywords,
+    });
+  }
+
+  function setDocGCount(counts) {
+    dispatch({
+      type: 'DOC_COUNT',
+      payload: counts,
+    });
+  }
+
+  function setExitSave(isExit) {
+    dispatch({
+      type: 'EXIT_SAVE',
+      payload: isExit,
     })
   }
 
@@ -198,6 +264,16 @@ const ContextProvider = ({ children }) => {
         addUser,
         persistEmail,
         addEmail,
+        persistLogin,
+        addLogin,
+        searchedData: state.searchedData,
+        setSearchedData,
+        keywords: state.keywords,
+        setKeywords,
+        docGenerateCount: state.docGenerateCount,
+        setDocGCount,
+        exitSave: state.exitSave,
+        setExitSave,
       }}
     >
       {children}

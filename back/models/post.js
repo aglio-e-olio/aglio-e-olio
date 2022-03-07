@@ -30,7 +30,7 @@ const postSchema = new mongoose.Schema({
 // 네이밍 통일하고 코드 길이 줄여야 겠다.
 postSchema.statics.create = function(body){// params를 payload로 바꾸기
     // Room 저장시
-    if(body.isPicture){
+    if(body.type === "image"){
         // 따로 처리해줘야 하는데 일단 나중에
     }
     const title = body.title;

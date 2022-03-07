@@ -1,9 +1,9 @@
 .code-editor {
   position: absolute;
-  top: 65px;
+  top: 55px;
   width: 33%;
   right: 0px;
-  background: rgba(243, 249, 255, 0.7);
+  background: white;
   height: 100%;
   text-align: left;
 }

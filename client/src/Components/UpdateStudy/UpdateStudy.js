@@ -18,19 +18,38 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   const [title, setTitle] = useState(data.title);
   const [announcer, setAnnouncer] = useState(data.announcer);
 
+  const [metaData, setMetaData] = useState([]);
+
+  const getData = async (selectedPreviewKey) => {
+    try {
+      const res = await axios({
+        method: "GET",
+        url: 'https://aglio-olio-api.shop/myroom/preview',
+        params: { _id: selectedPreviewKey },
+      })
+      setMetaData(prev => prev = res.data)
+    } catch(err) {
+      console.error(err)
+    }
+  }
+ 
+  useEffect(() => {
+    getData(selectedPreviewKey)
+  }, [])
+
   let algo_array = [];
-  if (data.algo_tag) {
+  if (data && data.algo_tag) {
     data.algo_tag.map((tag) => {
       let algo_object = {};
-      algo_object.label = tag.tag;
-      algo_object.value = tag.tag;
+      algo_object.label = tag;
+      algo_object.value = tag;
       algo_array.push(algo_object);
     });
   }
   const [algorithm, setAlgorithm] = useState(algo_array && [...algo_array]);
 
   let extra_array = [];
-  if (data.extra_tag) {
+  if (data && data.extra_tag) {
     data.extra_tag.map((tag) => {
       let extra_object = {};
       extra_object.label = tag;
@@ -137,22 +156,21 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     } else {
       uploadFile(file, config)
         .then((data) => {
-          console.log('uploadfile', data);
           let updateTime = new Date();
           let body = {
-            post_id: selectedPreviewKey,
+            _id: selectedPreviewKey,
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            is_picture: true,
+            type: "image",
             teemMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
             update_time: updateTime,
             canvas_data: ydocCanvasData,
             image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
-            user_email: 'tmdgus3901@gmail.com',
+            user_email: persistEmail,
             nickname: persistUser,
           };
 
@@ -169,7 +187,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
               // onCancel();
             });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
     }
   };
 
@@ -222,7 +240,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success">
+        <button type="submit" class="btn btn-success bg-neutral">
           저장
         </button>
       </form>

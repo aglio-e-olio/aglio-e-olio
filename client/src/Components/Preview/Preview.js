@@ -10,35 +10,50 @@ function Preview() {
   const navigate = useNavigate();
 
   /* preview에서 meta data 서버에 요청 */
-  useEffect(async () => {
+  const getData = async () => {
     try {
       const res = await axios({
         method: 'GET',
         url: 'https://aglio-olio-api.shop/myroom/preview',
-        params: { post_id: selectedPreviewKey },
+        params: { _id: selectedPreviewKey },
       });
       setMetaData(res.data);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  useEffect(async () => {
+    getData();
   }, [selectedPreviewKey]);
 
   function goToSelfstudy() {
-      const userID = persistEmail;
-      navigate(`/history/selfstudy/${userID}`);
+    const userID = persistEmail;
+    navigate(`/history/selfstudy/${userID}`);
+  }
+
+  async function handleDelete() {
+    try {
+      const res = await axios({
+        method: 'DELETE',
+        url: `https://aglio-olio-api.shop/myroom/delete/${selectedPreviewKey}`,
+        params: { _id: selectedPreviewKey },
+      });
+      alert('delete 성공');
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert('delete 실패');
+    }
   }
 
   return metaData && metaData !== 'error' ? (
     <div class="card w-96 glass">
       <figure>
-        {metaData.is_picture ? (
+        {metaData.type === 'image' ? (
           <img
             class="object-scale-down h-60 w-96"
-            src={
-              metaData.is_picture
-                ? metaData.image_tn_ref
-                : metaData.video_tn_ref
-            }
+            src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
           />
@@ -65,18 +80,21 @@ function Preview() {
           {metaData.algo_tag &&
             metaData.algo_tag.map((tag) => {
               return (
-                <span class="badge badge-outline">{tag.tag}</span> // tag 안에 _id와 value 넣음
+                <span class="badge badge-outline">{tag}</span> // tag 안에 _id와 value 넣음
               );
             })}
         </div>
         <div class="justify-end card-actions">
           {metaData.extra_tag &&
-            metaData.extra_tag.map((tag) => {
-              return <kbd class="kbd kbd-sm">{tag}</kbd>;
+            metaData.extra_tag.map((tag, index) => {
+              return <kbd key={index} class="kbd kbd-sm">{tag}</kbd>;
             })}
         </div>
         <div class="justify-end card-actions">
-          <button class="btn btn-error sm:btn-sm md:btn-md lg:btn-sm">
+          <button
+            onClick={handleDelete}
+            class="btn btn-error sm:btn-sm md:btn-md lg:btn-sm"
+          >
             삭제
           </button>
         </div>

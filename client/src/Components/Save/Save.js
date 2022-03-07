@@ -11,6 +11,7 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
+import { useNavigate } from 'react-router-dom';
 const Save = ({ isOpen, onCancel, yLines, doc }) => {
   dotenv.config();
 
@@ -18,8 +19,9 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
+  const navigate = useNavigate();
 
-  const { codes, urlSnapshot, email, persistUser } = useContext(codeContext);
+  const { urlSnapshot, persistUser, persistEmail, exitSave } = useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   console.log('SAVE 컴포넌트 안!');
@@ -122,29 +124,30 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     } else {
       uploadFile(file, config)
         .then((data) => {
-          console.log(data);
           let saveTime = new Date();
           let body = {
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            is_picture: true,
-            teemMates: announcerOptions.map(
+            type: "image",
+            teamMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
             save_time: saveTime,
             canvas_data: ydocCanvasData,
             image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
-            user_email: 'tmdgus3901@gmail.com',
+            user_email: persistEmail,
             nickname: persistUser,
           };
 
           axios
             .post('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
-              console.log(res);
               alert('post 성공');
+              if (exitSave === 1) {
+                navigate('/');
+              }
               // onCancel();
             })
             .catch(function (err) {
@@ -205,7 +208,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success">
+        <button type="submit" class="btn btn-success bg-neutral">
           저장
         </button>
       </form>

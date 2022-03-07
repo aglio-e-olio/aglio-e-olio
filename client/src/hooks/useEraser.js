@@ -48,7 +48,7 @@ export function useEraser({ doc, provider, awareness, yLines, undoManager }) {
     doc.transact(() => {
       yLine.set('id', id);
       yLine.set('points', yPoints);
-      yLine.set('userColor', '#ffffff');
+      yLine.set('userColor', '#E5E5E5');
       yLine.set('isComplete', false);
       // for Erasing
       yLine.set('isEraser', true);

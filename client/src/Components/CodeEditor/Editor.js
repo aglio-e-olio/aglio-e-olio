@@ -25,12 +25,12 @@ export const usercolors = [
 export const userColor = usercolors[random.uint32() % usercolors.length];
 
 const CodeEditor = ({ doc, provider }) => {
-  const { codes, extractCode } = useContext(codeContext);
+  const { codes, extractCode, persistUser } = useContext(codeContext);
   useEffect(() => {
     const ytext = doc.getText('codemirror');
 
     provider.awareness.setLocalStateField('user', {
-      name: 'Anonymous ' + Math.floor(Math.random() * 100),
+      name: persistUser,
       color: userColor.color,
       colorLight: userColor.light,
     });
@@ -58,9 +58,9 @@ const CodeEditor = ({ doc, provider }) => {
       state,
       parent: /** @type {HTMLElement} */ (document.querySelector('#editor')),
     });
-  }, []);
+  }, [persistUser]);
 
-  return <div className="code-editor" id="editor"></div>;
+  return <div className="w-full text-left" id="editor"></div>;
 };
 
 export default CodeEditor;
