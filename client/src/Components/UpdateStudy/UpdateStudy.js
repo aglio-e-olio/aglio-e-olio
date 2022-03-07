@@ -61,7 +61,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   }
   const [extras, setExtras] = useState(extra_array && [...extra_array]);
 
-  const { exitSave, urlSnapshot, persistEmail, persistUser, selectedPreviewKey } =
+  const { exitSave, urlSnapshot, persistEmail, persistUser, selectedPreviewKey, setDocGCount } =
     useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
@@ -182,6 +182,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
               console.log(res);
               alert('post 성공');
               if (exitSave === 1) {
+                setDocGCount(0);
                 navigate(-1);
               }
               // onCancel();
