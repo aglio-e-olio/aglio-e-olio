@@ -5,6 +5,7 @@ import UrlCopy from '../UrlCopy';
 import { useNavigate } from 'react-router-dom';
 import { codeContext } from '../../Context/ContextProvider';
 import Swal from 'sweetalert2';
+import ReactTooltip from 'react-tooltip';
 import { VideoCameraIcon, StopIcon } from '@heroicons/react/outline';
 
 const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
@@ -27,10 +28,12 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
         handleSave();
         // Swal.fire('Saved!', '', 'success')
       } else if (result.isDenied) {
-        Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then((result) => {
-          setDocGCount(0);
-          navigate('/');
-        });
+        Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then(
+          (result) => {
+            setDocGCount(0);
+            navigate('/');
+          }
+        );
       }
     });
   }
@@ -42,7 +45,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
 
   function handleStop() {
     setIsRecord(false);
-    console.log(isRecord, "isRecord?")
+    console.log(isRecord, 'isRecord?');
     stopRecord();
   }
 
@@ -175,6 +178,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
           </li>
         </ul>
       </div>
+      <ReactTooltip/>
     </div>
   );
 };
