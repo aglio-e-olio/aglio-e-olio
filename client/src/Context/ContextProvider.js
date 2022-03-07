@@ -16,6 +16,7 @@ const initialState = {
   selectedPreviewKey: '',
   searchedData: [],
   keywords: [],
+  docGenerateCount: 0,
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -85,6 +86,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         keywords: action.payload
+      };
+    
+    case 'DOC_COUNT':
+      return {
+        ...state,
+        docGenerateCount: action.payload
       }
 
     default:
@@ -210,6 +217,13 @@ const ContextProvider = ({ children }) => {
     });
   }
 
+  function setDocGCount(counts) {
+    dispatch({
+      type: 'DOC_COUNT',
+      payload: counts,
+    });
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -242,6 +256,8 @@ const ContextProvider = ({ children }) => {
         setSearchedData,
         keywords: state.keywords,
         setKeywords,
+        docGenerateCount: state.docGenerateCount,
+        setDocGCount,
       }}
     >
       {children}
