@@ -34,7 +34,7 @@ const HeaderNav = ({ peers, handleSave }) => {
   }
 
   return (
-    <div class="navbar bg-neutral z-10 rounded-box m-1 h-4">
+    <div class="navbar bg-neutral z-10 rounded-box m-1 h-2">
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
           <li>

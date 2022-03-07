@@ -22,7 +22,7 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
           (isOpen ? ' translate-x-0 z-50' : ' translate-x-full')
         }
       >
-        <article className="relative w-screen max-w-lg pb-10 flex flex-col space-y-6 overflow-y-scroll h-full">
+        <article className="indicator relative w-screen max-w-lg pb-10 flex flex-col space-y-6 overflow-y-scroll h-full">
           <button
             class="btn btn-secondary btn-xs w-8 top-1/3 left-0 fixed z-30"
             onClick={() => setIsOpen(false)}
@@ -51,7 +51,7 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
           </button>
           <CodeEditor doc={doc} provider={provider} />
           <textarea
-            className="w-full border-solid border-2 fixed bottom-20"
+            className="textarea textarea-info w-full fixed bottom-20"
             value={compileResult}
             placeholder={
               '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
