@@ -11,8 +11,7 @@ import ReactToolTip from 'react-tooltip';
 
 function App() {
   const { persistLogin, persistEmail } = useContext(codeContext);
-  const login_info = localStorage.getItem("persistLogin");
-  
+  const login_info = localStorage.getItem('persistLogin');
 
   return (
     <div className="App">
@@ -21,9 +20,7 @@ function App() {
           <Route path="/" element={<CreateRoom />} />
           <Route
             path="/room/:roomID"
-            
             element={login_info ? <Room /> : <Navigate replace to="/join" />}
-
           />
           <Route path="/join" element={<JoinRoom />} />
 

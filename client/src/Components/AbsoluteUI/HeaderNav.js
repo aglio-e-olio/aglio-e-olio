@@ -28,10 +28,12 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
         handleSave();
         // Swal.fire('Saved!', '', 'success')
       } else if (result.isDenied) {
-        Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then((result) => {
-          setDocGCount(0);
-          navigate('/');
-        });
+        Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then(
+          (result) => {
+            setDocGCount(0);
+            navigate('/');
+          }
+        );
       }
     });
   }
@@ -43,7 +45,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
 
   function handleStop() {
     setIsRecord(false);
-    console.log(isRecord, "isRecord?")
+    console.log(isRecord, 'isRecord?');
     stopRecord();
   }
 
@@ -55,7 +57,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
             <button
               class="btn btn-ghost"
               onClick={endStudy}
-              data-tip="클릭시 메인화면으로 이동합니다."
+              data-tip="메인화면으로 이동합니다."
             >
               <svg
                 role="img"
@@ -90,12 +92,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
         </ul>
       </div>
       <div class="navbar-center lg:flex">
-        <a
-          class="btn btn-ghost normal-case text-xl"
-          data-tip="알리오 올리오 입니다."
-        >
-          AO
-        </a>
+        <a class="btn btn-ghost normal-case text-xl">AO</a>
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
@@ -104,7 +101,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
               <button
                 class="btn btn-ghost mx-3"
                 onClick={handleStop}
-                data-tip="클릭시 녹화를 멈춥니다"
+                data-tip="녹화를 멈춥니다"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +127,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
               <button
                 class="btn btn-ghost mx-3"
                 onClick={handleStart}
-                data-tip="클릭시 녹화를 시작합니다"
+                data-tip="녹화를 시작합니다"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +150,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
             <button
               class="btn btn-ghost mx-3"
               onClick={handleSave}
-              data-tip="클릭시 화면을 저장합니다"
+              data-tip="화면을 저장합니다"
             >
               <svg
                 role="img"
@@ -181,6 +178,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
           </li>
         </ul>
       </div>
+      <ReactTooltip/>
     </div>
   );
 };
