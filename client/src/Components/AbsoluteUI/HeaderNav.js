@@ -5,6 +5,7 @@ import UrlCopy from '../UrlCopy';
 import { useNavigate } from 'react-router-dom';
 import { codeContext } from '../../Context/ContextProvider';
 import Swal from 'sweetalert2';
+import ReactToolTip from 'react-tooltip'
 
 const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
   const navigate = useNavigate();
@@ -110,7 +111,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
           </li>
         </ul>
       </div>
-      {/* <ReactTooltip /> */}
+      <ReactToolTip/>
     </div>
     
   );

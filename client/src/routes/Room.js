@@ -776,7 +776,7 @@ const Room = () => {
           onCancel={handleSaveCancel}
           yLines={yLines}
           doc={doc}
-          peers={peers}
+          peerAudios={peerAudios}
         />
         {/* <Record /> */}
       </div>

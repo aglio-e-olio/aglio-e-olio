@@ -13,7 +13,7 @@ import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
+const Save = ({ isOpen, onCancel, yLines, doc, peerAudios}) => {
   dotenv.config();
 
   const [title, setTitle] = useState('');
@@ -45,25 +45,25 @@ const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
     // console.log('save컴포넌트 만들어짐');
     // console.log('save컴포넌트 안 persistUser는', persistUser);
     // console.log('save컴포넌트 안 peers는', peers);
-    const peersName = [];
-    if (peers.length !== 0) {
-      peers.map((peer, index) => {
-        peersName.push({ label: peer.peerName, value: peer.peerName });
-      });
-    }
-    setAnnouncerOptions((prev) => (prev = peersName));
+    // const peersName = [];
+    // if (peers.length !== 0) {
+    //   peers.map((peer, index) => {
+    //     peersName.push({ label: peer.peerName, value: peer.peerName });
+    //   });
+    // }
+    // setAnnouncerOptions((prev) => (prev = peersName));
 
-    if (persistUser !== '') {
-      setAnnouncerOptions((prev) => [
-        ...prev,
-        { label: persistUser, value: persistUser },
-      ]);
-    }
+    // if (persistUser !== '') {
+    //   setAnnouncerOptions((prev) => [
+    //     ...prev,
+    //     { label: persistUser, value: persistUser },
+    //   ]);
+    // }
 
     return () => {
       // console.log('save컴포넌트 사라짐');
     };
-  }, [peers, persistUser]);
+  }, [peerAudios, persistUser]);
 
   const titleHandler = (e) => {
     e.preventDefault();
