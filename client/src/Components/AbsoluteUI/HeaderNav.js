@@ -4,14 +4,33 @@ import Audio from '../Audio/Audio';
 import UrlCopy from '../UrlCopy';
 import { useNavigate } from 'react-router-dom';
 import { codeContext } from '../../Context/ContextProvider';
+import Swal from 'sweetalert2';
 
 const HeaderNav = ({ peers, handleSave }) => {
   const navigate = useNavigate();
-  const {setDocGCount} = useContext(codeContext);
+  const {setDocGCount, setExitSave} = useContext(codeContext);
   
   function endStudy() {
-    setDocGCount(0);
-    navigate(-1);
+    Swal.fire({
+      title: 'Do you want to save the changes?',
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Save',
+      denyButtonText: `Don't save`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        setExitSave(1);
+        handleSave();
+        // Swal.fire('Saved!', '', 'success')
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info').then((result) =>{
+          setDocGCount(0);
+          navigate('/');
+        })
+      }
+    })
+    
   }
 
   return (
