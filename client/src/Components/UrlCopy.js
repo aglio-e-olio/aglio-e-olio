@@ -70,11 +70,9 @@ function UrlCopy() {
   const url = window.document.location.href;
 
   return (
-    <>
     <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)}>
       <UrlCopyIcon />
     </button>
-    </>
   );
 }
 
