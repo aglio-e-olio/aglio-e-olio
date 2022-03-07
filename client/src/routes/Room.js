@@ -200,10 +200,10 @@ const Room = () => {
 
   const onCapture = async () => {
     let snapshotUrl = '';
-    console.log('onCapture');
-    await html2canvas(document.body)
-      .then(async (canvas) => {
+    await html2canvas(document.getElementById("onCapture"))
+      .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
+        console.log(snapshotUrl, "snapshot!")
         getUrl(snapshotUrl);
       })
       .catch((e) => {
@@ -215,7 +215,7 @@ const Room = () => {
 
   return (
     <div>
-      <div class="fixed top-0 left-0 right-0 bottom-0 ">
+      <div class="fixed top-0 left-0 right-0 bottom-0 " id='onCapture'>
         <AbsoluteUI
           peers={peers}
           handleSave={handleSave}

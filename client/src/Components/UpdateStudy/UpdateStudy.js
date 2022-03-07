@@ -12,13 +12,15 @@ import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
+  console.log(data, "data 있나?")
   dotenv.config();
 
   const [title, setTitle] = useState(data.title);
   const [announcer, setAnnouncer] = useState(data.announcer);
-
+  const navigate = useNavigate();
   const [metaData, setMetaData] = useState([]);
 
   const getData = async (selectedPreviewKey) => {
@@ -60,7 +62,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   }
   const [extras, setExtras] = useState(extra_array && [...extra_array]);
 
-  const { codes, urlSnapshot, persistEmail, persistUser, selectedPreviewKey } =
+  const { exitSave, urlSnapshot, persistEmail, persistUser, selectedPreviewKey, setDocGCount } =
     useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
@@ -188,6 +190,10 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
                 showConfirmButton: false,
                 timer : 2000
               })
+              if (exitSave === 1) {
+                setDocGCount(0);
+                navigate(-1);
+              }
               onCancel();
             })
             .catch(function (err) {
