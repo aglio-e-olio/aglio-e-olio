@@ -5,7 +5,6 @@ import UrlCopy from '../UrlCopy';
 import { useNavigate } from 'react-router-dom';
 import { codeContext } from '../../Context/ContextProvider';
 import Swal from 'sweetalert2';
-import ReactTooltip from "react-tooltip";
 
 const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
   const navigate = useNavigate();
@@ -73,7 +72,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
         </ul>
       </div>
       <div class="navbar-center lg:flex">
-        <a class="btn btn-ghost normal-case text-xl" data-tip = "알리오 올리오 입니다.">AO</a>
+        <a class="btn btn-ghost normal-case text-xl">AO</a>
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
@@ -111,6 +110,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
           </li>
         </ul>
       </div>
+      {/* <ReactTooltip /> */}
     </div>
     
   );

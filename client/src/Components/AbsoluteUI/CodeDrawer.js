@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import CodeEditor from '../CodeEditor/Editor';
 import io from 'socket.io-client';
-import ReactToolTip from 'react-tooltip';
 
 const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
   const { codes, roomInfo, compileResult } = useContext(codeContext);
@@ -27,6 +26,7 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
         <button
           class="btn btn-ghost btn-xs w-8 top-1/3 -left-8 h-24 fixed z-30"
           onClick={() => setIsOpen(false)}
+          data-tip ="코드편집기를 닫습니다"
         >
           {isOpen ? (
             <svg
@@ -50,6 +50,7 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
         <button
           class="tab tab-lifted tab-active fixed -bottom-2 right-4 z-30"
           onClick={sendCode}
+          data-tip = "코드를 실행합니다"
         >
           Run
         </button>
