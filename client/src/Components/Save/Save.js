@@ -110,6 +110,18 @@ const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
       );
     }, 3000);
 
+  function getTime() {
+    const t = new Date();
+    const date = ('0' + t.getDate()).slice(-2);
+    const month = ('0' + (t.getMonth() + 1)).slice(-2);
+    const year = t.getFullYear();
+    const hours = ('0' + t.getHours()).slice(-2);
+    const minutes = ('0' + t.getMinutes()).slice(-2);
+    const seconds = ('0' + t.getSeconds()).slice(-2);
+    const time = `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+    return time;
+  }
+
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
     const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
@@ -145,7 +157,8 @@ const Save = ({ isOpen, onCancel, yLines, doc, peers }) => {
     } else {
       uploadFile(file, config)
         .then((data) => {
-          let saveTime = new Date();
+          const saveTime = getTime();
+
           let body = {
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),

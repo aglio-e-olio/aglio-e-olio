@@ -2,23 +2,21 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { codeContext } from '../../Context/ContextProvider';
 import Dropdown from '../Dropdown/Dropdown';
+import { XIcon } from '@heroicons/react/outline';
 
 function Search() {
   const [sortedData, setSortedData] = useState([]);
   const [query, setQuery] = useState('');
+  const inputRef = useRef('');
+
   // const [searchedData, setSearchedData] = useState(receivedData);
 
-  const {
-    persistEmail,
-    selectPreview,
-    searchedData,
-    setSearchedData,
-    keywords,
-    setKeywords,
-  } = useContext(codeContext);
+  const { setSearchedData, keywords, setKeywords } = useContext(codeContext);
+
+  const persistEmail = JSON.parse(localStorage.getItem('persistEmail'));
 
   /* 서버에 해당 유저 데이터 받아오기 */
-  useEffect(() => {
+  function getData() {
     axios({
       method: 'GET',
       url: 'https://aglio-olio-api.shop/myroom/metadata',
@@ -37,6 +35,10 @@ function Search() {
       .catch((err) => {
         console.error(err);
       });
+  }
+
+  useEffect(() => {
+    getData();
   }, []);
 
   // let renderCount = useRef(0);
@@ -86,7 +88,7 @@ function Search() {
     setSearchedData(datas);
   }, [keywords]);
 
-  /* 매 input event마다 데이터 필터링 */
+  /* 검색 기능 */
   function handleSearch(e) {
     setQuery(e.target.value);
   }
@@ -96,11 +98,22 @@ function Search() {
       return;
     }
 
-    let beforeKeyword = keywords;
     let keyword = {};
     keyword.key = 'search';
     keyword.value = query;
-    setKeywords([...new Set([...beforeKeyword, keyword])]);
+
+    /* 중복 검색 방지 */
+    let newKeywords = [...keywords, keyword].reduce((acc, cur) => {
+      !(
+        acc.find((keyword_obj) => keyword_obj.key === cur.key) &&
+        acc.find((keyword_obj) => keyword_obj.value === cur.value)
+      ) && acc.push(cur);
+
+      return acc;
+    }, []);
+
+    setKeywords([...newKeywords]);
+    inputRef.current.value = ''; // 검색 후 입력창 초기화
   }
 
   function handleKeyPress(e) {
@@ -134,26 +147,27 @@ function Search() {
           placeholder="Search"
           class="input input-bordered w-full max-w-xs"
           style={{ margin: 10 }}
+          ref={inputRef}
         ></input>
         <button class="btn btn-active btn-primary" onClick={searchKeyword}>
           Search
         </button>
         <div>
           <Dropdown title="Algorithm" item="algo_tag" />
-        </div>
-        <div>
           <Dropdown title="Announcer" item="announcer" />
-        </div>
-        <div>
           <Dropdown title="Extra Tag" item="extra_tag" />
         </div>
       </div>
       <br></br>
       <div class="mx-2.5">
         {keywords &&
-          keywords.map((keyword) => {
+          keywords.map((keyword, index) => {
             return (
-              <button class="btn btn-sm mx-2.5 no-animation" onClick={handleKeywordBtn}>
+              <button
+                key={index}
+                class="btn btn-sm m-2.5 no-animation"
+                onClick={handleKeywordBtn}
+              >
                 {keyword.value}
               </button>
             );
