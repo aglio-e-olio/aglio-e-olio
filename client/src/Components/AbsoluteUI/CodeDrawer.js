@@ -18,7 +18,7 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
   return (
     <section
       className={
-        ' w-screen max-w-lg right-0 absolute bg-white bg-opacity-80 h-3/4 shadow-xl delay-400 duration-500 ease-in-out transition-all transform  ' +
+        ' rounded-box w-screen max-w-lg top-20 right-0 absolute bg-white bg-opacity-80 h-3/4 shadow-xl delay-400 duration-500 ease-in-out transition-all transform  ' +
         (isOpen ? ' translate-x-0 z-50' : ' translate-x-full')
       }
     >
