@@ -178,7 +178,6 @@ const Room = () => {
 
   const onCapture = async () => {
     let snapshotUrl = '';
-    console.log('onCapture');
     await html2canvas(document.getElementById("onCapture"))
       .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
