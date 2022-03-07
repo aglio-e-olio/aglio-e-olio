@@ -15,13 +15,20 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
 const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
-  console.log(data, "data 있나?")
   dotenv.config();
 
   const [title, setTitle] = useState(data.title);
   const [announcer, setAnnouncer] = useState(data.announcer);
   const navigate = useNavigate();
   const [metaData, setMetaData] = useState([]);
+  const {
+    exitSave,
+    urlSnapshot,
+    persistEmail,
+    persistUser,
+    selectedPreviewKey,
+    setDocGCount,
+  } = useContext(codeContext);
 
   const getData = async (selectedPreviewKey) => {
     try {
@@ -30,7 +37,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
         url: 'https://aglio-olio-api.shop/myroom/preview',
         params: { _id: selectedPreviewKey },
       });
-      setMetaData((prev) => (prev = res.data));
+      setMetaData((prev) => res.data);
     } catch (err) {
       console.error(err);
     }
@@ -49,7 +56,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
       algo_array.push(algo_object);
     });
   }
-  const [algorithm, setAlgorithm] = useState(algo_array && [...algo_array]);
+  const [algorithm, setAlgorithm] = useState(algo_array);
 
   let extra_array = [];
   if (data && data.extra_tag) {
@@ -60,10 +67,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
       extra_array.push(extra_object);
     });
   }
-  const [extras, setExtras] = useState(extra_array && [...extra_array]);
-
-  const { exitSave, urlSnapshot, persistEmail, persistUser, selectedPreviewKey, setDocGCount } =
-    useContext(codeContext);
+  const [extras, setExtras] = useState(extra_array);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   // console.log('SAVE 컴포넌트 안!');
@@ -166,8 +170,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     }
 
     if (!(title && algorithm && announcer)) {
-      // alert('빈칸을 입력해 주세요.');
-      Swal.fire('빈칸을 입력해 주세요')
+      Swal.fire('빈칸을 입력해 주세요');
       return;
     } else {
       uploadFile(file, config)
@@ -194,15 +197,13 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
           axios
             .put('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
-              console.log(res);
-              // alert('post 성공');
               Swal.fire({
                 position: 'center',
                 icon: 'success',
                 title: '저장 성공!',
                 showConfirmButton: false,
-                timer : 2000
-              })
+                timer: 2000,
+              });
               if (exitSave === 1) {
                 setDocGCount(0);
                 navigate(-1);
@@ -211,15 +212,13 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
             })
             .catch(function (err) {
               console.error(err);
-              // alert('post 실패');
               Swal.fire({
                 position: 'top',
                 icon: 'error',
                 title: '저장 실패',
                 showConfirmButton: false,
-                timer : 2000
-              })
-              // onCancel();
+                timer: 2000,
+              });
             });
         })
         .catch((err) => console.error(err));
