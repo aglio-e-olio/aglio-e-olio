@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
+import { ChevronDownIcon } from '@heroicons/react/outline';
 
 export default function Dropdown({ title, item }) {
-  const { searchedData, setSearchedData, keywords, setKeywords } =
-    useContext(codeContext);
+  const { searchedData, keywords, setKeywords } = useContext(codeContext);
   const [dropdownOptions, setDropdownOptions] = useState([]);
 
   useEffect(() => {
@@ -14,18 +14,28 @@ export default function Dropdown({ title, item }) {
   }, [searchedData]);
 
   function optionClick(e) {
-    let beforeKeyword = keywords;
     let keyword = {};
     keyword.key = item;
     keyword.value = e.target.innerHTML;
-    setKeywords([...new Set([...beforeKeyword, keyword])]);
+
+    /* 중복 제거 */
+    let newKeywords = [...keywords, keyword].reduce((acc, cur) => {
+      !(
+        acc.find((keyword_obj) => keyword_obj.key === cur.key) &&
+        acc.find((keyword_obj) => keyword_obj.value === cur.value)
+      ) && acc.push(cur);
+
+      return acc;
+    }, []);
+
+    setKeywords([...newKeywords]);
   }
 
   return (
     <>
-      <div class="dropdown dropdown-hover">
+      <div class="dropdown dropdown-hover dropdown-primary">
         <label tabindex="0" class="btn m-1">
-          {title}
+          {title} <ChevronDownIcon class="h-5 w-5 ml-1" />
         </label>
         <ul
           tabindex="0"
