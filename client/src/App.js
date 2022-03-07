@@ -30,8 +30,8 @@ function App() {
             element={<SelfStudyRoom />}
           />
         </Routes>
+      <ReactToolTip/>
       </BrowserRouter>
-      <ReactToolTip />
     </div>
   );
 }
