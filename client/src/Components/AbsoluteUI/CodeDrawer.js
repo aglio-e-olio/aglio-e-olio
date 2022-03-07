@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import CodeEditor from '../CodeEditor/Editor';
 import io from 'socket.io-client';
+import ReactToolTip from 'react-tooltip'
 
 const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
   const { codes, roomInfo, compileResult } = useContext(codeContext);
@@ -25,7 +26,8 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
         <article className="relative w-screen max-w-lg pb-10 flex flex-col space-y-6 overflow-y-scroll h-full">
           <button
             class="btn btn-secondary btn-xs w-8 top-1/3 left-0 fixed z-30"
-            onClick={() => setIsOpen(false)}
+          onClick={() => setIsOpen(false)}
+          data-tip = "클릭시 코드편집기를 닫습니다"
           >
             <svg
               role="img"
@@ -42,11 +44,11 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
               color="#ffffff"
             >
               {' '}
-              <title id="chevronRightIconTitle">Chevron Right</title>{' '}
+              <title id="chevronRightIconTitle"></title>{' '}
               <polyline points="10 6 16 12 10 18 10 18" />{' '}
             </svg>
           </button>
-          <button class="tab tab-lifted tab-active fixed bottom-32 right-4 z-30" onClick={sendCode}>
+          <button class="tab tab-lifted tab-active fixed bottom-32 right-4 z-30" onClick={sendCode} data-tip = "클릭시 코드를 실행합니다">
             Run
           </button>
           <CodeEditor doc={doc} provider={provider} />

@@ -632,7 +632,6 @@ const Room = () => {
     setDocGCount(1);
   }
 
-
   const handleSave = () => {
     // 여기서 모달 열어줌
     onCapture();
@@ -726,10 +725,10 @@ const Room = () => {
 
   const onCapture = async () => {
     let snapshotUrl = '';
-    await html2canvas(document.getElementById("onCapture"))
+    await html2canvas(document.getElementById('onCapture'))
       .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
-        console.log(snapshotUrl, "snapshot!")
+        console.log(snapshotUrl, 'snapshot!');
         getUrl(snapshotUrl);
       })
       .catch((e) => {
@@ -781,7 +780,7 @@ const Room = () => {
         />
         {/* <Record /> */}
       </div>
-      {/* <ToastContainer /> */}
+      <ToastContainer />
     </div>
   );
 };

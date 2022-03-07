@@ -1,6 +1,7 @@
 import React from 'react';
 import UrlCopyIcon from './Atoms/UrlCopyIcon';
 import Swal from 'sweetalert2'
+import ReactTooltip from "react-tooltip";
 
 function UrlCopy() {
   console.log('UrlCopy 안');
@@ -70,7 +71,7 @@ function UrlCopy() {
   const url = window.document.location.href;
 
   return (
-    <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)}>
+    <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)} data-tip ="클릭시 URL을 복사합니다">
       <UrlCopyIcon />
     </button>
   );
