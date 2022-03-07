@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import CodeEditor from '../CodeEditor/Editor';
 import io from 'socket.io-client';
+import ReactToolTip from 'react-tooltip';
 
 const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
   const { codes, roomInfo, compileResult } = useContext(codeContext);

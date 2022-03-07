@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactToolTip from 'react-tooltip';
 
 const RightSideNav = ({ setIsOpen }) => {
   function handleClick() {

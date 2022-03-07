@@ -10,12 +10,6 @@ import './Canvas.css';
 import { useState } from 'react';
 import { useEraser } from '../../hooks/useEraser';
 
-const date = new Date();
-
-date.setUTCHours(0, 0, 0, 0);
-
-const START_TIME = date.getTime();
-
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
   return -65;

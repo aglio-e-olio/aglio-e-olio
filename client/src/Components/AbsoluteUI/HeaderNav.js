@@ -5,8 +5,9 @@ import UrlCopy from '../UrlCopy';
 import { useNavigate } from 'react-router-dom';
 import { codeContext } from '../../Context/ContextProvider';
 import Swal from 'sweetalert2';
+import ReactTooltip from "react-tooltip";
 
-const HeaderNav = ({ peers, handleSave }) => {
+const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
   const navigate = useNavigate();
   const {setDocGCount, setExitSave} = useContext(codeContext);
   
@@ -38,7 +39,7 @@ const HeaderNav = ({ peers, handleSave }) => {
       <div class="navbar-start">
         <ul class="menu menu-horizontal p-0">
           <li>
-            <button class="btn btn-ghost" onClick={endStudy}>
+            <button class="btn btn-ghost" onClick={endStudy} data-tip = "클릭시 메인화면으로 이동합니다.">
               <svg
                 role="img"
                 xmlns="http://www.w3.org/2000/svg"
@@ -62,25 +63,28 @@ const HeaderNav = ({ peers, handleSave }) => {
           <li>
             <MyAudio />
           </li>
-          {peers.map((peer_info, index) => {
+          {Array.from(peerAudios.keys()).map((id) => {
             return (
               <li>
-                <Audio key={index} peer_info={peer_info} />
+                <Audio key={id} peerAudio={peerAudios.get(id)} />
               </li>
             );
           })}
         </ul>
       </div>
       <div class="navbar-center lg:flex">
-        <a class="btn btn-ghost normal-case text-xl">AO</a>
+        <a class="btn btn-ghost normal-case text-xl" data-tip = "알리오 올리오 입니다.">AO</a>
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
           <li>
-            <button class="btn btn-secondary mx-3">Record</button>
+            <button class="btn btn-secondary mx-3" onClick={startRecord} data-tip = "클릭시 녹화를 시작합니다">Record Start</button>
           </li>
           <li>
-            <button class="btn btn-ghost mx-3" onClick={handleSave}>
+            <button class="btn btn-secondary mx-3" onClick={stopRecord} data-tip = "클릭시 녹화를 멈춥니다">Record Stop</button>
+          </li>
+          <li>
+            <button class="btn btn-ghost mx-3" onClick={handleSave} data-tip = "클릭시 화면을 저장합니다">
               <svg
                 role="img"
                 xmlns="http://www.w3.org/2000/svg"
@@ -108,6 +112,7 @@ const HeaderNav = ({ peers, handleSave }) => {
         </ul>
       </div>
     </div>
+    
   );
 };
 

@@ -7,6 +7,7 @@ import './App.css';
 import SelfStudyRoom from './routes/SelfStudyRoom';
 import JoinRoom from './routes/JoinRoom';
 import { codeContext } from './Context/ContextProvider';
+import ReactToolTip from 'react-tooltip';
 
 function App() {
   const { persistLogin, persistEmail } = useContext(codeContext);
@@ -33,6 +34,7 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
+      <ReactToolTip/>
     </div>
   );
 }
