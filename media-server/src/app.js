@@ -7,6 +7,7 @@ const config = require('./config')
 const path = require('path')
 const Room = require('./Room')
 const Peer = require('./Peer')
+const axios = require('axios');
 const {
   getPort,
   releasePort
@@ -307,6 +308,39 @@ io.on('connection', (socket) => {
     peer.recordingConsumers.clear();
     callback();
   });
+
+  socket.on('code compile', (payload) => {
+    const room = roomList.get(socket.room_id);
+    const url = 'https://api.jdoodle.com/v1/execute';
+
+    const sendData = {
+      // put your own client id and client secret of jdoodle
+      clientId: '47846de47896aadb1f698a6a38b3cc4d',
+      clientSecret:
+        'bed60c3f16b2d91101949996c5da18827216d6e4e94c5f1b13378ca8a3fbe309',
+      script: payload.codes,
+      stdin: '',
+      language: 'nodejs',
+      versionIndex: '3',
+    };
+
+    try {
+      axios({
+        method: 'post',
+        url,
+        data: sendData,
+      }).then((res) => {
+        socket.emit('code response', res.data.output);
+        room.broadCast(socket.id, 'code response', res.data.output);
+      });
+    } catch (e) {
+      return {
+        data: {
+          e: 'Error:404\nOops Something went wrong\n😢😞🙁',
+        },
+      };
+    }
+  })
 })
 
 // TODO remove - never used?

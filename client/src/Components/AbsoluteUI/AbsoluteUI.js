@@ -13,7 +13,8 @@ const AbsoluteUI = ({
   undoManager,
   setIsEraser,
   startRecord,
-  stopRecord
+  stopRecord,
+  socket
 }) => {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -27,6 +28,7 @@ const AbsoluteUI = ({
         setIsOpen={setIsOpen}
         doc={doc}
         provider={provider}
+        socket={socket}
       />
     </div>
   );
