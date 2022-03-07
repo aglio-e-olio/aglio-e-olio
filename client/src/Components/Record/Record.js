@@ -74,9 +74,9 @@ const Record = () => {
         const recordFile = new File([blob], fileName + ".webm", {
           type: blob.type,
         })
-        console.log(recordFile);
+        // console.log(recordFile);
         const screenURL = window.URL.createObjectURL(recordFile);
-        console.log(screenURL);
+        // console.log(screenURL);
 
         const config = {
           bucketName: process.env.REACT_APP_S3_BUCKET,

@@ -15,7 +15,7 @@ const AbsoluteUI = ({
   startRecord,
   stopRecord
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div class="z-5 bg-none">

@@ -3,9 +3,12 @@ import { codeContext } from '../../Context/ContextProvider';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReactPlayer from 'react-player';
+import PreviewTagBadge from '../Atoms/PreviewTagBadge';
+import PreviewText from '../Atoms/PreviewText';
+import Swal from 'sweetalert2';
 
 function Preview() {
-  const { selectedPreviewKey, persistEmail } = useContext(codeContext);
+  const { selectedPreviewKey, persistEmail, setExitSave } = useContext(codeContext);
   const [metaData, setMetaData] = useState(false);
   const navigate = useNavigate();
 
@@ -24,10 +27,13 @@ function Preview() {
   };
 
   useEffect(async () => {
-    getData();
+    if (selectedPreviewKey) {
+      getData();
+    }
   }, [selectedPreviewKey]);
 
   function goToSelfstudy() {
+    setExitSave(0);
     const userID = persistEmail;
     navigate(`/history/selfstudy/${userID}`);
   }
@@ -39,20 +45,35 @@ function Preview() {
         url: `https://aglio-olio-api.shop/myroom/delete/${selectedPreviewKey}`,
         params: { _id: selectedPreviewKey },
       });
-      alert('delete 성공');
+      // alert('delete 성공');
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'delete 성공!',
+        showConfirmButton: false,
+        timer : 2000
+      })
+      
       window.location.reload();
     } catch (err) {
       console.error(err);
-      alert('delete 실패');
+      // alert('delete 실패');
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'delete 실패!',
+        showConfirmButton: false,
+        timer : 2000
+      })
     }
   }
 
   return metaData && metaData !== 'error' ? (
-    <div class="card w-96 glass">
-      <figure>
+    <div class="card w-5/12 glass bg-gray-200">
+      <figure class="mt-4" >
         {metaData.type === 'image' ? (
           <img
-            class="object-scale-down h-60 w-96"
+            class="object-scale-down h-60 w-2/3 hover"
             src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
@@ -73,23 +94,22 @@ function Preview() {
             } // 플레이어 초기 포스터 사진
           />
         )}
-      </figure>
+      </figure >
       <div class="card-body">
-        <h2 class="card-title">{metaData.title}</h2>
-        <div class="justify-end card-actions">
-          {metaData.algo_tag &&
-            metaData.algo_tag.map((tag) => {
-              return (
-                <span class="badge badge-outline">{tag}</span> // tag 안에 _id와 value 넣음
-              );
-            })}
+        <h1 class="card-title">{metaData.title}</h1>
+        <h2 class="text-lg mb-16">{metaData.announcer}</h2>
+        <div class="card outline-black p-5 w-5/6 m-auto ">
+          <PreviewText data={metaData.save_time} title="Save Time" />
+          <PreviewText
+            data={metaData.update_time ? metaData.update_time : '-'}
+            title="Update Time"
+            margin = '1rem'
+          />
+          <PreviewTagBadge datas={metaData.teamMates} title="Teammates" />
+          <PreviewTagBadge datas={metaData.algo_tag} title="Algorithm Tag" />
+          <PreviewTagBadge datas={metaData.extra_tag} title="Extra Tag" />
         </div>
-        <div class="justify-end card-actions">
-          {metaData.extra_tag &&
-            metaData.extra_tag.map((tag, index) => {
-              return <kbd key={index} class="kbd kbd-sm">{tag}</kbd>;
-            })}
-        </div>
+
         <div class="justify-end card-actions">
           <button
             onClick={handleDelete}

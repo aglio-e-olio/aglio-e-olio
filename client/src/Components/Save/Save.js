@@ -12,6 +12,7 @@ import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 const Save = ({ isOpen, onCancel, yLines, doc }) => {
   dotenv.config();
 
@@ -20,6 +21,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
   const navigate = useNavigate();
+
 
   const { urlSnapshot, persistUser, persistEmail, exitSave } = useContext(codeContext);
 
@@ -44,6 +46,8 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     { label: '조헌일', value: '조헌일' },
     { label: '진승현', value: '진승현' },
   ]);
+
+  
 
   const [algorithmOptions, setAlgorithmOptions] = useState([
     { label: 'BFS', value: 'BFS' },
@@ -89,6 +93,18 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
       );
     }, 3000);
 
+  function getTime() {
+    const t = new Date();
+    const date = ('0' + t.getDate()).slice(-2);
+    const month = ('0' + (t.getMonth() + 1)).slice(-2);
+    const year = t.getFullYear();
+    const hours = ('0' + t.getHours()).slice(-2);
+    const minutes = ('0' + t.getMinutes()).slice(-2);
+    const seconds = ('0' + t.getSeconds()).slice(-2);
+    const time = `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+    return time;
+  }
+
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
     const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
@@ -119,18 +135,19 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     );
 
     if (!(title && algorithm && announcer)) {
-      alert('빈칸을 입력해 주세요.');
+      Swal.fire('빈칸을 입력해 주세요')
       return;
     } else {
       uploadFile(file, config)
         .then((data) => {
-          let saveTime = new Date();
+          const saveTime = getTime();
+
           let body = {
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            type: "image",
+            type: 'image',
             teamMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
@@ -144,16 +161,26 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
           axios
             .post('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
-              alert('post 성공');
+              Swal.fire({
+                position: 'top',
+                icon: 'success',
+                title: '저장 성공',
+                showConfirmButton: false,
+                timer : 2000
+              })
               if (exitSave === 1) {
                 navigate('/');
               }
-              // onCancel();
             })
             .catch(function (err) {
               console.error(err);
-              alert('post 실패');
-              // onCancel();
+              Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: '저장 실패',
+                showConfirmButton: false,
+                timer : 2000
+              })
             });
         })
         .catch((err) => console.error(err));

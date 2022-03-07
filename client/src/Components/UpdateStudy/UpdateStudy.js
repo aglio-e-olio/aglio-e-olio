@@ -11,31 +11,34 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
+  console.log(data, "data 있나?")
   dotenv.config();
 
   const [title, setTitle] = useState(data.title);
   const [announcer, setAnnouncer] = useState(data.announcer);
-
+  const navigate = useNavigate();
   const [metaData, setMetaData] = useState([]);
 
   const getData = async (selectedPreviewKey) => {
     try {
       const res = await axios({
-        method: "GET",
+        method: 'GET',
         url: 'https://aglio-olio-api.shop/myroom/preview',
         params: { _id: selectedPreviewKey },
-      })
-      setMetaData(prev => prev = res.data)
-    } catch(err) {
-      console.error(err)
+      });
+      setMetaData((prev) => (prev = res.data));
+    } catch (err) {
+      console.error(err);
     }
-  }
- 
+  };
+
   useEffect(() => {
-    getData(selectedPreviewKey)
-  }, [])
+    getData(selectedPreviewKey);
+  }, []);
 
   let algo_array = [];
   if (data && data.algo_tag) {
@@ -59,11 +62,11 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   }
   const [extras, setExtras] = useState(extra_array && [...extra_array]);
 
-  const { codes, urlSnapshot, persistEmail, persistUser, selectedPreviewKey } =
+  const { exitSave, urlSnapshot, persistEmail, persistUser, selectedPreviewKey, setDocGCount } =
     useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  console.log('SAVE 컴포넌트 안!');
+  // console.log('SAVE 컴포넌트 안!');
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -150,21 +153,35 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
       `image/${v1().toString().replace('-', '')}.png`
     );
 
+    function getTime() {
+      const t = new Date();
+      const date = ('0' + t.getDate()).slice(-2);
+      const month = ('0' + (t.getMonth() + 1)).slice(-2);
+      const year = t.getFullYear();
+      const hours = ('0' + t.getHours()).slice(-2);
+      const minutes = ('0' + t.getMinutes()).slice(-2);
+      const seconds = ('0' + t.getSeconds()).slice(-2);
+      const time = `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+      return time;
+    }
+
     if (!(title && algorithm && announcer)) {
-      alert('빈칸을 입력해 주세요.');
+      // alert('빈칸을 입력해 주세요.');
+      Swal.fire('빈칸을 입력해 주세요')
       return;
     } else {
       uploadFile(file, config)
         .then((data) => {
-          let updateTime = new Date();
+          const updateTime = getTime();
+
           let body = {
             _id: selectedPreviewKey,
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            type: "image",
-            teemMates: announcerOptions.map(
+            type: 'image',
+            teamMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
             update_time: updateTime,
@@ -178,12 +195,30 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
             .put('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
               console.log(res);
-              alert('post 성공');
-              // onCancel();
+              // alert('post 성공');
+              Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: '저장 성공!',
+                showConfirmButton: false,
+                timer : 2000
+              })
+              if (exitSave === 1) {
+                setDocGCount(0);
+                navigate(-1);
+              }
+              onCancel();
             })
             .catch(function (err) {
               console.error(err);
-              alert('post 실패');
+              // alert('post 실패');
+              Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: '저장 실패',
+                showConfirmButton: false,
+                timer : 2000
+              })
               // onCancel();
             });
         })

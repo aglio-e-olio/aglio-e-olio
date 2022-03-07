@@ -11,6 +11,9 @@ import { WebrtcProvider } from 'y-webrtc';
 import Save from '../Components/Save/Save';
 import html2canvas from 'html2canvas';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
+import Swal from 'sweetalert2';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import * as mediasoupClient from 'mediasoup-client';
 
@@ -52,10 +55,11 @@ const mediaType = {
 
 
 const Room = () => {
-  const navigate = useNavigate();
   const socketRef = useRef();
   const { roomID } = useParams();
+  const [peers, setPeers] = useState([]);
   const [isEraser, setIsEraser] = useState(false);
+  const [isOpen, setOpen] = useState(false);
 
   const {
     getCompileResult,
@@ -628,13 +632,10 @@ const Room = () => {
     setDocGCount(1);
   }
 
-  const [isOpen, setOpen] = useState(false);
 
   const handleSave = () => {
     // 여기서 모달 열어줌
     onCapture();
-    // const jsonYLines = yLines
-
     setOpen(true);
   };
 
@@ -725,10 +726,10 @@ const Room = () => {
 
   const onCapture = async () => {
     let snapshotUrl = '';
-    console.log('onCapture');
-    await html2canvas(document.body)
-      .then(async (canvas) => {
+    await html2canvas(document.getElementById("onCapture"))
+      .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
+        console.log(snapshotUrl, "snapshot!")
         getUrl(snapshotUrl);
       })
       .catch((e) => {
@@ -748,8 +749,7 @@ const Room = () => {
           <i class="fas fa-volume-up"></i> Close audio
         </button>
       </div> */}
-
-      <div class="fixed top-0 left-0 right-0 bottom-0 ">
+      <div class="fixed top-0 left-0 right-0 bottom-0 " id='onCapture'>
         <AbsoluteUI
           peerAudios={peerAudios}
           handleSave={handleSave}
@@ -777,9 +777,11 @@ const Room = () => {
           onCancel={handleSaveCancel}
           yLines={yLines}
           doc={doc}
+          peers={peers}
         />
         {/* <Record /> */}
       </div>
+      {/* <ToastContainer /> */}
     </div>
   );
 };
