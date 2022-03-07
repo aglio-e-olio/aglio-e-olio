@@ -16,50 +16,52 @@ const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
   }
 
   return (
-      <section
-        className={
-          ' w-screen max-w-lg right-0 absolute bg-white bg-opacity-50 h-full shadow-xl delay-400 duration-500 ease-in-out transition-all transform  ' +
-          (isOpen ? ' translate-x-0 z-50' : ' translate-x-full')
-        }
-      >
-        <article className="indicator relative w-screen max-w-lg pb-10 flex flex-col space-y-6 overflow-y-scroll h-full">
-          <button
-            class="btn btn-secondary btn-xs w-8 top-1/3 left-0 fixed z-30"
-            onClick={() => setIsOpen(false)}
-          >
+    <section
+      className={
+        ' w-screen max-w-lg right-0 absolute bg-white bg-opacity-80 h-3/4 shadow-xl delay-400 duration-500 ease-in-out transition-all transform  ' +
+        (isOpen ? ' translate-x-0 z-50' : ' translate-x-full')
+      }
+    >
+      <article className="indicator relative w-screen max-w-lg pb-10 flex flex-col space-y-6 overflow-y-scroll h-full">
+        <button
+          class="btn btn-ghost btn-xs w-8 top-1/3 -left-8 h-24 fixed z-30"
+          onClick={() => setIsOpen(false)}
+        >
+          {isOpen ? (
             <svg
-              role="img"
               xmlns="http://www.w3.org/2000/svg"
-              width="100%"
-              height="100%"
-              viewBox="0 0 24 24"
-              aria-labelledby="chevronRightIconTitle"
-              stroke="#ffffff"
-              stroke-width="5"
-              stroke-linecap="square"
-              stroke-linejoin="miter"
+              className="h-6 w-6"
               fill="none"
-              color="#ffffff"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={4}
             >
-              {' '}
-              <title id="chevronRightIconTitle">Chevron Right</title>{' '}
-              <polyline points="10 6 16 12 10 18 10 18" />{' '}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 5l7 7-7 7M5 5l7 7-7 7"
+              />
             </svg>
-          </button>
-          <button class="tab tab-lifted tab-active fixed bottom-32 right-4 z-30" onClick={sendCode}>
-            Run
-          </button>
-          <CodeEditor doc={doc} provider={provider} />
-          <textarea
-            className="textarea textarea-info w-full fixed bottom-20"
-            value={compileResult}
-            placeholder={
-              '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
-            }
-          />
-          
-        </article>
-      </section>
+          ) : (
+            <svg></svg>
+          )}
+        </button>
+        <button
+          class="tab tab-lifted tab-active fixed -bottom-2 right-4 z-30"
+          onClick={sendCode}
+        >
+          Run
+        </button>
+        <CodeEditor doc={doc} provider={provider} />
+        <textarea
+          className="textarea textarea-info w-full fixed -bottom-20"
+          value={compileResult}
+          placeholder={
+            '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
+          }
+        />
+      </article>
+    </section>
   );
 };
 
