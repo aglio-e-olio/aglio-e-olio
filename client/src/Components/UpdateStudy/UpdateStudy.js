@@ -11,6 +11,7 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
+import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
 const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
@@ -65,7 +66,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     useContext(codeContext);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  console.log('SAVE 컴포넌트 안!');
+  // console.log('SAVE 컴포넌트 안!');
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -165,7 +166,8 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     }
 
     if (!(title && algorithm && announcer)) {
-      alert('빈칸을 입력해 주세요.');
+      // alert('빈칸을 입력해 주세요.');
+      Swal.fire('빈칸을 입력해 주세요')
       return;
     } else {
       uploadFile(file, config)
@@ -193,16 +195,30 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
             .put('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
               console.log(res);
-              alert('post 성공');
+              // alert('post 성공');
+              Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: '저장 성공!',
+                showConfirmButton: false,
+                timer : 2000
+              })
               if (exitSave === 1) {
                 setDocGCount(0);
                 navigate(-1);
               }
-              // onCancel();
+              onCancel();
             })
             .catch(function (err) {
               console.error(err);
-              alert('post 실패');
+              // alert('post 실패');
+              Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: '저장 실패',
+                showConfirmButton: false,
+                timer : 2000
+              })
               // onCancel();
             });
         })

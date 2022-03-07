@@ -107,10 +107,10 @@ export default function Canvas({
     [completeLine, completeErase, isEraser]
   );
 
-  const [zIndex, setZindex] = useState(0);
-  const changeZofCanvas = () => {
-    setZindex((index) => (index === 10 ? 0 : 10));
-  };
+  // const [zIndex, setZindex] = useState(0);
+  // const changeZofCanvas = () => {
+  //   setZindex((index) => (index === 10 ? 0 : 10));
+  // };
 
   return (
     <div>

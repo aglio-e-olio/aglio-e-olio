@@ -12,6 +12,7 @@ import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 const Save = ({ isOpen, onCancel, yLines, doc }) => {
   dotenv.config();
 
@@ -45,6 +46,8 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     { label: '조헌일', value: '조헌일' },
     { label: '진승현', value: '진승현' },
   ]);
+
+  
 
   const [algorithmOptions, setAlgorithmOptions] = useState([
     { label: 'BFS', value: 'BFS' },
@@ -132,7 +135,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     );
 
     if (!(title && algorithm && announcer)) {
-      alert('빈칸을 입력해 주세요.');
+      Swal.fire('빈칸을 입력해 주세요')
       return;
     } else {
       uploadFile(file, config)
@@ -158,16 +161,26 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
           axios
             .post('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
-              alert('post 성공');
+              Swal.fire({
+                position: 'top',
+                icon: 'success',
+                title: '저장 성공',
+                showConfirmButton: false,
+                timer : 2000
+              })
               if (exitSave === 1) {
                 navigate('/');
               }
-              // onCancel();
             })
             .catch(function (err) {
               console.error(err);
-              alert('post 실패');
-              // onCancel();
+              Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: '저장 실패',
+                showConfirmButton: false,
+                timer : 2000
+              })
             });
         })
         .catch((err) => console.error(err));

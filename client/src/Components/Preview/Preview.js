@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import PreviewTagBadge from '../Atoms/PreviewTagBadge';
 import PreviewText from '../Atoms/PreviewText';
+import Swal from 'sweetalert2';
 
 function Preview() {
-  const { selectedPreviewKey, persistEmail } = useContext(codeContext);
+  const { selectedPreviewKey, persistEmail, setExitSave } = useContext(codeContext);
   const [metaData, setMetaData] = useState(false);
   const navigate = useNavigate();
 
@@ -32,6 +33,7 @@ function Preview() {
   }, [selectedPreviewKey]);
 
   function goToSelfstudy() {
+    setExitSave(0);
     const userID = persistEmail;
     navigate(`/history/selfstudy/${userID}`);
   }
@@ -43,11 +45,26 @@ function Preview() {
         url: `https://aglio-olio-api.shop/myroom/delete/${selectedPreviewKey}`,
         params: { _id: selectedPreviewKey },
       });
-      alert('delete 성공');
+      // alert('delete 성공');
+      Swal.fire({
+        position: 'center',
+        icon: 'success',
+        title: 'delete 성공!',
+        showConfirmButton: false,
+        timer : 2000
+      })
+      
       window.location.reload();
     } catch (err) {
       console.error(err);
-      alert('delete 실패');
+      // alert('delete 실패');
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'delete 실패!',
+        showConfirmButton: false,
+        timer : 2000
+      })
     }
   }
 
