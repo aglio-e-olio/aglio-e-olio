@@ -13,6 +13,7 @@ import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 
 const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
+  console.log(data, "data 있나?")
   dotenv.config();
 
   const [title, setTitle] = useState(data.title);
