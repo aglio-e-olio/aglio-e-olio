@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 
 function Preview() {
-  const { selectedPreviewKey, persistEmail } = useContext(codeContext);
+  const { selectedPreviewKey, persistEmail, setExitSave } = useContext(codeContext);
   const [metaData, setMetaData] = useState(false);
   const navigate = useNavigate();
 
@@ -28,6 +28,7 @@ function Preview() {
   }, [selectedPreviewKey]);
 
   function goToSelfstudy() {
+    setExitSave(0);
     const userID = persistEmail;
     navigate(`/history/selfstudy/${userID}`);
   }
