@@ -60,7 +60,7 @@ const SelfStudyRoom = () => {
   const onCapture = async () => {
     let snapshotUrl = '';
     console.log('onCapture');
-    await html2canvas(document.body)
+    await html2canvas(document.getElementById("onCapture"))
       .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
         getUrl(snapshotUrl);
@@ -101,7 +101,7 @@ const SelfStudyRoom = () => {
 
   return (
     <div>
-      <div class="fixed top-0 left-0 right-0 bottom-0 ">
+      <div class="fixed top-0 left-0 right-0 bottom-0 " id='onCapture'>
         <SelfAbsolute
           // peers={peers}
           handleSave={handleSave}
