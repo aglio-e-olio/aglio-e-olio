@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { codeContext } from '../../Context/ContextProvider';
 import Swal from 'sweetalert2';
 
-const HeaderNav = ({ peerAudios, handleSave }) => {
+const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
   const navigate = useNavigate();
   const {setDocGCount, setExitSave} = useContext(codeContext);
   
@@ -77,7 +77,10 @@ const HeaderNav = ({ peerAudios, handleSave }) => {
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
           <li>
-            <button class="btn btn-secondary mx-3">Record</button>
+            <button class="btn btn-secondary mx-3" onClick={startRecord}>Record Start</button>
+          </li>
+          <li>
+            <button class="btn btn-secondary mx-3" onClick={stopRecord}>Record Stop</button>
           </li>
           <li>
             <button class="btn btn-ghost mx-3" onClick={handleSave}>

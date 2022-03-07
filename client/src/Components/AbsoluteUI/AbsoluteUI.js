@@ -12,12 +12,14 @@ const AbsoluteUI = ({
   yLines,
   undoManager,
   setIsEraser,
+  startRecord,
+  stopRecord
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div class="z-5 bg-none">
-      <HeaderNav peerAudios={peerAudios} handleSave={handleSave} />
+      <HeaderNav peerAudios={peerAudios} handleSave={handleSave} startRecord={startRecord} stopRecord={stopRecord} />
       <LeftSideToolbar setIsEraser={setIsEraser} yLines={yLines} undoManager={undoManager}/>
       <RightSideNav setIsOpen={setIsOpen} />
       <CodeDrawer

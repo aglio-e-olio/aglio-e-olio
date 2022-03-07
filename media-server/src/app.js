@@ -116,6 +116,8 @@ io.on('connection', (socket) => {
 
     roomList.get(room_id).addPeer(new Peer(socket.id, name, email))
     socket.room_id = room_id
+    console.log("join 안에서의 socket.id:", socket.id)
+    console.log('socket.room_id:', socket.room_id);
 
     cb(roomList.get(room_id).toJson())
   })
@@ -257,7 +259,10 @@ io.on('connection', (socket) => {
   })
 
   socket.on('start-record', async (callback) => {
+    console.log("start-record socket_id:", socket.id)
+    console.log("start-record", socket.room_id)
     const room = roomList.get(socket.room_id);
+    console.log("start-record:", room)
     const peer = room.getPeers().get(socket.id);
     let recordInfo = {};
 

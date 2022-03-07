@@ -20,6 +20,18 @@ let awareness;
 let yLines;
 let undoManager;
 
+let producerTransport;
+let consumerTransport;
+
+let consumers = new Map();
+let producers = new Map();
+
+let screenTrackHolder = null;
+let producerLabel = new Map();
+
+const socket = io.connect('https://3.39.27.19:8000', {
+  withCredentials: false,
+});;
 
 /* Change the values below to adjust video quality. */
 const displayMediaOptions = {
@@ -75,81 +87,32 @@ const Room = () => {
       return newState;
     })
   }
-  let name;
 
-  let socket = io.connect('https://3.39.27.19:8000', {
-    withCredentials: false,
-  });;
-  let producerTransport;
-  let consumerTransport;
-
-  let consumers = new Map();
-  let producers = new Map();
-
-  let screenTrackHolder = null;
-  let producerLabel = new Map();
+  socket.request = (type, data = {}) => {
+    return new Promise((resolve, reject) => {
+      socket.emit(type, data, (data) => {
+        if (data.error) {
+          reject(data.error)
+        } else {
+          resolve(data)
+        }
+      })
+    })
+  }
 
   useEffect(() => {
-    socket.request = (type, data = {}) => {
-      return new Promise((resolve, reject) => {
-        socket.emit(type, data, (data) => {
-          if (data.error) {
-            reject(data.error)
-          } else {
-            resolve(data)
-          }
-        })
-      })
-    }
+
     createRoom(roomID).then(async () => {
       await join(persistUser, persistEmail, roomID);
       initSockets();
     })
 
-    startAudioButtonRef.current.addEventListener('click', () => {
-      produce(mediaType.audio);
-    });
-    stopAudioButtonRef.current.addEventListener('click', () => {
-      closeProducer(mediaType.audio, false)
-    });
-    startRecordButtonRef.current.addEventListener('click', async () => {
-      console.log('startRecord()');
-      isRecordingRef.current = true;
-      await produce(mediaType.screen);
-      await produce(mediaType.allAudio);
-
-      socket.emit(
-        'start-record',
-        (data) => {
-          if (data.error) {
-            screenTrackStop();
-            closeProducer(mediaType.screen, true);
-            closeProducer(mediaType.allAudio, true);
-            alert(data.error);
-            startRecordButtonRef.current.disabled = false;
-            stopRecordButtonRef.current.disabled = true;
-            isRecordingRef.current = false;
-          } else {
-            alert(data.success);
-          }
-        }
-      );
-
-      startRecordButtonRef.current.disabled = true;
-      stopRecordButtonRef.current.disabled = false;
-    })
-    stopRecordButtonRef.current.addEventListener('click', () => {
-      console.log('stopRecord()');
-
-      socket.emit('stop-record', () => {
-        closeProducer(mediaType.screen, true);
-        closeProducer(mediaType.allAudio, true);
-      });
-
-      startRecordButtonRef.current.disabled = false;
-      stopRecordButtonRef.current.disabled = true;
-      isRecordingRef.current = false;
-    })
+    // startAudioButtonRef.current.addEventListener('click', () => {
+    //   produce(mediaType.audio);
+    // });
+    // stopAudioButtonRef.current.addEventListener('click', () => {
+    //   closeProducer(mediaType.audio, false)
+    // });
   }, []);
 
   ////////// INIT /////////
@@ -372,6 +335,40 @@ const Room = () => {
   }
 
   //////// MAIN FUNCTIONS /////////////
+  const startRecord = async () => {
+    console.log('startRecord()');
+    isRecordingRef.current = true;
+    await produce(mediaType.screen);
+    await produce(mediaType.allAudio);
+
+    socket.emit(
+      'start-record',
+      (data) => {
+        if (data.error) {
+          screenTrackStop();
+          closeProducer(mediaType.screen, true);
+          closeProducer(mediaType.allAudio, true);
+          alert(data.error);
+          startRecordButtonRef.current.disabled = false;
+          stopRecordButtonRef.current.disabled = true;
+          isRecordingRef.current = false;
+        } else {
+          alert(data.success);
+        }
+      }
+    );
+  };
+
+  const stopRecord = () => {
+    console.log('stopRecord()');
+
+    socket.emit('stop-record', () => {
+      closeProducer(mediaType.screen, true);
+      closeProducer(mediaType.allAudio, true);
+    });
+
+    isRecordingRef.current = false;
+  }
 
   const produce = async (type) => {
     let mediaConstraints = {}
@@ -489,7 +486,7 @@ const Room = () => {
         if (kind === 'video') {
           /* No need */
         } else {
-          peerAudioUpsert(consumer.id, {name: peerName, stream: stream})
+          peerAudioUpsert(consumer.id, { name: peerName, stream: stream })
         }
 
         consumer.on(
@@ -743,22 +740,14 @@ const Room = () => {
 
   return (
     <div>
-      <div>
-        {/* audio open and close */}
+      {/* <div>
         <button ref={startAudioButtonRef} >
           <i class="fas fa-volume-up"></i> Open audio
         </button>
         <button ref={stopAudioButtonRef}>
           <i class="fas fa-volume-up"></i> Close audio
         </button>
-        <button ref={startRecordButtonRef}>
-          <i class="fas fa-volume-up"></i> Record start
-        </button>
-        <button ref={stopRecordButtonRef}>
-          <i class="fas fa-volume-up"></i> Record stop
-        </button>
-        {/* audio open and close */}
-      </div>
+      </div> */}
 
       <div class="fixed top-0 left-0 right-0 bottom-0 ">
         <AbsoluteUI
@@ -770,6 +759,8 @@ const Room = () => {
           yLines={yLines}
           undoManager={undoManager}
           setIsEraser={setIsEraser}
+          startRecord={startRecord}
+          stopRecord={stopRecord}
         />
         <Canvas
           doc={doc}
