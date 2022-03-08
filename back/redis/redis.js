@@ -180,45 +180,48 @@ const redis_save = async (req, res, next) =>{
     const user_email = body.user_email;
     const save_string_data = JSON.stringify(body);
 
-    await mutex.runExclusive(async()=>{
-        const count = await getAsync('count');
-        if(count>=SAVE_COUNT){
-            
-            // 여기서 부터 이 다음 까지 시간이 많이 걸리니?
-            logger.verbose("mongodb save start :: function_time_check_post_async");
-            await rpushAsync("save_list", save_string_data);
-            const save_array = await lrangeAsync("save_list", 0, -1);
-            let array = [];
-            save_array.forEach(element=>{
-                array.push(JSON.parse(element));
-            })
-            logger.verbose(`array length : ${save_array.length}`);
+    const count = await getAsync('count');
+    if(count>=SAVE_COUNT){
+        
+        // 여기서 부터 이 다음 까지 시간이 많이 걸리니?
+        logger.verbose("mongodb save start :: no_mutex_and_all_async_test");
+        await rpushAsync("save_list", save_string_data);
+        const save_array = await lrangeAsync("save_list", 0, -1);
 
-            logger.verbose("mongodb Post.insertMany :: function_time_check_post_async");
-            Post.insertMany(array);
-            logger.verbose("mongodb delAsync(users) :: function_time_check_post_async");
-            await delAsync("users");
-            logger.verbose("mongodb delAsync(save_list) :: function_time_check_post_async");
-            await delAsync("save_list");
-            logger.verbose("mongodb setAsync(count) :: function_time_check_post_async");
-            await setAsync("count", 0);
+        let array = [];
+        save_array.forEach(element=>{
+            array.push(JSON.parse(element));
+        })
 
-            // array = null; save_array = null; => let const가 차이가 있다면..
-            res.status(200).send("insert many success ");
-            logger.verbose("mongodb save end ::  function_time_check_post_async");
-            return;
-        } else {
-            logger.verbose("redis save start :: function_time_check_post_async");
-            await Promise.all([
-                incrAsync("count"),
-                rpushAsync("save_list", save_string_data),
-                saddAsync("users", user_email)
-            ])
-            res.status(200).json({result : "success"});
-            logger.verbose("redis save end :: function_time_check_post_async");
-            return;
-        }
-    })  
+        logger.verbose("mongodb Post.insertMany :: no_mutex_and_all_async_test");
+        Post.insertMany(array);
+        logger.verbose("mongodb del(users) :: no_mutex_and_all_async_test");
+        // redisClient.del("users");
+        await delAsync("users");
+        logger.verbose("mongodb del(save_list) :: no_mutex_and_all_async_test");
+        // redisClient.del("save_list")
+        await delAsync("save_list");
+        logger.verbose("mongodb set(count) :: no_mutex_and_all_async_test");
+        await setAsync("count", 0);
+        // redisClient.set("count", 0);
+
+        // array = null; save_array = null; => let const가 차이가 있다면..
+        res.status(200).send("insert many success ");
+        logger.verbose("mongodb save end ::  no_mutex_and_all_async_test");
+        return;
+    } else {
+        logger.verbose("redis save start :: no_mutex_and_all_async_test");
+
+        // 여기 넣는 거는 완전히 되어야 할 듯
+        await Promise.all([
+            incrAsync("count"),
+            rpushAsync("save_list", save_string_data),
+            saddAsync("users", user_email)
+        ])
+        res.status(200).json({result : "success"});
+        logger.verbose("redis save end :: no_mutex_and_all_async_test");
+        return;
+    }
 }
 exports.redis_save = redis_save;
 

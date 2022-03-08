@@ -11,15 +11,23 @@ router.post('/test', redis_save,  (req, res)=>{
     return;
 })
 
-router.get('/test', redis_test, (req,res)=>{
-    res.send("mongo");
+router.get('/test',  (req,res)=>{
+    let a;
+    logger.verbose(a);
+    a = 1;
+    res.send('a');
 })
 
-
-router.get('/1', (req,res)=>{
+function for_loop2(){
     for(let i = 0; i<10000000000; i++){
 
     }
+}
+async function for_loop (){
+    return await for_loop2();
+}
+router.get('/1', async (req,res)=>{
+    await for_loop();
     res.send('1')
 })
 
@@ -27,6 +35,7 @@ router.get('/2', (req, res)=>{
     res.send("Thank you");
 })
 
+/***
 router.post('/save_many', redis_save, (req, res)=>{
 
     const save_array = req.save_array;
@@ -50,6 +59,12 @@ router.post('/save_many', redis_save, (req, res)=>{
         }
     })    
 })
+ */
+router.post('/save_many', redis_save)
+
+
+
+
 
 router.post('/save', async (req, res)=>{
     const body = req.body;
