@@ -31,7 +31,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit}) => 
         Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then(
           (result) => {
             setDocGCount(0);
-            exit(true);
+            exit();
             navigate('/');
           }
         );

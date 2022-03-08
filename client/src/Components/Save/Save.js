@@ -201,7 +201,7 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
                 showLoaderOnConfirm: true,
               });
               if (exitSave === 1) {
-                exit(true);
+                exit();
                 navigate('/');
               }
               onCancel();
