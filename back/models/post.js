@@ -54,7 +54,7 @@ postSchema.statics.create = async function(body){
         body["title"] = "제목없음";
     }
     const new_post = new this(body);
-    return new_post.save();
+    return await new_post.save();
 }
 
 postSchema.statics.update = async function(filter, update){

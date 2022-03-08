@@ -20,7 +20,7 @@ const logFormat = printf(info=>{
 const logger = winston.createLogger({
     format: combine(
         timestamp({
-            format:'YYYY-MM-DD HH:mm:ss',
+            format:'YYYY-MM-DD HH:mm:ss.SSS',
         }),
         logFormat,
     ),
@@ -53,6 +53,15 @@ const logger = winston.createLogger({
             dirname:logDir + '/error',
             filename:`%DATE%.error.log`,
             maxFiles:30, 
+            zippedArchive:true
+        }),
+
+        new winstonDaily({
+            level:'verbose',
+            datePattern:'YYYY-MM-DD',
+            dirname:logDir + '/verbose',
+            filename:`%DATE%.verbose.log`,
+            maxFiles:30,
             zippedArchive:true
         })
     ],

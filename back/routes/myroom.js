@@ -3,7 +3,7 @@ const Post = require('../models/post');
 const mongoose = require('mongoose')
 const { ObjectId } = mongoose.Types;
 const logger = require('../config/winston');
-const { mutex } = require('../lib/mutex');
+// const { mutex } = require('../lib/mutex');
 const { redis_test,  redis_save, setAsync, delAsync } = require('../redis/redis')
 
 router.post('/test', redis_save,  (req, res)=>{
@@ -51,7 +51,7 @@ router.post('/save_many', redis_save, (req, res)=>{
     })    
 })
 
-router.post('/save', (req, res)=>{
+router.post('/save', async (req, res)=>{
     const body = req.body;
 
     // Error Handling
@@ -81,7 +81,13 @@ router.post('/save', (req, res)=>{
         return; 
     }
 
+    await Post.create(body);
+
+    res.status(200).json({result :"success"});
+
+
     // Post Save
+    /**
     try{
         Post.create(body);
     }
@@ -91,6 +97,7 @@ router.post('/save', (req, res)=>{
     } finally{
         res.status(200).json({result : "success"});
     }
+     */
 })
 
 router.put('/save', (req,res)=>{

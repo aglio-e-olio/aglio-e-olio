@@ -4,13 +4,14 @@ exports.redisClient = redisClient;
 const { promisify } = require('util');
 const logger = require('../config/winston');
 const Post = require('../models/post');
+const Mutex = require('async-mutex').Mutex;
+
+const mutex = new Mutex();
 
 
 
+const SAVE_COUNT = 150;
 
-const SAVE_COUNT = 100;
-
-const { mutex } = require('../lib/mutex');
 
 /* promisify */
 const getAsync = promisify(redisClient.get).bind(redisClient);
@@ -18,6 +19,9 @@ const setAsync = promisify(redisClient.set).bind(redisClient);
 const rpushAsync = promisify(redisClient.rpush).bind(redisClient);
 const lrangeAsync = promisify(redisClient.lrange).bind(redisClient);
 const delAsync = promisify(redisClient.del).bind(redisClient);
+const incrAsync = promisify(redisClient.incr).bind(redisClient);
+const saddAsync = promisify(redisClient.sadd).bind(redisClient);
+
 exports.delAsync = delAsync;
 exports.setAsync = setAsync;
 
@@ -121,7 +125,7 @@ const redis_metadata = async (req, res, next)=>{
 }
 
 
-const redis_save = (req, res, next) =>{
+const redis_save = async (req, res, next) =>{
     const body = req.body;
 
     /* Error Handling */
@@ -176,31 +180,45 @@ const redis_save = (req, res, next) =>{
     const user_email = body.user_email;
     const save_string_data = JSON.stringify(body);
 
-    redisClient.get("count", async function(err, count){
-        if (err){
-            res.status(500).json({error :"error"});
-        } else if(count >= SAVE_COUNT){
-
-            // await mutex.acquire();
+    await mutex.runExclusive(async()=>{
+        const count = await getAsync('count');
+        if(count>=SAVE_COUNT){
+            
+            // 여기서 부터 이 다음 까지 시간이 많이 걸리니?
+            logger.verbose("mongodb save start :: function_time_check_post_async");
             await rpushAsync("save_list", save_string_data);
-            req.save_array = await lrangeAsync("save_list", 0, -1);
-            next();
-        } else {
-            redisClient.incr("count");
-            redisClient.rpush("save_list", save_string_data, function(err){
-                if(err){
-                    res.status(500).json({error : "error"});
-                    return;
-                } else {
-                    redisClient.sadd("users", user_email, function(err){
-                        if(err) {res.status(500).json({error : "error"})};
-                    });
-                    res.status(200).json({result : "success"});
-                    return;
-                }
+            const save_array = await lrangeAsync("save_list", 0, -1);
+            let array = [];
+            save_array.forEach(element=>{
+                array.push(JSON.parse(element));
             })
+            logger.verbose(`array length : ${save_array.length}`);
+
+            logger.verbose("mongodb Post.insertMany :: function_time_check_post_async");
+            Post.insertMany(array);
+            logger.verbose("mongodb delAsync(users) :: function_time_check_post_async");
+            await delAsync("users");
+            logger.verbose("mongodb delAsync(save_list) :: function_time_check_post_async");
+            await delAsync("save_list");
+            logger.verbose("mongodb setAsync(count) :: function_time_check_post_async");
+            await setAsync("count", 0);
+
+            // array = null; save_array = null; => let const가 차이가 있다면..
+            res.status(200).send("insert many success ");
+            logger.verbose("mongodb save end ::  function_time_check_post_async");
+            return;
+        } else {
+            logger.verbose("redis save start :: function_time_check_post_async");
+            await Promise.all([
+                incrAsync("count"),
+                rpushAsync("save_list", save_string_data),
+                saddAsync("users", user_email)
+            ])
+            res.status(200).json({result : "success"});
+            logger.verbose("redis save end :: function_time_check_post_async");
+            return;
         }
-    })
+    })  
 }
 exports.redis_save = redis_save;
 
