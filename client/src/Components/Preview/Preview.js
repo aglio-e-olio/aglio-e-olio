@@ -40,6 +40,20 @@ function Preview() {
   }
 
   async function handleDelete() {
+
+    const showLoading = function () {
+      Swal.fire({
+        title: '삭제중입니다',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+    };
+
+    showLoading();
+
     try {
       const res = await axios({
         method: 'DELETE',

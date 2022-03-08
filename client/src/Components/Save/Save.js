@@ -13,7 +13,7 @@ import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-const Save = ({ isOpen, onCancel, yLines, doc, peerAudios}) => {
+const Save = ({ isOpen, onCancel, yLines, doc, peerAudios }) => {
   dotenv.config();
 
   const [title, setTitle] = useState('');
@@ -46,12 +46,11 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios}) => {
     // console.log('save컴포넌트 안 persistUser는', persistUser);
     // console.log('save컴포넌트 안 peers는', peerAudios);
     const peersName = [];
-    
+
     if (peerAudios.size !== 0) {
       peerAudios.forEach((value, key) => {
         peersName.push({ label: value.name, value: value.name });
       });
-
     }
     // console.log('peersName은?', peersName);
     setAnnouncerOptions((prev) => (prev = peersName));
@@ -177,6 +176,18 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios}) => {
             user_email: persistEmail,
             nickname: persistUser,
           };
+          const showLoading = function () {
+            Swal.fire({
+              title: '저장중입니다',
+              allowOutsideClick: false,
+              showConfirmButton: false,
+              willOpen: () => {
+                Swal.showLoading();
+              },
+            });
+          };
+
+          showLoading();
 
           axios
             .post('https://aglio-olio-api.shop/myroom/save', body)
@@ -187,6 +198,7 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios}) => {
                 title: '저장 성공',
                 showConfirmButton: false,
                 timer: 2000,
+                showLoaderOnConfirm: true,
               });
               if (exitSave === 1) {
                 navigate('/');
