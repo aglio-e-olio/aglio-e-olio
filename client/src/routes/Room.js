@@ -33,13 +33,13 @@ let screenTrackHolder = null;
 let producerLabel = new Map();
 
 // 준영이형 서버
-// const socket = io.connect('https://3.39.27.19:8000', {
-//   withCredentials: false,
-// });
-// 진승현 서버
-const socket = io.connect('https://3.35.138.234:8000', {
+const socket = io.connect('https://3.39.27.19:8000', {
   withCredentials: false,
 });
+// // 진승현 서버
+// const socket = io.connect('https://3.35.138.234:8000', {
+//   withCredentials: false,
+// });
 
 /* Change the values below to adjust video quality. */
 const displayMediaOptions = {

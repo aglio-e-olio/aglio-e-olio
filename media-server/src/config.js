@@ -64,38 +64,38 @@ module.exports = {
       ]
     },
     // WebRtcTransport settings 준영이 형
-    // webRtcTransport: {
-    //   listenIps: [
-    //     {
-    //       ip: '0.0.0.0',
-    //       announcedIp: "3.39.27.19" // replace by public IP address
-    //     }
-    //   ],
-    //   maxIncomingBitrate: 1500000,
-    //   initialAvailableOutgoingBitrate: 1000000
-    // },
-    // plainRtpTransport: {
-    //   listenIp: { ip: '0.0.0.0', announcedIp: '3.39.27.19' }, // TODO: Change announcedIp to your external IP or domain name
-    //   rtcpMux: true,
-    //   comedia: false
-    // }
-
-    // 승현
     webRtcTransport: {
       listenIps: [
         {
           ip: '0.0.0.0',
-          announcedIp: "3.35.138.234" // replace by public IP address
+          announcedIp: "3.39.27.19" // replace by public IP address
         }
       ],
       maxIncomingBitrate: 1500000,
       initialAvailableOutgoingBitrate: 1000000
     },
     plainRtpTransport: {
-      listenIp: { ip: '0.0.0.0', announcedIp:'3.35.138.234' }, // TODO: Change announcedIp to your external IP or domain name
+      listenIp: { ip: '0.0.0.0', announcedIp: '3.39.27.19' }, // TODO: Change announcedIp to your external IP or domain name
       rtcpMux: true,
       comedia: false
     }
+
+    // 승현
+    // webRtcTransport: {
+    //   listenIps: [
+    //     {
+    //       ip: '0.0.0.0',
+    //       announcedIp: "3.35.138.234" // replace by public IP address
+    //     }
+    //   ],
+    //   maxIncomingBitrate: 1500000,
+    //   initialAvailableOutgoingBitrate: 1000000
+    // },
+    // plainRtpTransport: {
+    //   listenIp: { ip: '0.0.0.0', announcedIp:'3.35.138.234' }, // TODO: Change announcedIp to your external IP or domain name
+    //   rtcpMux: true,
+    //   comedia: false
+    // }
 
   }
 }
