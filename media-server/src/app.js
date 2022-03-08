@@ -262,7 +262,6 @@ io.on('connection', (socket) => {
     if (roomList.get(socket.room_id).getPeers().size === 0) {
       roomList.delete(socket.room_id)
     }
-    roomList.get(socket.room_id).broadCast(socket.id, "bye", roomList.get(socket.room_id).getPeers().get(socket.id).name);
 
     socket.room_id = null
 
