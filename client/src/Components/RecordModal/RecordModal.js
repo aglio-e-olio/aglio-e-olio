@@ -123,6 +123,19 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
       // code_data : codes
     };
 
+    const showLoading = function () {
+      Swal.fire({
+        title: '영상 저장중입니다',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+    };
+
+    showLoading();
+
     axios
       .post('https://aglio-olio-api.shop/myroom/save', body)
       .then(function (res) {

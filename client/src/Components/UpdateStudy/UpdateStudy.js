@@ -194,13 +194,26 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
             nickname: persistUser,
           };
 
+          const showLoading = function () {
+            Swal.fire({
+              title: '업데이트 중입니다',
+              allowOutsideClick: false,
+              showConfirmButton: false,
+              willOpen: () => {
+                Swal.showLoading();
+              },
+            });
+          };
+
+          showLoading();
+
           axios
             .put('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
               Swal.fire({
                 position: 'center',
                 icon: 'success',
-                title: '저장 성공!',
+                title: '업데이트 성공!',
                 showConfirmButton: false,
                 timer: 2000,
               });
@@ -215,7 +228,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
               Swal.fire({
                 position: 'top',
                 icon: 'error',
-                title: '저장 실패',
+                title: '업데이트 실패',
                 showConfirmButton: false,
                 timer: 2000,
               });
