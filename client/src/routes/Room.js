@@ -32,7 +32,7 @@ let producers = new Map();
 let screenTrackHolder = null;
 let producerLabel = new Map();
 
-// 준영이형 서버
+//준영이형 서버
 const socket = io.connect('https://3.39.27.19:8000', {
   withCredentials: false,
 });
@@ -109,6 +109,11 @@ const Room = () => {
   };
 
   useEffect(() => {
+    console.log('Room안 useEffect안 persistUser는 ', persistUser);
+    if (persistUser === '') {
+      return;
+    }
+
     createRoom(roomID).then(async () => {
       await join(persistUser, persistEmail, roomID);
       initSockets();
@@ -120,7 +125,7 @@ const Room = () => {
     // stopAudioButtonRef.current.addEventListener('click', () => {
     //   closeProducer(mediaType.audio, false)
     // });
-  }, []);
+  }, [persistUser]);
 
   ////////// INIT /////////
 
