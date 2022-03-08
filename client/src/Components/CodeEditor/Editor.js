@@ -58,7 +58,7 @@ const CodeEditor = ({ doc, provider }) => {
       state,
       parent: /** @type {HTMLElement} */ (document.querySelector('#editor')),
     });
-  }, [persistUser]);
+  }, []);
 
   return <div className="w-full text-left" id="editor"></div>;
 };
