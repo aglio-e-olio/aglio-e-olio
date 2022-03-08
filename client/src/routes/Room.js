@@ -33,7 +33,7 @@ let screenTrackHolder = null;
 let producerLabel = new Map();
 
 //준영이형 서버
-const socket = io.connect('https://3.39.27.19:8000', {
+const socket = io.connect('https://aglio-olio.shop', {
   withCredentials: false,
 });
 // // 진승현 서버
