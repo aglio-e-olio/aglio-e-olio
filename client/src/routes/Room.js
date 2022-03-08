@@ -32,7 +32,12 @@ let producers = new Map();
 let screenTrackHolder = null;
 let producerLabel = new Map();
 
-const socket = io.connect('https://3.39.27.19:8000', {
+//준영이형 서버
+// const socket = io.connect('https://3.39.27.19:8000', {
+//   withCredentials: false,
+// });;
+// 진승현 서버
+const socket = io.connect('https://3.35.138.234:8000', {
   withCredentials: false,
 });;
 
@@ -336,6 +341,22 @@ const Room = () => {
         exit(true)
       }
     )
+
+    socket.on('hello', (new_member) => {
+      console.log('name이 찍히는지?', new_member);
+      toast.success(`${new_member}님이 입장했습니다`,{
+        autoClose: 2000,
+        position: toast.POSITION.TOP_RIGHT
+      });
+    })
+
+    socket.on('bye', (left_member) => {
+      console.log('name이 찍히는지?', left_member);
+      toast.error(`${left_member}님이 나갔습니다`,{
+        autoClose: 2000,
+        position: toast.POSITION.TOP_RIGHT
+      });
+    })
 
     socket.on('code response', (code) => {
       handleCompileResult(code);

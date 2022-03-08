@@ -121,6 +121,10 @@ io.on('connection', (socket) => {
     console.log('socket.room_id:', socket.room_id);
 
     cb(roomList.get(room_id).toJson())
+
+    const room = roomList.get(room_id);
+
+    room.broadCast(socket.id, 'hello', name);
   })
 
   socket.on('getProducers', (_, callback) => {
@@ -218,11 +222,13 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
+    
     console.log('Disconnect', {
       name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`
     })
 
     if (!socket.room_id) return
+    roomList.get(socket.room_id).broadCast(socket.id, "bye", roomList.get(socket.room_id).getPeers().get(socket.id).name);
     roomList.get(socket.room_id).removePeer(socket.id)
   })
 
