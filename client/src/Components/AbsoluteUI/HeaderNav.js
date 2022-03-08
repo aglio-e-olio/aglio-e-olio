@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import ReactTooltip from 'react-tooltip';
 import { VideoCameraIcon, StopIcon } from '@heroicons/react/outline';
 
-const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
+const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit}) => {
   const navigate = useNavigate();
   const { setDocGCount, setExitSave } = useContext(codeContext);
   const [isRecord, setIsRecord] = useState(false);
@@ -31,6 +31,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
         Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then(
           (result) => {
             setDocGCount(0);
+            exit(true);
             navigate('/');
           }
         );
@@ -92,7 +93,9 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
         </ul>
       </div>
       <div class="navbar-center lg:flex">
-        <a class="btn btn-ghost normal-case text-xl">AO</a>
+        <a class="btn btn-ghost normal-case text-white font-sans text-3xl">
+          Aglio Olio
+        </a>
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
@@ -178,7 +181,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord }) => {
           </li>
         </ul>
       </div>
-      <ReactTooltip/>
+      <ReactTooltip />
     </div>
   );
 };
