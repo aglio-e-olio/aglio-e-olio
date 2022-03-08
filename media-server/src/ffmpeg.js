@@ -5,18 +5,31 @@ const { EventEmitter } = require('events');
 
 const { createSdpText } = require('./sdp');
 const { convertStringToStream } = require('./utils');
+const dotenv = require('dotenv');
+const s3FolderUpload = require('s3-folder-upload')
 
+dotenv.config();
 const RECORD_FILE_LOCATION_PATH = process.env.RECORD_FILE_LOCATION_PATH || './files';
+const credentials = {
+  "accessKeyId": process.env.AWS_ACCESS_KEY_ID,
+  "secretAccessKey": process.env.AWS_SECRET_ACCESS_KEY,
+  "region": process.env.S3_REGION,
+  "bucket": process.env.S3_BUCKET
+}
+
 
 module.exports = class FFmpeg {
-  constructor (rtpParameters) {
+  constructor(rtpParameters) {
     this._rtpParameters = rtpParameters;
     this._process = undefined;
+    this._mkdirProcess = undefined;
+    this._convertProcess = undefined;
+    this._cleanupProcess = undefined;
     this._observer = new EventEmitter();
     this._createProcess();
   }
 
-  _createProcess () {
+  _createProcess() {
     const sdpString = createSdpText(this._rtpParameters);
     const sdpStream = convertStringToStream(sdpString);
 
@@ -35,7 +48,7 @@ module.exports = class FFmpeg {
     if (this._process.stdout) {
       this._process.stdout.setEncoding('utf-8');
 
-      this._process.stdout.on('data', data => 
+      this._process.stdout.on('data', data =>
         console.log('ffmpeg::process::data [data:%o]', data)
       );
     }
@@ -51,6 +64,60 @@ module.exports = class FFmpeg {
     this._process.once('close', () => {
       console.log('ffmpeg::process::close');
       this._observer.emit('process-close');
+
+      this._mkdirProcess = child_process.spawn(
+        'mkdir', 
+        [`${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}`]
+      );
+      this._mkdirProcess.on('exit', (code, signal) => {
+        console.log('mkdir process exited with ' + `code ${code} and signal ${signal}`);
+        const convertArgs = [
+          '-i',
+          `${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}.webm`,
+          '-f',
+          'hls',
+          '-hls_time',
+          '2',
+          '-hls_playlist_type',
+          'vod',
+          '-hls_segment_type',
+          'mpegts',
+          '-hls_list_size',
+          '0',
+          `${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}/playlist.m3u8`
+        ]
+        this._convertProcess = child_process.spawn('ffmpeg', convertArgs);
+        this._convertProcess.on('exit', async (code, signal) => {
+          console.log('ffmpeg process exited with ' + `code ${code} and signal ${signal}`);
+          if (code === 0) {
+            const hlsFolderName = this._rtpParameters.fileName;
+            const localFolderPath = `${RECORD_FILE_LOCATION_PATH}/${hlsFolderName}`;
+            const bucketRootPath = 'live-study-reocrd'
+            const bucketFolderPath = `${bucketRootPath}/${hlsFolderName}`;
+            const options = {
+              useFoldersForFileTypes: false,
+              uploadFolder: bucketFolderPath
+            };
+            s3FolderUpload(localFolderPath, credentials, options)
+            .then(() => {
+              child_process.exec("cd files && find . ! -name '.keep' -type f -exec rm -f {} + && find . -type d -empty -delete");
+              const m3u8Link = `https://${process.env.S3_BUCKET}.s3.ap-northeast-2.amazonaws.com/${bucketFolderPath}/playlist.m3u8`
+            })
+            .catch(e => {
+              console.log("Error happend while uploading to S3: ", e);
+            })
+          }
+        })
+        this._convertProcess.on('error', data => {
+          console.log(data);
+        })
+        this._convertProcess.stdout.on('data', data => {
+          console.log(`child stdout:\n${data}`);
+        })
+        this._convertProcess.stderr.on('data', data => {
+          console.log(`child stderr:\n${data}`);
+        })
+      })
     });
 
     sdpStream.on('error', error =>
@@ -62,12 +129,12 @@ module.exports = class FFmpeg {
     sdpStream.pipe(this._process.stdin);
   }
 
-  kill () {
+  kill() {
     console.log('kill() [pid:%d]', this._process.pid);
     this._process.kill('SIGINT');
   }
 
-  get _commandArgs () {
+  get _commandArgs() {
     let commandArgs = [
       '-loglevel',
       'debug',
@@ -97,7 +164,7 @@ module.exports = class FFmpeg {
     return commandArgs;
   }
 
-  get _videoArgs () {
+  get _videoArgs() {
     return [
       '-map',
       '0:v:0',
@@ -106,7 +173,7 @@ module.exports = class FFmpeg {
     ];
   }
 
-  get _audioArgs () {
+  get _audioArgs() {
     return [
       '-map',
       '0:a:0',
