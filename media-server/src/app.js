@@ -246,6 +246,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('exitRoom', async (_, callback) => {
+    roomList.get(socket.room_id).broadCast(socket.id, "bye", roomList.get(socket.room_id).getPeers().get(socket.id).name);
     console.log('Exit room', {
       name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`
     })
@@ -256,6 +257,7 @@ io.on('connection', (socket) => {
       })
       return
     }
+
     // close transports
     await roomList.get(socket.room_id).removePeer(socket.id)
     if (roomList.get(socket.room_id).getPeers().size === 0) {
