@@ -11,10 +11,10 @@ import { HomeIcon } from '@heroicons/react/outline';
 
 const History = () => {
   const navigate = useNavigate();
-  const [view, setView] = useState('table');
+  const [view, setView] = useState('Table');
 
   // function handleView() {
-  //   if 
+  //   if
   //   setIsTable((prev) => !prev);
   // }
   return (
@@ -27,34 +27,30 @@ const History = () => {
           />
         </button>
         <Search />
-        <div class="btn-group ">
+        <div class="btn-group mx-2.5 fixed top-24">
           <input
             type="radio"
             name="options"
             data-title="Table"
-            class="btn btn-sm"
-            onClick={(e) => setView((prev) => e.dataset.title)}
+            class="btn btn-sm bg-black"
+            onClick={(e) => setView('Table', e.target.dataset.title)}
+            onChange={e=>console.log(e.target.dataset.title)}
             checked
           />
           <input
             type="radio"
             name="options"
             data-title="Cards"
-            class="btn btn-sm"
-            onClick={(e) => setView((prev) => e.dataset.title)}
+            class="btn btn-sm bg-black"
+            onClick={(e) => setView('Cards', e.target.dataset.title)}
+            onChange={e=>console.log(e.target.dataset.title)}
           />
         </div>
       </div>
       <div>
-        <SplitPane
-          split="vertical"
-          minSize="550px"
-        >
+        <SplitPane split="vertical" minSize="550px">
           <div class="h-36">
-            {/* <button class="btn btn-sm flex-left mb-2.5" onClick={handleView}>
-            {isTable ? 'Table' : ' Cards'}
-          </button> */}
-            {view === 'table' ? <InfoTable /> : <InfoCards />}
+            {view === 'Table' ? <InfoTable /> : <InfoCards />}
           </div>
           <Preview />
         </SplitPane>

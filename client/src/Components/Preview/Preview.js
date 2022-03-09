@@ -84,7 +84,7 @@ function Preview() {
   }
 
   return metaData && metaData !== 'error' ? (
-    <div class="card w-2/3 glass bg-gray-200 p-3" style={{ height: '90%' }}>
+    <div class="card w-2/3 glass bg-gray-200 p-3">
       <figure>
         {metaData.type === 'image' ? (
           <img
