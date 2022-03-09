@@ -7,7 +7,7 @@ const Post = require('../models/post');
 const Mutex = require('async-mutex').Mutex;
 
 const mutex = new Mutex();
-
+const { Worker } = require('worker_threads')
 
 
 const SAVE_COUNT = 150;
@@ -35,6 +35,21 @@ redisClient.set("count", 0, function(err){
         console.log("redis 'count' : 0 set done ");
     }
 });
+
+
+function runWorker(workerData){
+    return new Promise((resolve, reject)=>{
+        const worker = new Worker('./worker/worker.js', {workerData});
+        worker.on('message', resolve);
+        worker.on('error', reject);
+        worker.on('exit', (code)=>{
+            if(code !==0 )reject(new Error(`Worker sttoped with exit code ${code}`));
+            console.log('worker exit')
+        })
+    })
+}
+
+
 
 function roughSizeOfObject( object ) {
 
@@ -226,7 +241,7 @@ const redis_save = async (req, res, next) =>{
 
      */
     let flag = false;
-    let array = [];
+    
     await mutex.runExclusive(async()=>{
         const count = await getAsync('count');
         if(count>=SAVE_COUNT){
@@ -235,10 +250,9 @@ const redis_save = async (req, res, next) =>{
             await rpushAsync("save_list", save_string_data);
             const save_array = await lrangeAsync("save_list", 0, -1);
 
-            
-            save_array.forEach(element=>{
-                array.push(JSON.parse(element));
-            })
+        
+            // DB!!
+            runWorker(save_array);
 
             logger.verbose("mongodb del(users) :: use_flag");
             // redisClient.del("users");
@@ -252,6 +266,7 @@ const redis_save = async (req, res, next) =>{
 
             res.status(200).send("insert many success ");
             logger.verbose("mongodb save end ::  use_flag");
+            return;
         } else {
             logger.verbose("redis save start :: use_flag");
 
@@ -267,15 +282,6 @@ const redis_save = async (req, res, next) =>{
         }
     })
     
-    // 보내고 나서 해봅시다.
-    if(flag){
-        flag = false;
-        logger.verbose("mongodb start");
-        Post.insertMany(array);
-        logger.verbose("mongodb end");
-        return;
-    }
-
 }
 exports.redis_save = redis_save;
 
