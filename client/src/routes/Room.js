@@ -71,6 +71,7 @@ const Room = () => {
     persistEmail,
     docGenerateCount,
     setDocGCount,
+    setIsRecording,
   } = useContext(codeContext);
 
   // const remoteAudiosRef = useRef();
@@ -349,7 +350,13 @@ const Room = () => {
   const startRecord = async () => {
     console.log('startRecord()');
     isRecordingRef.current = true;
-    await produce(mediaType.screen);
+    const success = await produce(mediaType.screen);
+    if (success === false) {
+      isRecordingRef.current = false;
+      setIsRecording(false);
+      alert("녹화를 위해서 스크린 선택이 반드시 필요합니다.");
+      return;
+    }
     await produce(mediaType.allAudio);
 
     socket.emit('start-record', (data) => {
@@ -444,6 +451,7 @@ const Room = () => {
         stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
       } else {
         stream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+        console.log(stream);
       }
       console.log(
         'supportedConstraints: ' +
@@ -499,8 +507,18 @@ const Room = () => {
       });
 
       producerLabel.set(type, producer.id);
+      return new Promise(
+        function (resolve, reject) {
+          resolve(true);
+        }
+      );
     } catch (err) {
       console.log('Produce error:', err);
+      return new Promise(
+        function (resolve, reject) {
+          resolve(false);
+        }
+      );
     }
   };
 

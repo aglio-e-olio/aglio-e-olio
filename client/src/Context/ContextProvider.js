@@ -18,6 +18,7 @@ const initialState = {
   keywords: [],
   docGenerateCount: 0,
   exitSave: 0,
+  isRecording: false,
 };
 
 // reducer는 action에서 받은 type에 따라서 state를 변경한다.
@@ -99,6 +100,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         exitSave: action.payload
+      }
+
+    case 'SET_IS_RECORDING':
+      return {
+        ...state,
+        isRecording: action.payload
       }
 
     default:
@@ -238,6 +245,13 @@ const ContextProvider = ({ children }) => {
     })
   }
 
+  function setIsRecording(isRecording) {
+    dispatch({
+      type: 'SET_IS_RECORDING',
+      payload: isRecording,
+    })
+  }
+
   return (
     <codeContext.Provider
       //provider에 value props로 state와 dispatch를 내려준다.
@@ -274,6 +288,8 @@ const ContextProvider = ({ children }) => {
         setDocGCount,
         exitSave: state.exitSave,
         setExitSave,
+        isRecording: state.isRecording,
+        setIsRecording,
       }}
     >
       {children}

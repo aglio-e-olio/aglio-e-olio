@@ -8,10 +8,10 @@ import Swal from 'sweetalert2';
 import ReactTooltip from 'react-tooltip';
 import { VideoCameraIcon, StopIcon } from '@heroicons/react/outline';
 
-const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit}) => {
+const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit }) => {
   const navigate = useNavigate();
-  const { setDocGCount, setExitSave } = useContext(codeContext);
-  const [isRecord, setIsRecord] = useState(false);
+  const { setDocGCount, setExitSave, setIsRecording, isRecording } = useContext(codeContext);
+  // const [isRecord, setIsRecord] = useState(false);
 
   function endStudy() {
     Swal.fire({
@@ -40,13 +40,12 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit}) => 
   }
 
   function handleStart() {
-    setIsRecord(true);
+    setIsRecording(true);
     startRecord();
   }
 
   function handleStop() {
-    setIsRecord(false);
-    console.log(isRecord, 'isRecord?');
+    setIsRecording(false);
     stopRecord();
   }
 
@@ -100,7 +99,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit}) => 
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
           <li>
-            {isRecord ? (
+            {isRecording ? (
               <button
                 class="btn btn-ghost mx-3"
                 onClick={handleStop}
