@@ -103,7 +103,7 @@ module.exports = class FFmpeg {
             s3FolderUpload(this._localFolderPath, credentials, this._options)
               .then(() => {
                 // S3한테 this.m3u8Link에 있는 링크를 헌일이 API 서버에 prepared=true로 바꿔달라는 요청 보내기
-                child_process.exec("cd files && find . ! -name '.keep' -type f -exec rm -f {} + && find . -type d -empty -delete");
+                child_process.exec(`cd files && rm -rf ${this._hlsFolderName} && rm ${this._hlsFolderName}.webm`);
               })
               .catch(e => {
                 console.log("Error happend while uploading to S3: ", e);

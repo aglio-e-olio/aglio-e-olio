@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useContext } from 'react';
 import io from 'socket.io-client';
 import Canvas from '../Components/Canvas/Canvas';
 import './Room.css';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { codeContext } from '../Context/ContextProvider';
 
 import * as Y from 'yjs';
@@ -12,7 +12,7 @@ import Save from '../Components/Save/Save';
 import RecordModal from '../Components/RecordModal/RecordModal';
 import html2canvas from 'html2canvas';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -56,9 +56,7 @@ const mediaType = {
 };
 
 const Room = () => {
-  const socketRef = useRef();
   const { roomID } = useParams();
-  const [peers, setPeers] = useState([]);
   const [isEraser, setIsEraser] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [videoModalOpen, setVideoModalOpen] = useState(false);
@@ -75,9 +73,9 @@ const Room = () => {
     setDocGCount,
   } = useContext(codeContext);
 
-  const remoteAudiosRef = useRef();
-  const startAudioButtonRef = useRef();
-  const stopAudioButtonRef = useRef();
+  // const remoteAudiosRef = useRef();
+  // const startAudioButtonRef = useRef();
+  // const stopAudioButtonRef = useRef();
   const startRecordButtonRef = useRef();
   const stopRecordButtonRef = useRef();
   const deviceRef = useRef();
@@ -364,7 +362,10 @@ const Room = () => {
         stopRecordButtonRef.current.disabled = true;
         isRecordingRef.current = false;
       } else {
-        alert(data.success);
+        setTimeout(() => {
+          stopRecord();
+          alert('10분 이상 녹화의 경우 프리미엄 서비스를 구독 부탁드립니다.');
+        }, 600000);
       }
     });
   };
@@ -372,14 +373,20 @@ const Room = () => {
   const stopRecord = () => {
     console.log('stopRecord()');
 
-    socket.emit('stop-record', ({ m3u8Link }) => {
-      closeProducer(mediaType.screen, true);
-      closeProducer(mediaType.allAudio, true);
-      setVideoUrl((prev) => (prev = m3u8Link));
-      handleVideoSave();
-    });
-
-    isRecordingRef.current = false;
+    socket.emit(
+      'stop-record',
+      { isRecording: isRecordingRef.current },
+      ({ res }) => {
+        if (res.error) {
+          alert(res.error);
+        } else {
+          closeProducer(mediaType.screen, true);
+          closeProducer(mediaType.allAudio, true);
+          setVideoUrl((prev) => (prev = res.m3u8Link));
+          handleVideoSave();
+          isRecordingRef.current = false;
+        }
+      });
   };
 
   const produce = async (type) => {
@@ -440,7 +447,7 @@ const Room = () => {
       }
       console.log(
         'supportedConstraints: ' +
-          navigator.mediaDevices.getSupportedConstraints()
+        navigator.mediaDevices.getSupportedConstraints()
       );
 
       let track;
@@ -463,7 +470,10 @@ const Room = () => {
       let elem;
 
       producer.on('trackended', () => {
-        closeProducer(type, false);
+        if (type === mediaType.screen) {
+          alert('스크린 공유를 중지하셨습니다.\n녹화가 멈추지는 않지만, 오디오만 담기게 됩니다.');
+        }
+        closeProducer(type, isRecordingRef.current);
       });
 
       producer.on('transportclose', () => {
@@ -629,7 +639,6 @@ const Room = () => {
     getCompileResult(code);
   }
 
-  ////////////////////////////////////////////////
 
   // 단 한번만 provider 만들기 : 다중 rendering 방지
   if (docGenerateCount === 0) {
@@ -659,86 +668,6 @@ const Room = () => {
   const handleVideoSaveCancel = () => {
     setVideoModalOpen((prev) => (prev = false));
   };
-
-  // function sendCode() {
-  //   socketRef.current.emit('code compile', { codes, roomID });
-  // }
-
-  // useEffect(() => {
-  //   socketRef.current = io.connect('/');
-  //   navigator.mediaDevices
-  //     .getUserMedia({ audio: true })
-  //     .then((stream) => {
-  //       addAudioStream(stream);
-  //       getRoomInfo(roomID);
-  //       console.log('join넘기기전 persistUser : ', persistUser);
-  //       if (!!persistUser) {
-  //         socketRef.current.emit('join room', {
-  //           roomID,
-  //           persistUser,
-  //           persistEmail,
-  //         });
-  //       }
-  //       socketRef.current.on('all users', (props) => {
-  //         const peers = [];
-  //         props.users.forEach((userID) => {
-  //           //createPeer 함수안에서 서버한테 상대방 소켓 id 담아서 sending signal 날린다.
-  //           const peer = createPeer(userID, socketRef.current.id, stream);
-  //           peersRef.current.push({
-  //             peerID: userID,
-  //             peer,
-  //           });
-  //           const peerName = props.names[userID];
-  //           console.log('상대방 이름은', peerName);
-  //           //내가 만든 peer 와 상대방 이름이 들어있다.
-  //           peers.push({ peer: peer, peerName: peerName });
-  //         });
-  //         setPeers(peers);
-  //         console.log(peers);
-  //       });
-
-  //       socketRef.current.on('hello', (new_member) => {
-  //         console.log(new_member);
-  //         alert(`${new_member} 님이 입장했습니다.`);
-  //       });
-
-  //       socketRef.current.on('bye', (left_user) => {
-  //         alert(`${left_user} 님이 떠났습니다.`);
-  //       });
-
-  //       socketRef.current.on('user joined', (payload) => {
-  //         const peer = addPeer(payload.signal, payload.callerID, stream);
-  //         peersRef.current.push({
-  //           peerID: payload.callerID,
-  //           peer,
-  //         });
-  //         const peerName = payload.names[payload.callerID];
-  //         console.log('addPeer할때 peerName은', peerName);
-  //         setPeers((users) => [...users, { peer: peer, peerName: peerName }]);
-  //       });
-
-  //       socketRef.current.on('code response', (code) => {
-  //         handleCompileResult(code);
-  //       });
-
-  //       socketRef.current.on('receiving returned signal', (payload) => {
-  //         const item = peersRef.current.find((p) => p.peerID === payload.id);
-  //         item.peer.signal(payload.signal);
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       console.log(`getUserMedia error : ${error}`);
-  //     });
-  // }, []);
-
-  // /* Below are Simple Peer Library Function */
-  // function createPeer(userToSignal, callerID, stream) {
-  //   const peer = new Peer({
-  //     initiator: true,
-  //     trickle: false,
-  //     stream,
-  //   });
-  // }
 
   const onCapture = async () => {
     let snapshotUrl = '';

@@ -34,7 +34,7 @@ export default function Dropdown({ title, item }) {
   return (
     <>
       <div class="dropdown dropdown-hover dropdown-primary">
-        <label tabindex="0" class="btn m-1">
+        <label tabindex="0" class="btn m-1 ">
           {title} <ChevronDownIcon class="h-5 w-5 ml-1" />
         </label>
         <ul

@@ -8,7 +8,8 @@ import PreviewText from '../Atoms/PreviewText';
 import Swal from 'sweetalert2';
 
 function Preview() {
-  const { selectedPreviewKey, persistEmail, setExitSave, setDocGCount } = useContext(codeContext);
+  const { selectedPreviewKey, persistEmail, setExitSave, setDocGCount } =
+    useContext(codeContext);
   const [metaData, setMetaData] = useState(false);
   const navigate = useNavigate();
 
@@ -40,7 +41,6 @@ function Preview() {
   }
 
   async function handleDelete() {
-
     const showLoading = function () {
       Swal.fire({
         title: '삭제중입니다',
@@ -66,9 +66,9 @@ function Preview() {
         icon: 'success',
         title: 'delete 성공!',
         showConfirmButton: false,
-        timer : 2000
-      })
-      
+        timer: 2000,
+      });
+
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -78,17 +78,18 @@ function Preview() {
         icon: 'error',
         title: 'delete 실패!',
         showConfirmButton: false,
-        timer : 2000
-      })
+        timer: 2000,
+      });
     }
   }
 
   return metaData && metaData !== 'error' ? (
-    <div class="card w-5/12 glass bg-gray-200">
-      <figure class="mt-4" >
+    <div class="card w-2/3 glass bg-gray-200 p-3">
+      <figure>
         {metaData.type === 'image' ? (
           <img
-            class="object-scale-down h-60 w-2/3 hover"
+            class="object-scale-down m-auto"
+            style={{ width: '90%' }}
             src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
@@ -104,21 +105,26 @@ function Preview() {
             controls={true} // 플레이어 컨트롤 노출 여부
             light={false} // 플레이어 모드
             pip={true} // pip 모드 설정 여부
-            poster={
-              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg'
-            } // 플레이어 초기 포스터 사진
+            config={
+              {
+                file: {
+                  hlsOptions: {
+                    maxBufferLength: 5 // N초 단위로 버퍼링
+                  }
+                }
+              }
+            }
           />
         )}
-      </figure >
-      <div class="card-body">
+      </figure>
+      <div class="card-body" style={{ height: '90%' }}>
         <h1 class="card-title">{metaData.title}</h1>
-        <h2 class="text-lg mb-16">{metaData.announcer}</h2>
-        <div class="card outline-black p-5 w-5/6 m-auto ">
+        <h2 class="text-lg">{metaData.announcer}</h2>
+        <div class="card p-5 w-2/3 m-auto ">
           <PreviewText data={metaData.save_time} title="Save Time" />
           <PreviewText
             data={metaData.update_time ? metaData.update_time : '-'}
             title="Update Time"
-            margin = '1rem'
           />
           <PreviewTagBadge datas={metaData.teamMates} title="Teammates" />
           <PreviewTagBadge datas={metaData.algo_tag} title="Algorithm Tag" />
