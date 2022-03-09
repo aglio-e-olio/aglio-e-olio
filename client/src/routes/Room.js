@@ -461,7 +461,10 @@ const Room = () => {
       let elem;
 
       producer.on('trackended', () => {
-        closeProducer(type, false);
+        if (type === mediaType.screen) {
+          alert('스크린 공유를 중지하셨습니다.\n녹화가 멈추지는 않지만, 오디오만 담기게 됩니다.');
+        }
+        closeProducer(type, isRecordingRef.current);
       });
 
       producer.on('transportclose', () => {
