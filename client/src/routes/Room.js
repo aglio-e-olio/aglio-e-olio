@@ -33,7 +33,8 @@ let producers = new Map();
 let screenTrackHolder = null;
 let producerLabel = new Map();
 
-const socket = io.connect('https://3.39.27.19:8000', {
+// Media-server
+const socket = io.connect('https://aglio-olio.shop', {
   withCredentials: false,
 });
 
@@ -107,6 +108,10 @@ const Room = () => {
   };
 
   useEffect(() => {
+    if (persistUser === '') {
+      return;
+    }
+
     createRoom(roomID).then(async () => {
       await join(persistUser, persistEmail, roomID);
       initSockets();
@@ -118,7 +123,7 @@ const Room = () => {
     // stopAudioButtonRef.current.addEventListener('click', () => {
     //   closeProducer(mediaType.audio, false)
     // });
-  }, []);
+  }, [persistUser]);
 
   ////////// INIT /////////
 
@@ -319,6 +324,22 @@ const Room = () => {
 
     socket.on('disconnect', function () {
       exit(true);
+    });
+
+    socket.on('hello', (new_member) => {
+      console.log('name이 찍히는지?', new_member);
+      toast.success(`${new_member}님이 입장했습니다`, {
+        autoClose: 2000,
+        position: toast.POSITION.TOP_RIGHT,
+      });
+    });
+
+    socket.on('bye', (left_member) => {
+      console.log('name이 찍히는지?', left_member);
+      toast.error(`${left_member}님이 나갔습니다`, {
+        autoClose: 2000,
+        position: toast.POSITION.TOP_RIGHT,
+      });
     });
 
     socket.on('code response', (code) => {
@@ -757,6 +778,7 @@ const Room = () => {
           startRecord={startRecord}
           stopRecord={stopRecord}
           socket={socket}
+          exit={exit}
         />
         <Canvas
           doc={doc}
@@ -774,6 +796,7 @@ const Room = () => {
           yLines={yLines}
           doc={doc}
           peerAudios={peerAudios}
+          exit={exit}
         />
         <RecordModal
           isOpen={videoModalOpen}

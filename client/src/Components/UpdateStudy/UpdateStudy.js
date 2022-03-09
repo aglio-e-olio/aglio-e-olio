@@ -30,47 +30,35 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     setDocGCount,
   } = useContext(codeContext);
 
-  const getData = async (selectedPreviewKey) => {
-    try {
-      const res = await axios({
-        method: 'GET',
-        url: 'https://aglio-olio-api.shop/myroom/preview',
-        params: { _id: selectedPreviewKey },
+  function makeArray(array, data, key) {
+    if (data && data[key]) {
+      data[key].map((tag) => {
+        let obj = {};
+        obj.label = tag;
+        obj.value = tag;
+        array.push(obj);
       });
-      setMetaData((prev) => res.data);
-    } catch (err) {
-      console.error(err);
     }
-  };
-
-  useEffect(() => {
-    getData(selectedPreviewKey);
-  }, []);
-
-  let algo_array = [];
-  if (data && data.algo_tag) {
-    data.algo_tag.map((tag) => {
-      let algo_object = {};
-      algo_object.label = tag;
-      algo_object.value = tag;
-      algo_array.push(algo_object);
-    });
+    return array;
   }
+
+  let algo_array = makeArray([], data, 'algo_tag');
+  let extra_array = makeArray([], data, 'extra_tag');
+  let announcer_array = makeArray([], data, 'teamMates');
   const [algorithm, setAlgorithm] = useState(algo_array);
-
-  let extra_array = [];
-  if (data && data.extra_tag) {
-    data.extra_tag.map((tag) => {
-      let extra_object = {};
-      extra_object.label = tag;
-      extra_object.value = tag;
-      extra_array.push(extra_object);
-    });
-  }
   const [extras, setExtras] = useState(extra_array);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
   // console.log('SAVE 컴포넌트 안!');
+
+  const [algorithmOptions, setAlgorithmOptions] = useState([
+    { label: 'BFS', value: 'BFS' },
+    { label: 'DFS', value: 'DFS' },
+    { label: 'STACK', value: 'STACK' },
+    { label: 'QUEUE', value: 'QUEUE' },
+  ]);
+  const [announcerOptions, setAnnouncerOptions] = useState(announcer_array);
+  const [extrasOptions, setExtrasOptions] = useState([]);
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -81,24 +69,6 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     (inputValue) => setAnnouncer(inputValue),
     []
   );
-
-  //나중에 쓰일 듯.
-  const [announcerOptions, setAnnouncerOptions] = useState([
-    { label: '박현우', value: '박현우' },
-    { label: '최준영', value: '최준영' },
-    { label: '김도경', value: '김도경' },
-    { label: '조헌일', value: '조헌일' },
-    { label: '진승현', value: '진승현' },
-  ]);
-
-  const [algorithmOptions, setAlgorithmOptions] = useState([
-    { label: 'BFS', value: 'BFS' },
-    { label: 'DFS', value: 'DFS' },
-    { label: 'STACK', value: 'STACK' },
-    { label: 'QUEUE', value: 'QUEUE' },
-  ]);
-
-  const [extrasOptions, setExtrasOptions] = useState([]);
 
   const handleChangeAlgorithm = useCallback(setAlgorithm, []);
   const handleChangeExtras = useCallback(setExtras, []);

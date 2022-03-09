@@ -34,13 +34,13 @@ const Audio = (props) => {
       <StyledAudio autoPlay ref={audioRef} />
       {/* <button>{props.peer.peerID}</button> */}
       {color ? (
-        <div class="avatar placeholder">
+        <div class="avatar placeholder m-1">
           <div class="bg-neutral-focus text-neutral-content ring ring-primary ring-offset-2 rounded-full w-12 h-12">
             <span ref={nameRef}></span>
           </div>
         </div>
       ) : (
-        <div class="avatar placeholder ">
+        <div class="avatar placeholder m-1">
           <div class="bg-neutral-focus text-neutral-content rounded-full w-12 h-12">
             <span ref={nameRef}></span>
           </div>

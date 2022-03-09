@@ -13,7 +13,7 @@ import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-const Save = ({ isOpen, onCancel, yLines, doc, peerAudios }) => {
+const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
   dotenv.config();
 
   const [title, setTitle] = useState('');
@@ -195,6 +195,7 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios }) => {
                 showLoaderOnConfirm: true,
               });
               if (exitSave === 1) {
+                exit();
                 navigate('/');
               }
               onCancel();
