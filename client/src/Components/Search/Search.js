@@ -151,15 +151,14 @@ function Search() {
   }
 
   return (
-    <div>
-      <div class="m-2.5">
+    <div class='p-3'>
+      <div>
         <input
           onChange={handleSearch}
           onKeyPress={handleKeyPress}
           type="text"
           placeholder="Search"
           class="input input-bordered w-full max-w-xs"
-          style={{ margin: 10 }}
           ref={inputRef}
         ></input>
         <button
@@ -172,12 +171,11 @@ function Search() {
         <Dropdown title="Announcer" item="announcer" />
         <Dropdown title="Extra Tag" item="extra_tag" />
       </div>
-      <br></br>
-      <div class="mx-2.5">
+      <div class="mx-2.5 mt-1">
         {keywords &&
           keywords.map((keyword, index) => {
             const classes = [
-              'badge badge-info gap-2 mx-2',
+              'badge badge-info badge-outline gap-2 mx-2',
               'badge badge-success gap-2 mx-2',
               'badge badge-warning gap-2 mx-2',
               'badge badge-error gap-2 mx-2',
