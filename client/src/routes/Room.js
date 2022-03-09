@@ -779,6 +779,7 @@ const Room = () => {
           isOpen={videoModalOpen}
           onCancel={handleVideoSaveCancel}
           videoUrl={videoUrl}
+          peerAudios={peerAudios}
         />
       </div>
       <ToastContainer />

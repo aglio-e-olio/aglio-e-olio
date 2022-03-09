@@ -21,13 +21,7 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios }) => {
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
   const navigate = useNavigate();
-  const [announcerOptions, setAnnouncerOptions] = useState([
-    // { label: '박현우', value: '박현우' },
-    // { label: '최준영', value: '최준영' },
-    // { label: '김도경', value: '김도경' },
-    // { label: '조헌일', value: '조헌일' },
-    // { label: '진승현', value: '진승현' },
-  ]);
+  const [announcerOptions, setAnnouncerOptions] = useState([]);
 
   const [algorithmOptions, setAlgorithmOptions] = useState([
     { label: 'BFS', value: 'BFS' },

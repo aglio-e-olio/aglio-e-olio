@@ -6,7 +6,8 @@ const { EventEmitter } = require('events');
 const { createSdpText } = require('./sdp');
 const { convertStringToStream } = require('./utils');
 const dotenv = require('dotenv');
-const s3FolderUpload = require('s3-folder-upload')
+const s3FolderUpload = require('s3-folder-upload');
+const axios = require('axios');
 
 dotenv.config();
 const RECORD_FILE_LOCATION_PATH = process.env.RECORD_FILE_LOCATION_PATH || './files';
@@ -101,6 +102,7 @@ module.exports = class FFmpeg {
           if (code === 0) {
             s3FolderUpload(this._localFolderPath, credentials, this._options)
               .then(() => {
+                // S3한테 this.m3u8Link에 있는 링크를 헌일이 API 서버에 prepared=true로 바꿔달라는 요청 보내기
                 child_process.exec("cd files && find . ! -name '.keep' -type f -exec rm -f {} + && find . -type d -empty -delete");
               })
               .catch(e => {
