@@ -6,6 +6,7 @@ import RedoIcon from '../Atoms/RedoIcon';
 import UndoIcon from '../Atoms/UndoIcon';
 
 const LeftSideToolbar = ({ setIsEraser, yLines, undoManager }) => {
+
   const clearAllLines = React.useCallback(() => {
     yLines.delete(0, yLines.length);
   }, []);
@@ -20,34 +21,35 @@ const LeftSideToolbar = ({ setIsEraser, yLines, undoManager }) => {
     undoManager.redo();
   }, []);
 
+  function handleTrueEraser(e) {
+    console.log('e는?', e);
+    setIsEraser((prev) => (prev = true));
+  }
+
+  function handleFalseEraser() {
+    setIsEraser((prev) => (prev = false));
+  }
+
+
   return (
-    <ul class="menu bg-neutral p-2 rounded-box fixed left-1 z-50 top-1/3 ">
-      <li onClick={() => setIsEraser(false)}>
-        <a>
-          <PenIcon />
-        </a>
-      </li>
-      <li onClick={() => setIsEraser(true)}>
-        <a>
-          <EraserIcon />
-        </a>
-      </li>
-      <li onClick={clearAllLines}>
-        <a>
-          <TrashIcon />
-        </a>
-      </li>
-      <li onClick={undoLine}>
-        <a>
-          <UndoIcon />
-        </a>
-      </li>
-      <li onClick={redoLine}>
-        <a>
-          <RedoIcon />
-        </a>
-      </li>
-    </ul>
+    <div class="btn-group bg-neutral p-2 rounded-box fixed left-1 z-50 top-1/3 flex flex-col">
+      <button class="btn" onClick={handleFalseEraser}>
+        {<PenIcon />}
+      </button>
+      <button class="btn" onClick={handleTrueEraser}>
+        <EraserIcon />
+      </button>
+      <button class="btn" onClick={clearAllLines}>
+        {<TrashIcon />}
+      </button>
+      <button class="btn" onClick={undoLine}>
+        {<UndoIcon />}
+      </button>
+      <button class="btn" onClick={redoLine}>
+        {<RedoIcon />}
+      </button>
+    </div>
+
   );
 };
 
