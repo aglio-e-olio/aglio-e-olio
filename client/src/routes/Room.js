@@ -9,6 +9,7 @@ import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 
 import Save from '../Components/Save/Save';
+import RecordModal from '../Components/RecordModal/RecordModal';
 import html2canvas from 'html2canvas';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
 import Swal from 'sweetalert2';
@@ -32,14 +33,10 @@ let producers = new Map();
 let screenTrackHolder = null;
 let producerLabel = new Map();
 
-//준영이형 서버
+// Media-server
 const socket = io.connect('https://aglio-olio.shop', {
   withCredentials: false,
 });
-// // 진승현 서버
-// const socket = io.connect('https://3.35.138.234:8000', {
-//   withCredentials: false,
-// });
 
 /* Change the values below to adjust video quality. */
 const displayMediaOptions = {
@@ -64,6 +61,8 @@ const Room = () => {
   const [peers, setPeers] = useState([]);
   const [isEraser, setIsEraser] = useState(false);
   const [isOpen, setOpen] = useState(false);
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState('');
 
   const {
     getCompileResult,
@@ -109,7 +108,6 @@ const Room = () => {
   };
 
   useEffect(() => {
-    console.log('Room안 useEffect안 persistUser는 ', persistUser);
     if (persistUser === '') {
       return;
     }
@@ -374,9 +372,11 @@ const Room = () => {
   const stopRecord = () => {
     console.log('stopRecord()');
 
-    socket.emit('stop-record', () => {
+    socket.emit('stop-record', ({ m3u8Link }) => {
       closeProducer(mediaType.screen, true);
       closeProducer(mediaType.allAudio, true);
+      setVideoUrl((prev) => (prev = m3u8Link));
+      handleVideoSave();
     });
 
     isRecordingRef.current = false;
@@ -651,6 +651,15 @@ const Room = () => {
     setOpen(false);
   };
 
+  const handleVideoSave = () => {
+    // 여기서 RecordModal 열어줌
+    setVideoModalOpen((prev) => (prev = true));
+  };
+
+  const handleVideoSaveCancel = () => {
+    setVideoModalOpen((prev) => (prev = false));
+  };
+
   // function sendCode() {
   //   socketRef.current.emit('code compile', { codes, roomID });
   // }
@@ -789,7 +798,12 @@ const Room = () => {
           peerAudios={peerAudios}
           exit={exit}
         />
-        {/* <Record /> */}
+        <RecordModal
+          isOpen={videoModalOpen}
+          onCancel={handleVideoSaveCancel}
+          videoUrl={videoUrl}
+          peerAudios={peerAudios}
+        />
       </div>
       <ToastContainer />
     </div>

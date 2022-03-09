@@ -270,10 +270,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('start-record', async (callback) => {
-    console.log("start-record socket_id:", socket.id)
-    console.log("start-record", socket.room_id)
     const room = roomList.get(socket.room_id);
-    console.log("start-record:", room)
     const peer = room.getPeers().get(socket.id);
     let recordInfo = {};
 
@@ -289,7 +286,7 @@ io.on('connection', (socket) => {
       recordInfo[producer.kind] = await publishProducerRtpStream(peer, producer, room);
     }
 
-    recordInfo.fileName = Date.now().toString();
+    recordInfo.fileName = `${peer.name}_` + Date.now().toString();
 
     peer.process = getProcess(recordInfo);
 
@@ -308,15 +305,15 @@ io.on('connection', (socket) => {
   socket.on('stop-record', (callback) => {
     const peer = roomList.get(socket.room_id).getPeers().get(socket.id);
 
+    callback({m3u8Link: peer.process.m3u8Link});
+    
     peer.process.kill();
     peer.process = undefined;
-
 
     for (const remotePort of peer.remotePorts) {
       releasePort(remotePort);
     }
     peer.recordingConsumers.clear();
-    callback();
   });
 
   socket.on('code compile', (payload) => {
@@ -330,7 +327,7 @@ io.on('connection', (socket) => {
         'bed60c3f16b2d91101949996c5da18827216d6e4e94c5f1b13378ca8a3fbe309',
       script: payload.codes,
       stdin: '',
-      language: 'nodejs',
+      language: 'python3',
       versionIndex: '3',
     };
 

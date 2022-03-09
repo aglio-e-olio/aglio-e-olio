@@ -23,5 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 
 # video fiels
-*.webm
-*.mp4
+/files/*
+!/fiels/.keep
