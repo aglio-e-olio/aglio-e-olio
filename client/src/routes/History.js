@@ -27,14 +27,14 @@ const History = () => {
     //     </SplitPane>
     //   </SplitPane>
     // </div>
-    <div>
+    <div style={{height:'100vh'}}>
       <Navbar />
-      <div class="flex flex-col w-full border-opacity-50">
+      <div class="flex flex-col w-full border-opacity-50" style={{height: 150}}>
         <Search />
-        <div class="divider"></div>
       </div>
-      <SplitPane split="vertical" minSize="500px" maxSize='-200px'>
-        <div>
+      <div class="divider"></div>
+      <SplitPane split="vertical" minSize="550px" >
+        <div class='h-36'>
         <button class="btn btn-sm flex-left mb-2.5" onClick={handleView}>{isTable?"Table":" Cards"}</button>
         {isTable?<InfoTable />:<InfoCards />}
         </div>

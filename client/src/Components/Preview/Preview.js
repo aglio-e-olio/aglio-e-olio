@@ -84,11 +84,11 @@ function Preview() {
   }
 
   return metaData && metaData !== 'error' ? (
-    <div class="card w-5/12 glass bg-gray-200">
+    <div class="card w-2/3 glass bg-gray-200">
       <figure class="mt-4" >
         {metaData.type === 'image' ? (
           <img
-            class="object-scale-down h-60 w-2/3 hover"
+            class="object-scale-down h-60 hover"
             src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
@@ -113,7 +113,7 @@ function Preview() {
       <div class="card-body">
         <h1 class="card-title">{metaData.title}</h1>
         <h2 class="text-lg mb-16">{metaData.announcer}</h2>
-        <div class="card outline-black p-5 w-5/6 m-auto ">
+        <div class="card p-5 w-2/3 m-auto ">
           <PreviewText data={metaData.save_time} title="Save Time" />
           <PreviewText
             data={metaData.update_time ? metaData.update_time : '-'}
