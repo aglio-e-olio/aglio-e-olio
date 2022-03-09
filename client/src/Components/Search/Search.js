@@ -124,11 +124,24 @@ function Search() {
   }
 
   /* tag 버튼 누를 시 해당 tag 검색 필터에서 제외. */
-  function handleKeywordBtn(e) {
+  function handleKeywordBadge(e) {
     let temp = keywords;
     let i = 0;
     for (i = 0; i < temp.length; i++) {
-      if (temp[i].value === e.target.innerHTML) {
+      if (temp[i].value === e.target.innerText) {
+        temp.splice(i, 1);
+        break;
+      }
+    }
+    setKeywords([...temp]);
+    // setKeywords(temp); // 바뀌지 않음.
+  }
+
+  function handleXClick(value) {
+    let temp = keywords;
+    let i = 0;
+    for (i = 0; i < temp.length; i++) {
+      if (temp[i].value === value) {
         temp.splice(i, 1);
         break;
       }
@@ -138,38 +151,59 @@ function Search() {
   }
 
   return (
-    <div>
-      <div class="m-2.5">
+    <div class='p-3'>
+      <div>
         <input
           onChange={handleSearch}
           onKeyPress={handleKeyPress}
           type="text"
           placeholder="Search"
           class="input input-bordered w-full max-w-xs"
-          style={{ margin: 10 }}
           ref={inputRef}
         ></input>
-        <button class="btn btn-active btn-primary" onClick={searchKeyword}>
+        <button
+          class="btn btn-active btn-primary mr-10"
+          onClick={searchKeyword}
+        >
           Search
         </button>
-        <div>
-          <Dropdown title="Algorithm" item="algo_tag" />
-          <Dropdown title="Announcer" item="announcer" />
-          <Dropdown title="Extra Tag" item="extra_tag" />
-        </div>
+        <Dropdown title="Algorithm" item="algo_tag" />
+        <Dropdown title="Announcer" item="announcer" />
+        <Dropdown title="Extra Tag" item="extra_tag" />
       </div>
-      <br></br>
-      <div class="mx-2.5">
+      <div class="mx-2.5 mt-1">
         {keywords &&
           keywords.map((keyword, index) => {
+            const classes = [
+              'badge badge-info badge-outline gap-2 mx-2',
+              'badge badge-success gap-2 mx-2',
+              'badge badge-warning gap-2 mx-2',
+              'badge badge-error gap-2 mx-2',
+            ];
+            const badge_class = classes[index % classes.length];
             return (
-              <button
+              <div
                 key={index}
-                class="btn btn-sm m-2.5 no-animation"
-                onClick={handleKeywordBtn}
+                onClick={handleKeywordBadge}
+                class={badge_class}
+                style={{ cursor: 'pointer' }}
               >
                 {keyword.value}
-              </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  class="inline-block w-4 h-4 stroke-current"
+                  onClick={(e) => handleXClick(keyword.value)}
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </div>
             );
           })}
       </div>
