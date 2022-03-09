@@ -94,7 +94,6 @@ const redis_metadata = async (req, res, next)=>{
 
     const user_email = req.query.user_email;
 
-    mutex.acquire();
     const is_user = await sismemberAsync("users", user_email);
 
     if(is_user){        
@@ -119,7 +118,6 @@ const redis_metadata = async (req, res, next)=>{
         })
     }
     else {
-        mutex.release();
         next();
     }
 }
@@ -177,56 +175,11 @@ const redis_save = async (req, res, next) =>{
     if(!body.hasOwnProperty('title')|| body.title===""){
         body["title"] = "제목없음";
     }
-
+    
     const user_email = body.user_email;
     const save_string_data = JSON.stringify(body);
-    /**
-    redisClient.get('count', async function(err,count){
-        if(count>=SAVE_COUNT){
-            logger.verbose("mongodb save start");
-            redisClient.rpush("save_list", save_string_data, function(err){
-                if(err) return res.send('fail');
-
-                redisClient.lrange("save_list", 0,-1, async function(err, save_array){
-                    if(err) return res.send('fail');
-
-                    let array = [];
-                    save_array.forEach(element=>{
-                        array.push(JSON.parse(element));
-                    })
-                    logger.verbose(`array length : ${save_array.length}`);
-
-                    logger.verbose("post save start");
-                    Post.insertMany(array);
-                    logger.verbose("del users start");
-                    await delAsync("users");
-                    logger.verbose("del save_list start");
-                    await delAsync("save_list");
-                    logger.verbose("set count start");
-                    await setAsync("count", 0);
-
-                    logger.verbose("mogodb save end");
-                    res.status(200).json({result :"success"});
-                })
-            })
-        }
-
-
-        else {
-            logger.verbose("redis save start");
-            await Promise.all([
-                incrAsync("count"),
-                rpushAsync("save_list", save_string_data),
-                saddAsync("users", user_email)
-            ])
-            res.status(200).json({result : "success"});
-            logger.verbose("redis save end");
-        }
-    })
-
-     */
     let flag = false;
-    let array = [];
+
     await mutex.runExclusive(async()=>{
         const count = await getAsync('count');
         if(count>=SAVE_COUNT){
@@ -235,7 +188,7 @@ const redis_save = async (req, res, next) =>{
             await rpushAsync("save_list", save_string_data);
             const save_array = await lrangeAsync("save_list", 0, -1);
 
-            
+            let array = [];
             save_array.forEach(element=>{
                 array.push(JSON.parse(element));
             })
@@ -250,6 +203,7 @@ const redis_save = async (req, res, next) =>{
             await setAsync("count", 0);
             // redisClient.set("count", 0);
 
+            // array = null; save_array = null; => let const가 차이가 있다면..
             res.status(200).send("insert many success ");
             logger.verbose("mongodb save end ::  use_flag");
         } else {
@@ -270,9 +224,7 @@ const redis_save = async (req, res, next) =>{
     // 보내고 나서 해봅시다.
     if(flag){
         flag = false;
-        logger.verbose("mongodb start");
         Post.insertMany(array);
-        logger.verbose("mongodb end");
         return;
     }
 
