@@ -104,9 +104,15 @@ function Preview() {
             controls={true} // 플레이어 컨트롤 노출 여부
             light={false} // 플레이어 모드
             pip={true} // pip 모드 설정 여부
-            poster={
-              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg'
-            } // 플레이어 초기 포스터 사진
+            config={
+              {
+                file: {
+                  hlsOptions: {
+                    maxBufferLength: 5 // N초 단위로 버퍼링
+                  }
+                }
+              }
+            }
           />
         )}
       </figure >
