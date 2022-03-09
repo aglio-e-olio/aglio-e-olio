@@ -10,7 +10,6 @@ import Swal from 'sweetalert2';
 
 const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
   dotenv.config();
-  console.log(isOpen, 'Record모달창 안입니다.');
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
@@ -30,9 +29,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
   const { persistUser, persistEmail } = useContext(codeContext);
 
   useEffect(() => {
-    console.log('save컴포넌트 만들어짐');
-    // console.log('save컴포넌트 안 persistUser는', persistUser);
-    // console.log('save컴포넌트 안 peers는', peerAudios);
     const peersName = [];
 
     if (peerAudios.size !== 0) {
@@ -40,7 +36,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
         peersName.push({ label: value.name, value: value.name });
       });
     }
-    // console.log('peersName은?', peersName);
     setAnnouncerOptions((prev) => (prev = peersName));
 
     if (persistUser !== '') {
@@ -51,7 +46,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
     }
 
     return () => {
-      // console.log('save컴포넌트 사라짐');
     };
   }, [peerAudios, persistUser]);
 
@@ -118,7 +112,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log('video submit 발생');
 
     const saveTime = getTime();
     let body = {
@@ -135,7 +128,7 @@ const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
       image_tn_ref: videoUrl, // videoURL링크 들어있다.
       user_email: persistEmail,
       nickname: persistUser,
-      video_flag: false, // 비디오 추가
+      video_flag: 'false', // 비디오 추가
     };
 
     const showLoading = function () {

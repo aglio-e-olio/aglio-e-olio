@@ -351,7 +351,7 @@ const Room = () => {
   const stopRecord = () => {
     console.log('stopRecord()');
 
-    socket.emit('stop-record', (m3u8Link) => {
+    socket.emit('stop-record', ({ m3u8Link }) => {
       closeProducer(mediaType.screen, true);
       closeProducer(mediaType.allAudio, true);
       setVideoUrl((prev) => (prev = m3u8Link));
