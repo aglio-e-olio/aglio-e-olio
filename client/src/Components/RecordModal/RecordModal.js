@@ -120,7 +120,7 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
       image_tn_ref: videoUrl, // data는 객체고 data.location에 링크 들어있다.
       user_email: persistEmail,
       nickname: persistUser,
-      // code_data : codes
+      video_flag : false, // 비디오 추가
     };
 
     const showLoading = function () {
@@ -139,7 +139,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
     axios
       .post('https://aglio-olio-api.shop/myroom/save', body)
       .then(function (res) {
-        // alert('post 성공');
         Swal.fire({
           position: 'center',
           icon: 'success',
@@ -149,7 +148,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
         })
       })
       .catch(function (err) {
-        // alert('post실패');
         Swal.fire({
           position: 'center',
           icon: 'error',

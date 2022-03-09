@@ -9,11 +9,12 @@ import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 
 import Save from '../Components/Save/Save';
+import RecordModal from '../Components/RecordModal/RecordModal';
 import html2canvas from 'html2canvas';
 import AbsoluteUI from '../Components/AbsoluteUI/AbsoluteUI';
 import Swal from 'sweetalert2';
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import * as mediasoupClient from 'mediasoup-client';
 
@@ -34,25 +35,24 @@ let producerLabel = new Map();
 
 const socket = io.connect('https://3.39.27.19:8000', {
   withCredentials: false,
-});;
+});
 
 /* Change the values below to adjust video quality. */
 const displayMediaOptions = {
   video: {
     width: { max: 1920 },
     height: { max: 1080 },
-    frameRate: 20
+    frameRate: 20,
   },
-  audio: false
+  audio: false,
 };
 
 const mediaType = {
   audio: 'audioType',
   video: 'videoType',
   screen: 'screenType',
-  allAudio: 'allAudio'
-}
-
+  allAudio: 'allAudio',
+};
 
 const Room = () => {
   const socketRef = useRef();
@@ -60,6 +60,8 @@ const Room = () => {
   const [peers, setPeers] = useState([]);
   const [isEraser, setIsEraser] = useState(false);
   const [isOpen, setOpen] = useState(false);
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState('');
 
   const {
     getCompileResult,
@@ -89,27 +91,26 @@ const Room = () => {
       const newState = new Map(prev);
       newState.delete(key);
       return newState;
-    })
-  }
+    });
+  };
 
   socket.request = (type, data = {}) => {
     return new Promise((resolve, reject) => {
       socket.emit(type, data, (data) => {
         if (data.error) {
-          reject(data.error)
+          reject(data.error);
         } else {
-          resolve(data)
+          resolve(data);
         }
-      })
-    })
-  }
+      });
+    });
+  };
 
   useEffect(() => {
-
     createRoom(roomID).then(async () => {
       await join(persistUser, persistEmail, roomID);
       initSockets();
-    })
+    });
 
     // startAudioButtonRef.current.addEventListener('click', () => {
     //   produce(mediaType.audio);
@@ -124,14 +125,15 @@ const Room = () => {
   const createRoom = async (room_id) => {
     await socket
       .request('createRoom', {
-        room_id
-      }).then((data) => {
-        console.log(`Room "${room_id}" ${data}`)
+        room_id,
+      })
+      .then((data) => {
+        console.log(`Room "${room_id}" ${data}`);
       })
       .catch((err) => {
-        console.log('Create room error:', err)
-      })
-  }
+        console.log('Create room error:', err);
+      });
+  };
 
   const join = async (name, email, room_id) => {
     socket
@@ -140,37 +142,35 @@ const Room = () => {
         email,
         room_id,
       })
-      .then(
-        async function (roomObject) {
-          console.log('Joined the following room: ', roomObject)
-          const data = await socket.request('getRouterRtpCapabilities')
-          deviceRef.current = await loadDevice(data)
-          await initTransports(deviceRef)
-          await socket.request('getProducers')
-          produce(mediaType.audio);
-        }
-      )
-      .catch((err) => {
-        console.log('Join error:', err)
+      .then(async function (roomObject) {
+        console.log('Joined the following room: ', roomObject);
+        const data = await socket.request('getRouterRtpCapabilities');
+        deviceRef.current = await loadDevice(data);
+        await initTransports(deviceRef);
+        await socket.request('getProducers');
+        produce(mediaType.audio);
       })
-  }
+      .catch((err) => {
+        console.log('Join error:', err);
+      });
+  };
 
   const loadDevice = async (routerRtpCapabilities) => {
-    let device
+    let device;
     try {
-      device = new mediasoupClient.Device()
+      device = new mediasoupClient.Device();
     } catch (error) {
       if (error.name === 'UnsupportedError') {
-        console.error('Browser not supported')
-        alert('Browser not supported')
+        console.error('Browser not supported');
+        alert('Browser not supported');
       }
-      console.error(error)
+      console.error(error);
     }
     await device.load({
-      routerRtpCapabilities
-    })
-    return device
-  }
+      routerRtpCapabilities,
+    });
+    return device;
+  };
 
   const initTransports = async (deviceRef) => {
     // init producerTransport
@@ -178,15 +178,15 @@ const Room = () => {
     {
       const data = await socket.request('createWebRtcTransport', {
         forceTcp: false,
-        rtpCapabilities: device.rtpCapabilities
-      })
+        rtpCapabilities: device.rtpCapabilities,
+      });
 
       if (data.error) {
-        console.error(data.error)
-        return
+        console.error(data.error);
+        return;
       }
 
-      producerTransport = device.createSendTransport(data)
+      producerTransport = device.createSendTransport(data);
 
       producerTransport.on(
         'connect',
@@ -194,12 +194,12 @@ const Room = () => {
           socket
             .request('connectTransport', {
               dtlsParameters,
-              transport_id: data.id
+              transport_id: data.id,
             })
             .then(callback)
-            .catch(errback)
+            .catch(errback);
         }
-      )
+      );
 
       producerTransport.on(
         'produce',
@@ -210,109 +210,99 @@ const Room = () => {
                 producerTransportId: producerTransport.id,
                 kind,
                 rtpParameters,
-                isRecording: true
-              })
+                isRecording: true,
+              });
               callback({
-                id: producer_id
-              })
+                id: producer_id,
+              });
             } else {
               const { producer_id } = await socket.request('produce', {
                 producerTransportId: producerTransport.id,
                 kind,
                 rtpParameters,
-                isRecording: false
-              })
+                isRecording: false,
+              });
               callback({
-                id: producer_id
-              })
+                id: producer_id,
+              });
             }
-
           } catch (err) {
-            errback(err)
+            errback(err);
           }
         }
-      )
+      );
 
-      producerTransport.on(
-        'connectionstatechange',
-        function (state) {
-          switch (state) {
-            case 'connecting':
-              break
+      producerTransport.on('connectionstatechange', function (state) {
+        switch (state) {
+          case 'connecting':
+            break;
 
-            case 'connected':
-              //localVideo.srcObject = stream
-              break
+          case 'connected':
+            //localVideo.srcObject = stream
+            break;
 
-            case 'failed':
-              producerTransport.close()
-              break
+          case 'failed':
+            producerTransport.close();
+            break;
 
-            default:
-              break
-          }
+          default:
+            break;
         }
-      )
+      });
     }
 
     // init consumerTransport
     {
       const data = await socket.request('createWebRtcTransport', {
-        forceTcp: false
-      })
+        forceTcp: false,
+      });
 
       if (data.error) {
-        console.error(data.error)
-        return
+        console.error(data.error);
+        return;
       }
 
       // only one needed
-      consumerTransport = device.createRecvTransport(data)
+      consumerTransport = device.createRecvTransport(data);
       consumerTransport.on(
         'connect',
         function ({ dtlsParameters }, callback, errback) {
           socket
             .request('connectTransport', {
               transport_id: consumerTransport.id,
-              dtlsParameters
+              dtlsParameters,
             })
             .then(callback)
-            .catch(errback)
+            .catch(errback);
         }
-      )
+      );
 
-      consumerTransport.on(
-        'connectionstatechange',
-        async function (state) {
-          switch (state) {
-            case 'connecting':
-              break
+      consumerTransport.on('connectionstatechange', async function (state) {
+        switch (state) {
+          case 'connecting':
+            break;
 
-            case 'connected':
-              //remoteVideo.srcObject = await stream;
-              //await socket.request('resume');
-              break
+          case 'connected':
+            //remoteVideo.srcObject = await stream;
+            //await socket.request('resume');
+            break;
 
-            case 'failed':
-              consumerTransport.close()
-              break
+          case 'failed':
+            consumerTransport.close();
+            break;
 
-            default:
-              break
-          }
+          default:
+            break;
         }
-      )
+      });
     }
-  }
+  };
 
   const initSockets = async () => {
-    socket.on(
-      'consumerClosed',
-      function ({ consumer_id }) {
-        console.log('Closing consumer:', consumer_id)
-        removeConsumer(consumer_id)
-      }
-    )
+    socket.on('consumerClosed', function ({ consumer_id }) {
+      console.log('Closing consumer:', consumer_id);
+      removeConsumer(consumer_id);
+    });
 
     /**
      * data: [ {
@@ -320,27 +310,21 @@ const Room = () => {
      *  producer_socket_id:
      * }]
      */
-    socket.on(
-      'newProducers',
-      async function (producerList) {
-        console.log('New producers', producerList)
-        for (let { producer_id, peer_id } of producerList) {
-          await consume(producer_id, peer_id)
-        }
+    socket.on('newProducers', async function (producerList) {
+      console.log('New producers', producerList);
+      for (let { producer_id, peer_id } of producerList) {
+        await consume(producer_id, peer_id);
       }
-    )
+    });
 
-    socket.on(
-      'disconnect',
-      function () {
-        exit(true)
-      }
-    )
+    socket.on('disconnect', function () {
+      exit(true);
+    });
 
     socket.on('code response', (code) => {
       handleCompileResult(code);
     });
-  }
+  };
 
   //////// MAIN FUNCTIONS /////////////
   const startRecord = async () => {
@@ -349,68 +333,67 @@ const Room = () => {
     await produce(mediaType.screen);
     await produce(mediaType.allAudio);
 
-    socket.emit(
-      'start-record',
-      (data) => {
-        if (data.error) {
-          screenTrackStop();
-          closeProducer(mediaType.screen, true);
-          closeProducer(mediaType.allAudio, true);
-          alert(data.error);
-          startRecordButtonRef.current.disabled = false;
-          stopRecordButtonRef.current.disabled = true;
-          isRecordingRef.current = false;
-        } else {
-          alert(data.success);
-        }
+    socket.emit('start-record', (data) => {
+      if (data.error) {
+        screenTrackStop();
+        closeProducer(mediaType.screen, true);
+        closeProducer(mediaType.allAudio, true);
+        alert(data.error);
+        startRecordButtonRef.current.disabled = false;
+        stopRecordButtonRef.current.disabled = true;
+        isRecordingRef.current = false;
+      } else {
+        alert(data.success);
       }
-    );
+    });
   };
 
   const stopRecord = () => {
     console.log('stopRecord()');
 
-    socket.emit('stop-record', () => {
+    socket.emit('stop-record', (m3u8Link) => {
       closeProducer(mediaType.screen, true);
       closeProducer(mediaType.allAudio, true);
+      setVideoUrl((prev) => (prev = m3u8Link));
+      handleVideoSave();
     });
 
     isRecordingRef.current = false;
-  }
+  };
 
   const produce = async (type) => {
-    let mediaConstraints = {}
-    let audio = false
-    let screen = false
-    let allAudio = false
+    let mediaConstraints = {};
+    let audio = false;
+    let screen = false;
+    let allAudio = false;
     switch (type) {
       case mediaType.audio:
         mediaConstraints = {
           audio: true,
-          video: false
-        }
-        audio = true
-        break
+          video: false,
+        };
+        audio = true;
+        break;
       case mediaType.screen:
         mediaConstraints = displayMediaOptions;
-        screen = true
-        break
+        screen = true;
+        break;
       case mediaType.allAudio:
-        allAudio = true
-        break
+        allAudio = true;
+        break;
       default:
-        return
+        return;
     }
     if (!deviceRef.current.canProduce('video') && !audio) {
-      console.error('Cannot produce video')
-      return
+      console.error('Cannot produce video');
+      return;
     }
     if (producerLabel.has(type)) {
-      console.log('Producer already exists for this type ' + type)
-      return
+      console.log('Producer already exists for this type ' + type);
+      return;
     }
-    console.log('Mediacontraints:', mediaConstraints)
-    let stream
+    console.log('Mediacontraints:', mediaConstraints);
+    let stream;
     try {
       if (type === mediaType.allAudio) {
         // audio Context API로 consumer들에 모은 stream 합치기
@@ -423,16 +406,21 @@ const Room = () => {
           audioContext.createMediaStreamSource(otherStream).connect(acDest);
         }
         if (producerLabel.has(mediaType.audio)) {
-          let myStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          let myStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+          });
           audioContext.createMediaStreamSource(myStream).connect(acDest);
         }
         stream = new MediaStream([...acDest.stream.getTracks()]);
       } else if (type === mediaType.audio) {
-        stream = await navigator.mediaDevices.getUserMedia(mediaConstraints)
+        stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
       } else {
-        stream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints)
+        stream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
       }
-      console.log('supportedConstraints: ' + navigator.mediaDevices.getSupportedConstraints())
+      console.log(
+        'supportedConstraints: ' +
+          navigator.mediaDevices.getSupportedConstraints()
+      );
 
       let track;
       if (audio || allAudio) {
@@ -443,76 +431,72 @@ const Room = () => {
       }
 
       const params = {
-        track: track
-      }
-      let producer = await producerTransport.produce(params)
+        track: track,
+      };
+      let producer = await producerTransport.produce(params);
 
-      console.log('Producer', producer)
+      console.log('Producer', producer);
 
-      producers.set(producer.id, producer)
+      producers.set(producer.id, producer);
 
-      let elem
+      let elem;
 
       producer.on('trackended', () => {
-        closeProducer(type, false)
-      })
+        closeProducer(type, false);
+      });
 
       producer.on('transportclose', () => {
-        console.log('Producer transport close')
+        console.log('Producer transport close');
         if (!audio) {
           elem.srcObject.getTracks().forEach(function (track) {
-            track.stop()
-          })
-          elem.parentNode.removeChild(elem)
+            track.stop();
+          });
+          elem.parentNode.removeChild(elem);
         }
-        producers.delete(producer.id)
-      })
+        producers.delete(producer.id);
+      });
 
       producer.on('close', () => {
-        console.log('Closing producer')
+        console.log('Closing producer');
         if (!audio) {
           elem.srcObject.getTracks().forEach(function (track) {
-            track.stop()
-          })
-          elem.parentNode.removeChild(elem)
+            track.stop();
+          });
+          elem.parentNode.removeChild(elem);
         }
-        producers.delete(producer.id)
-      })
+        producers.delete(producer.id);
+      });
 
-      producerLabel.set(type, producer.id)
-
+      producerLabel.set(type, producer.id);
     } catch (err) {
-      console.log('Produce error:', err)
+      console.log('Produce error:', err);
     }
-  }
+  };
 
   const consume = async (producer_id, peer_id) => {
-    getConsumeStream(producer_id, peer_id).then(
-      function ({ consumer, stream, kind, peerName }) {
-        consumers.set(consumer.id, stream)
+    getConsumeStream(producer_id, peer_id).then(function ({
+      consumer,
+      stream,
+      kind,
+      peerName,
+    }) {
+      consumers.set(consumer.id, stream);
 
-        if (kind === 'video') {
-          /* No need */
-        } else {
-          peerAudioUpsert(consumer.id, { name: peerName, stream: stream })
-        }
-
-        consumer.on(
-          'trackended',
-          function () {
-            removeConsumer(consumer.id)
-          }
-        )
-
-        consumer.on(
-          'transportclose',
-          function () {
-            removeConsumer(consumer.id)
-          }
-        )
+      if (kind === 'video') {
+        /* No need */
+      } else {
+        peerAudioUpsert(consumer.id, { name: peerName, stream: stream });
       }
-    )
-  }
+
+      consumer.on('trackended', function () {
+        removeConsumer(consumer.id);
+      });
+
+      consumer.on('transportclose', function () {
+        removeConsumer(consumer.id);
+      });
+    });
+  };
 
   const getConsumeStream = async (producerId, peerId) => {
     const { rtpCapabilities } = deviceRef.current;
@@ -520,113 +504,109 @@ const Room = () => {
       rtpCapabilities,
       consumerTransportId: consumerTransport.id, // might be
       producerId,
-      peerId
-    })
+      peerId,
+    });
     const { consumerId, kind, rtpParameters, peerName } = data;
 
-    let codecOptions = {}
+    let codecOptions = {};
     const consumer = await consumerTransport.consume({
       id: consumerId,
       producerId,
       kind,
       rtpParameters,
-      codecOptions
-    })
+      codecOptions,
+    });
 
-    const stream = new MediaStream()
-    stream.addTrack(consumer.track)
+    const stream = new MediaStream();
+    stream.addTrack(consumer.track);
 
     return {
       consumer,
       stream,
       kind,
-      peerName
-    }
-  }
+      peerName,
+    };
+  };
 
   const closeProducer = async (type, isRecording) => {
     if (!producerLabel.has(type)) {
-      console.log('There is no producer for this type ' + type)
-      return
+      console.log('There is no producer for this type ' + type);
+      return;
     }
 
-    let producer_id = producerLabel.get(type)
-    console.log('Close producer', producer_id)
+    let producer_id = producerLabel.get(type);
+    console.log('Close producer', producer_id);
 
     await socket.request('producerClosed', {
       producer_id,
-      isRecording: isRecording
+      isRecording: isRecording,
     });
 
-    producers.get(producer_id).close()
-    producers.delete(producer_id)
-    producerLabel.delete(type)
+    producers.get(producer_id).close();
+    producers.delete(producer_id);
+    producerLabel.delete(type);
 
     if (type !== mediaType.audio || type !== mediaType.allAudio) {
       screenTrackStop();
     }
-  }
+  };
 
   const pauseProducer = (type) => {
     if (!producerLabel.has(type)) {
-      console.log('There is no producer for this type ' + type)
-      return
+      console.log('There is no producer for this type ' + type);
+      return;
     }
 
-    let producer_id = producerLabel.get(type)
-    producers.get(producer_id).pause()
-  }
+    let producer_id = producerLabel.get(type);
+    producers.get(producer_id).pause();
+  };
 
   const resumeProducer = (type) => {
     if (!producerLabel.has(type)) {
-      console.log('There is no producer for this type ' + type)
-      return
+      console.log('There is no producer for this type ' + type);
+      return;
     }
 
-    let producer_id = producerLabel.get(type)
-    producers.get(producer_id).resume()
-  }
+    let producer_id = producerLabel.get(type);
+    producers.get(producer_id).resume();
+  };
 
   const removeConsumer = (consumer_id) => {
     peerAudioDelete(consumer_id);
-  }
+  };
 
   const exit = (offline = false) => {
     let clean = function () {
-      consumerTransport.close()
-      producerTransport.close()
-      socket.off('disconnect')
-      socket.off('newProducers')
-      socket.off('consumerClosed')
-    }
+      consumerTransport.close();
+      producerTransport.close();
+      socket.off('disconnect');
+      socket.off('newProducers');
+      socket.off('consumerClosed');
+    };
 
     if (!offline) {
       socket
         .request('exitRoom')
         .then((e) => console.log(e))
         .catch((e) => console.warn(e))
-        .finally(
-          function () {
-            clean()
-          }
-        )
+        .finally(function () {
+          clean();
+        });
     } else {
-      clean()
+      clean();
     }
-  }
+  };
 
   const screenTrackStop = () => {
     if (screenTrackHolder !== null) {
       screenTrackHolder.stop();
       screenTrackHolder = null;
     }
-  }
+  };
 
   function handleCompileResult(code) {
     getCompileResult(code);
   }
-
-
 
   ////////////////////////////////////////////////
 
@@ -648,6 +628,15 @@ const Room = () => {
 
   const handleSaveCancel = () => {
     setOpen(false);
+  };
+
+  const handleVideoSave = () => {
+    // 여기서 RecordModal 열어줌
+    setVideoModalOpen((prev) => (prev = true));
+  };
+
+  const handleVideoSaveCancel = () => {
+    setVideoModalOpen((prev) => (prev = false));
   };
 
   // function sendCode() {
@@ -730,7 +719,6 @@ const Room = () => {
   //   });
   // }
 
-
   const onCapture = async () => {
     let snapshotUrl = '';
     await html2canvas(document.getElementById('onCapture'))
@@ -756,7 +744,7 @@ const Room = () => {
           <i class="fas fa-volume-up"></i> Close audio
         </button>
       </div> */}
-      <div class="fixed top-0 left-0 right-0 bottom-0 " id='onCapture'>
+      <div class="fixed top-0 left-0 right-0 bottom-0 " id="onCapture">
         <AbsoluteUI
           peerAudios={peerAudios}
           handleSave={handleSave}
@@ -787,7 +775,11 @@ const Room = () => {
           doc={doc}
           peerAudios={peerAudios}
         />
-        {/* <Record /> */}
+        <RecordModal
+          isOpen={videoModalOpen}
+          onCancel={handleVideoSaveCancel}
+          videoUrl={videoUrl}
+        />
       </div>
       <ToastContainer />
     </div>
