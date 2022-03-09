@@ -295,15 +295,15 @@ io.on('connection', (socket) => {
   socket.on('stop-record', (callback) => {
     const peer = roomList.get(socket.room_id).getPeers().get(socket.id);
 
+    callback({m3u8Link: peer.process.m3u8Link});
+    
     peer.process.kill();
     peer.process = undefined;
-
 
     for (const remotePort of peer.remotePorts) {
       releasePort(remotePort);
     }
     peer.recordingConsumers.clear();
-    callback();
   });
 
   socket.on('code compile', (payload) => {

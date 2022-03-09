@@ -16,7 +16,7 @@ const credentials = {
   "region": process.env.S3_REGION,
   "bucket": process.env.S3_BUCKET
 }
-
+const bucketRootPath = 'live-study-reocrd'
 
 module.exports = class FFmpeg {
   constructor(rtpParameters) {
@@ -26,6 +26,15 @@ module.exports = class FFmpeg {
     this._convertProcess = undefined;
     this._cleanupProcess = undefined;
     this._observer = new EventEmitter();
+    this.m3u8Link = undefined;
+    this._hlsFolderName = rtpParameters.fileName;
+    this._localFolderPath = `${RECORD_FILE_LOCATION_PATH}/${this._hlsFolderName}`;
+    this._bucketFolderPath = `${bucketRootPath}/${this._hlsFolderName}`;
+    this._options = {
+      useFoldersForFileTypes: false,
+      uploadFolder: this._bucketFolderPath
+    };
+    this.m3u8Link = `https://${process.env.S3_BUCKET}.s3.ap-northeast-2.amazonaws.com/${this._bucketFolderPath}/playlist.m3u8`;
     this._createProcess();
   }
 
@@ -66,14 +75,14 @@ module.exports = class FFmpeg {
       this._observer.emit('process-close');
 
       this._mkdirProcess = child_process.spawn(
-        'mkdir', 
-        [`${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}`]
+        'mkdir',
+        [`${RECORD_FILE_LOCATION_PATH}/${this._hlsFolderName}`]
       );
       this._mkdirProcess.on('exit', (code, signal) => {
         console.log('mkdir process exited with ' + `code ${code} and signal ${signal}`);
         const convertArgs = [
           '-i',
-          `${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}.webm`,
+          `${RECORD_FILE_LOCATION_PATH}/${this._hlsFolderName}.webm`,
           '-f',
           'hls',
           '-hls_time',
@@ -84,28 +93,19 @@ module.exports = class FFmpeg {
           'mpegts',
           '-hls_list_size',
           '0',
-          `${RECORD_FILE_LOCATION_PATH}/${this._rtpParameters.fileName}/playlist.m3u8`
+          `${RECORD_FILE_LOCATION_PATH}/${this._hlsFolderName}/playlist.m3u8`
         ]
         this._convertProcess = child_process.spawn('ffmpeg', convertArgs);
         this._convertProcess.on('exit', async (code, signal) => {
           console.log('ffmpeg process exited with ' + `code ${code} and signal ${signal}`);
           if (code === 0) {
-            const hlsFolderName = this._rtpParameters.fileName;
-            const localFolderPath = `${RECORD_FILE_LOCATION_PATH}/${hlsFolderName}`;
-            const bucketRootPath = 'live-study-reocrd'
-            const bucketFolderPath = `${bucketRootPath}/${hlsFolderName}`;
-            const options = {
-              useFoldersForFileTypes: false,
-              uploadFolder: bucketFolderPath
-            };
-            s3FolderUpload(localFolderPath, credentials, options)
-            .then(() => {
-              child_process.exec("cd files && find . ! -name '.keep' -type f -exec rm -f {} + && find . -type d -empty -delete");
-              const m3u8Link = `https://${process.env.S3_BUCKET}.s3.ap-northeast-2.amazonaws.com/${bucketFolderPath}/playlist.m3u8`
-            })
-            .catch(e => {
-              console.log("Error happend while uploading to S3: ", e);
-            })
+            s3FolderUpload(this._localFolderPath, credentials, this._options)
+              .then(() => {
+                child_process.exec("cd files && find . ! -name '.keep' -type f -exec rm -f {} + && find . -type d -empty -delete");
+              })
+              .catch(e => {
+                console.log("Error happend while uploading to S3: ", e);
+              })
           }
         })
         this._convertProcess.on('error', data => {
