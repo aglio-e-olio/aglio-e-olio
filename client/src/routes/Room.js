@@ -362,7 +362,10 @@ const Room = () => {
         stopRecordButtonRef.current.disabled = true;
         isRecordingRef.current = false;
       } else {
-        alert(data.success);
+        setTimeout(() => {
+          stopRecord();
+          alert('10분 이상 녹화의 경우 프리미엄 서비스를 구독 부탁드립니다.');
+        }, 600000);
       }
     });
   };
@@ -370,14 +373,20 @@ const Room = () => {
   const stopRecord = () => {
     console.log('stopRecord()');
 
-    socket.emit('stop-record', ({ m3u8Link }) => {
-      closeProducer(mediaType.screen, true);
-      closeProducer(mediaType.allAudio, true);
-      setVideoUrl((prev) => (prev = m3u8Link));
-      handleVideoSave();
-    });
-
-    isRecordingRef.current = false;
+    socket.emit(
+      'stop-record',
+      { isRecording: isRecordingRef.current },
+      ({ res }) => {
+        if (res.error) {
+          alert(res.error);
+        } else {
+          closeProducer(mediaType.screen, true);
+          closeProducer(mediaType.allAudio, true);
+          setVideoUrl((prev) => (prev = res.m3u8Link));
+          handleVideoSave();
+          isRecordingRef.current = false;
+        }
+      });
   };
 
   const produce = async (type) => {
@@ -438,7 +447,7 @@ const Room = () => {
       }
       console.log(
         'supportedConstraints: ' +
-          navigator.mediaDevices.getSupportedConstraints()
+        navigator.mediaDevices.getSupportedConstraints()
       );
 
       let track;

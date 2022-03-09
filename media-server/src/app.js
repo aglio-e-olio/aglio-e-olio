@@ -121,9 +121,9 @@ io.on('connection', (socket) => {
     console.log('socket.room_id:', socket.room_id);
 
     cb(roomList.get(room_id).toJson())
-    
+
     const room = roomList.get(room_id);
-    
+
     //들어온 사람 알림 추가
     room.broadCast(socket.id, 'hello', name);
   })
@@ -223,7 +223,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    
+
     console.log('Disconnect', {
       name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`
     })
@@ -302,18 +302,24 @@ io.on('connection', (socket) => {
     callback({ success: "녹화 시작합니다." });
   });
 
-  socket.on('stop-record', (callback) => {
+  socket.on('stop-record', ({ isRecording }, callback) => {
     const peer = roomList.get(socket.room_id).getPeers().get(socket.id);
+    const res = {};
 
-    callback({m3u8Link: peer.process.m3u8Link});
-    
-    peer.process.kill();
-    peer.process = undefined;
-
-    for (const remotePort of peer.remotePorts) {
-      releasePort(remotePort);
+    if (isRecording === true) {
+      res.m3u8Link = peer.process.m3u8Link;
+      callback({ res: res });
+      peer.process.kill();
+      peer.process = undefined;
+      
+      for (const remotePort of peer.remotePorts) {
+        releasePort(remotePort);
+      }
+      peer.recordingConsumers.clear();
+    } else {
+      res.error = '[WIP] 녹화 버튼을 다시 눌러주시기 바랍니다.'
+      callback({ res: res });
     }
-    peer.recordingConsumers.clear();
   });
 
   socket.on('code compile', (payload) => {
