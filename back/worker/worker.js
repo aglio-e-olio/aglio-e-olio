@@ -1,5 +1,17 @@
 const { workerData, parentPort } = require('worker_threads');
 const Post = require('../models/post')
+const mongoose = require("mongoose");
+
+const MONGO_URI = 'mongodb://localhost:27017/mongoose';
+mongoose.connect(MONGO_URI)
+    .then(()=>{
+        console.info("Mongoose connected successfully in worker.js")
+    })
+    .catch(err=>{
+        console.error("Mongoose connected failed: " + error);
+    })
+
+
 
 
 const run = async ()=>{

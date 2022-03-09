@@ -19,6 +19,12 @@ const morganFormat = process.env.NODE_ENV !=="production" ? "dev" : combined;
 
 const MONGO_URI = 'mongodb://localhost:27017/mongoose';
 
+/**
+const run = require('./worker/')
+run().catch(err=>console.error(err));
+ */
+
+
 /* DB Connection */
 mongoose.Promise = global.Promise;
 mongoose
