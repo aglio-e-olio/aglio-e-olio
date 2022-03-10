@@ -52,8 +52,7 @@ const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
       ]);
     }
 
-    return () => {
-    };
+    return () => {};
   }, [peerAudios, persistUser]);
 
   const titleHandler = (e) => {
