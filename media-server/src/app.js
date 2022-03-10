@@ -154,19 +154,25 @@ io.on('connection', (socket) => {
   })
 
   socket.on('createWebRtcTransport', async (_, callback) => {
-    console.log('Create webrtc transport', {
-      name: `${roomList.get(socket.room_id).getPeers().get(socket.id).name}`
-    })
-
-    try {
-      const { params } = await roomList.get(socket.room_id).createWebRtcTransport(socket.id)
-
-      callback(params)
-    } catch (err) {
-      console.error(err)
+    if (roomList.get(socket.room_id) === undefined) {
+      console.log({createWebRtcTransport: "리액트 무한 렌더링으로 인한 에러 핸들링"})
       callback({
-        error: err.message
+        error: "createWebRtcTransport: 리액트 무한 렌더링으로 인한 에러 핸들링"
       })
+    } else {
+      console.log('Create webrtc transport', {
+        name: `${roomList.get(socket.room_id).getPeers().get(socket.id).name}`
+      })
+      try {
+        const { params } = await roomList.get(socket.room_id).createWebRtcTransport(socket.id)
+  
+        callback(params)
+      } catch (err) {
+        console.error(err)
+        callback({
+          error: err.message
+        })
+      }
     }
   })
 
@@ -321,6 +327,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('code compile', (payload) => {
+    console.log({
+      code_compile_paylod: payload
+    })
     const room = roomList.get(socket.room_id);
     const url = 'https://api.jdoodle.com/v1/execute';
 
