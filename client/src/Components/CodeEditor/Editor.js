@@ -47,6 +47,13 @@ const CodeEditor = ({ doc, provider }) => {
         javascript(),
         keymap.of([indentWithTab]),
         yCollab(ytext, provider.awareness),
+        EditorView.updateListener.of((editorUpdate) => {
+          if (editorUpdate.docChanged) {
+            const doc = editorUpdate.state.doc;
+            const value = doc.toString();
+            extractCode(value);
+          }
+        }),
         
       ],
     });
