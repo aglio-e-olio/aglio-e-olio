@@ -6,7 +6,7 @@ import { EditorState, EditorView, basicSetup } from '@codemirror/basic-setup';
 import { keymap, ViewUpdate } from '@codemirror/view';
 import { javascript } from '@codemirror/lang-javascript';
 import { indentWithTab } from '@codemirror/commands';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import * as random from 'lib0/random';
 import './Editor.css';
 import { codeContext } from '../../Context/ContextProvider';
@@ -24,17 +24,21 @@ export const usercolors = [
 
 export const userColor = usercolors[random.uint32() % usercolors.length];
 
-const CodeEditor = ({ doc, provider }) => {
-  const { codes, extractCode, persistUser } = useContext(codeContext);
-  useEffect(() => {
-    const ytext = doc.getText('codemirror');
 
+const CodeEditor = ({ doc, provider }) => {
+  const editorRef = useRef();
+  const { extractCode, persistUser } = useContext(codeContext);
+
+  useEffect(() => {
+    console.log('컴포넌트 나타남.')
+    const ytext = doc.getText('codemirror');
+    const codeUserColor = provider.awareness.getLocalState('color');
+    console.log('codeUserColor는', codeUserColor, typeof (codeUserColor));
     provider.awareness.setLocalStateField('user', {
       name: persistUser,
-      color: userColor.color,
-      colorLight: userColor.light,
+      color: codeUserColor.color,
+      colorLight: codeUserColor.color,
     });
-
     const state = EditorState.create({
       doc: ytext.toString(),
       extensions: [
@@ -45,16 +49,21 @@ const CodeEditor = ({ doc, provider }) => {
         yCollab(ytext, provider.awareness),
       ],
     });
-
     const view = new EditorView({
       state,
-      parent: /** @type {HTMLElement} */ (document.querySelector('#editor')),
+      parent: editorRef.current
     });
-  }, []);
 
-  let text = doc.getText('codemirror')
-  console.log(text.toString(), "받아오는 독");
-  return <div className="w-full text-left" id="editor"></div>;
+
+    return () => {
+      console.log('컴포넌트 사라짐.')
+      view.destroy();
+    }
+
+  })
+
+  return <div className="w-full text-left" ref={editorRef}></div>
+
 };
 
 export default CodeEditor;

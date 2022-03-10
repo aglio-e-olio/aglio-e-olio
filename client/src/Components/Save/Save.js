@@ -43,7 +43,6 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
     useContext(codeContext);
 
   useEffect(() => {
-    console.log('save컴포넌트 만들어짐');
     // console.log('save컴포넌트 안 persistUser는', persistUser);
     // console.log('save컴포넌트 안 peers는', peerAudios);
     const peersName = [];
