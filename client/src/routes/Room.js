@@ -370,8 +370,12 @@ const Room = () => {
         isRecordingRef.current = false;
       } else {
         setTimeout(() => {
-          stopRecord();
-          alert('10분 이상 녹화의 경우 프리미엄 서비스를 구독 부탁드립니다.');
+          if (isRecordingRef.current === true) {
+            stopRecord();
+            alert('10분 이상 녹화의 경우 프리미엄 서비스를 구독 부탁드립니다.');
+          } else {
+            console.log('이미 실시간 협업룸을 나가 녹화 강제 종료가 필요하지 않음')
+          }
         }, 600000);
       }
     });
