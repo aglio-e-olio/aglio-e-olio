@@ -654,6 +654,7 @@ const Room = () => {
       socket.off('disconnect');
       socket.off('newProducers');
       socket.off('consumerClosed');
+      producerLabel.clear();
     };
 
     if (!offline) {
