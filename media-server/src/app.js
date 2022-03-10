@@ -246,17 +246,17 @@ io.on('connection', (socket) => {
   })
 
   socket.on('exitRoom', async (_, callback) => {
-    roomList.get(socket.room_id).broadCast(socket.id, "bye", roomList.get(socket.room_id).getPeers().get(socket.id).name);
-    console.log('Exit room', {
-      name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`
-    })
-
     if (!roomList.has(socket.room_id)) {
       callback({
         error: 'not currently in a room'
       })
       return
     }
+    
+    roomList.get(socket.room_id).broadCast(socket.id, "bye", roomList.get(socket.room_id).getPeers().get(socket.id).name);
+    console.log('Exit room', {
+      name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`
+    })
 
     // close transports
     await roomList.get(socket.room_id).removePeer(socket.id)
@@ -288,7 +288,7 @@ io.on('connection', (socket) => {
 
     recordInfo.fileName = `${peer.name}_` + Date.now().toString();
 
-    peer.process = getProcess(recordInfo);
+    peer.process = getProcess(recordInfo, callback);
 
     setTimeout(async () => {
       for (const consumer of peer.recordingConsumers.values()) {
@@ -298,8 +298,6 @@ io.on('connection', (socket) => {
         await consumer.requestKeyFrame();
       }
     }, 1000);
-
-    callback({ success: "녹화 시작합니다." });
   });
 
   socket.on('stop-record', ({ isRecording }, callback) => {
@@ -450,12 +448,12 @@ const publishProducerRtpStream = async (peer, producer, room) => {
 };
 
 // Returns process command to use (GStreamer/FFmpeg) default is FFmpeg
-const getProcess = (recordInfo) => {
+const getProcess = (recordInfo, callback) => {
   switch (PROCESS_NAME) {
     case 'GStreamer':
       return new GStreamer(recordInfo);
     case 'FFmpeg':
     default:
-      return new FFmpeg(recordInfo);
+      return new FFmpeg(recordInfo, callback);
   }
 };

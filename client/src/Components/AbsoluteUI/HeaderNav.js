@@ -40,7 +40,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit }) =>
   }
 
   function handleStart() {
-    setIsRecording(true);
+    // setIsRecording(true);
     startRecord();
   }
 
