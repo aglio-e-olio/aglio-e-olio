@@ -4,11 +4,11 @@ import CodeEditor from '../CodeEditor/Editor';
 import io from 'socket.io-client';
 import ReactToolTip from 'react-tooltip';
 
-const CodeDrawer = ({ isOpen, setIsOpen, doc, provider, socket }) => {
+const CodeDrawer = ({ isOpen, setIsOpen, doc, provider, socket, isSelfStudy }) => {
   const { codes, compileResult } = useContext(codeContext);
 
   function sendCode() {
-    socket.emit('code compile', { codes });
+    socket.emit('code compile', { codes, isSelfStudy: isSelfStudy });
   }
 
   return (

@@ -10,7 +10,7 @@ import { VideoCameraIcon, StopIcon } from '@heroicons/react/outline';
 
 const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit }) => {
   const navigate = useNavigate();
-  const { setDocGCount, setExitSave, setIsRecording, isRecording } = useContext(codeContext);
+  const { setDocGCount, setExitSave, setIsRecording, isRecording, getCompileResult } = useContext(codeContext);
   // const [isRecord, setIsRecord] = useState(false);
 
   function endStudy() {
@@ -22,6 +22,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit }) =>
       confirmButtonText: 'Save',
       denyButtonText: `Don't save`,
     }).then((result) => {
+      getCompileResult('');
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         setExitSave(1);

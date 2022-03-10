@@ -252,7 +252,7 @@ io.on('connection', (socket) => {
       })
       return
     }
-    
+
     roomList.get(socket.room_id).broadCast(socket.id, "bye", roomList.get(socket.room_id).getPeers().get(socket.id).name);
     console.log('Exit room', {
       name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`
@@ -309,7 +309,7 @@ io.on('connection', (socket) => {
       callback({ res: res });
       peer.process.kill();
       peer.process = undefined;
-      
+
       for (const remotePort of peer.remotePorts) {
         releasePort(remotePort);
       }
@@ -342,7 +342,13 @@ io.on('connection', (socket) => {
         data: sendData,
       }).then((res) => {
         socket.emit('code response', res.data.output);
-        room.broadCast(socket.id, 'code response', res.data.output);
+        if (!payload.isSelfStudy) {
+          room.broadCast(socket.id, 'code response', res.data.output);
+        }
+        console.log({
+          compileResult: res.data.output,
+          isSelfStudy: payload.isSelfStudy,
+        })
       });
     } catch (e) {
       return {

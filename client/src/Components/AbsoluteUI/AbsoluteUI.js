@@ -30,6 +30,7 @@ const AbsoluteUI = ({
         doc={doc}
         provider={provider}
         socket={socket}
+        isSelfStudy={false}
       />
     </div>
   );
