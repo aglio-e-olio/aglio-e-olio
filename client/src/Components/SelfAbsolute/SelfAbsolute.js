@@ -12,6 +12,7 @@ const SelfAbsolute = ({
   yLines,
   undoManager,
   setIsEraser,
+  socket
 }) => {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -29,6 +30,8 @@ const SelfAbsolute = ({
         setIsOpen={setIsOpen}
         doc={doc}
         provider={provider}
+        socket={socket}
+        isSelfStudy={true}
       />
     </div>
   );

@@ -8,9 +8,16 @@ import Swal from 'sweetalert2';
 import ReactTooltip from 'react-tooltip';
 import { VideoCameraIcon, StopIcon } from '@heroicons/react/outline';
 
-const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit }) => {
+const HeaderNav = ({
+  peerAudios,
+  handleSave,
+  startRecord,
+  stopRecord,
+  exit,
+}) => {
   const navigate = useNavigate();
-  const { setDocGCount, setExitSave, setIsRecording, isRecording } = useContext(codeContext);
+  const { setDocGCount, setExitSave, setIsRecording, isRecording, getCompileResult } =
+    useContext(codeContext);
   // const [isRecord, setIsRecord] = useState(false);
 
   function endStudy() {
@@ -22,6 +29,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit }) =>
       confirmButtonText: 'Save',
       denyButtonText: `Don't save`,
     }).then((result) => {
+      getCompileResult('');
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         setExitSave(1);
@@ -40,7 +48,7 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit }) =>
   }
 
   function handleStart() {
-    setIsRecording(true);
+    // setIsRecording(true);
     startRecord();
   }
 
@@ -92,9 +100,12 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit }) =>
         </ul>
       </div>
       <div class="navbar-center lg:flex">
-        <a class="btn btn-ghost normal-case text-white font-sans text-3xl">
+        <span
+          class=""
+          style={{ fontFamily: 'Pacifico', fontSize: '30px', color: 'white' }}
+        >
           Aglio Olio
-        </a>
+        </span>
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">

@@ -26,6 +26,11 @@ let yLines;
 let undoManager;
 let data;
 
+// Media-server
+const socket = io.connect('https://aglio-olio.shop', {
+  withCredentials: false,
+});
+
 const SelfStudyRoom = () => {
   const socketRef = useRef();
   const [isOpen, setOpen] = useState(false);
@@ -80,9 +85,9 @@ const SelfStudyRoom = () => {
   }
 
   useEffect(() => {
-    socketRef.current = io.connect('/');
+    // socketRef.current = io.connect('https://aglio-olio.shop');
 
-    socketRef.current.on('code response', (code) => {
+    socket.on('code response', (code) => {
       handleCompileResult(code);
     });
 
@@ -112,6 +117,7 @@ const SelfStudyRoom = () => {
           yLines={yLines}
           undoManager={undoManager}
           setIsEraser={setIsEraser}
+          socket={socket}
         />
         <Canvas
           doc={doc}

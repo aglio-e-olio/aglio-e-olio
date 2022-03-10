@@ -60,6 +60,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     { label: '완전탐색', value: '완전탐색' },
     { label: 'Greedy', value: 'Greedy' },
     { label: '동적계획법', value: '동적계획법' },
+    { label: 'DP', value: 'DP' },
     { label: '그래프', value: '그래프' },
     { label: '정렬', value: '정렬' },
     { label: '문자열', value: '문자열' },
