@@ -9,6 +9,7 @@ import { useKeyboardEvents } from '../../hooks/useKeyboardEvents';
 import './Canvas.css';
 import { useState } from 'react';
 import { useEraser } from '../../hooks/useEraser';
+import { codeContext } from '../../Context/ContextProvider';
 
 function getYOffset() {
   //   return (Date.now() - START_TIME) / 80;
@@ -57,6 +58,7 @@ export default function Canvas({
 
   useKeyboardEvents();
 
+  const {isRecording} = React.useContext(codeContext);
 
   // On pointer down, start a new current line
   const handlePointerDown = React.useCallback(
@@ -114,7 +116,12 @@ export default function Canvas({
   // };
 
   return (
-    <div>
+    
+    <div class={isRecording ? (
+      "border-8 border-red-500 border-solid"
+    ):(
+      "border-none"
+    )}>
       <div
         className="z-0"
         style={
