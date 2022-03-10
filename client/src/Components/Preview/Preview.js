@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReactPlayer from 'react-player';
 import PreviewTagBadge from '../Atoms/PreviewTagBadge';
-import PreviewText from '../Atoms/PreviewText';
+import { TrashIcon } from '@heroicons/react/outline';
 import Swal from 'sweetalert2';
 
 function Preview() {
@@ -84,12 +84,12 @@ function Preview() {
   }
 
   return metaData && metaData !== 'error' ? (
-    <div class="card w-2/3 glass bg-gray-200 p-3">
-      <figure>
+    <div class="w-2/3 p-3 m-auto">
+      <figure class="transition mt-10">
         {metaData.type === 'image' ? (
           <img
-            class="object-scale-down m-auto"
-            style={{ width: '90%' }}
+            class="object-scale-down m-auto shadow-xl rounded-3xl"
+            style={{ width: '90%', cursor: 'pointer' }}
             src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
@@ -97,47 +97,56 @@ function Preview() {
         ) : (
           <ReactPlayer
             className="react-player"
+            class="shadow-xl rounded-3xl"
             url={metaData.image_tn_ref} // 플레이어 url
-            width="400px" // 플레이어 크기 (가로)
-            height="300px" // 플레이어 크기 (세로)
+            width="90%" // 플레이어 크기 (가로)
             playing={false} // 자동 재생 on
             muted={false} // 자동 재생 on
             controls={true} // 플레이어 컨트롤 노출 여부
             light={false} // 플레이어 모드
             pip={true} // pip 모드 설정 여부
-            config={
-              {
-                file: {
-                  hlsOptions: {
-                    maxBufferLength: 5 // N초 단위로 버퍼링
-                  }
-                }
-              }
-            }
+            style={{ margin: 'auto', cursor: 'pointer' }}
+            config={{
+              file: {
+                hlsOptions: {
+                  maxBufferLength: 5, // N초 단위로 버퍼링
+                },
+              },
+            }}
           />
         )}
       </figure>
+
       <div class="card-body" style={{ height: '90%' }}>
-        <h1 class="card-title">{metaData.title}</h1>
-        <h2 class="text-lg">{metaData.announcer}</h2>
-        <div class="card p-5 w-2/3 m-auto ">
-          <PreviewText data={metaData.save_time} title="Save Time" />
-          <PreviewText
-            data={metaData.update_time ? metaData.update_time : '-'}
-            title="Update Time"
-          />
-          <PreviewTagBadge datas={metaData.teamMates} title="Teammates" />
-          <PreviewTagBadge datas={metaData.algo_tag} title="Algorithm Tag" />
-          <PreviewTagBadge datas={metaData.extra_tag} title="Extra Tag" />
+        <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="text-right font-bold">
+              <p>Title</p>
+              <p>Announcer</p>
+              <p>Save Time</p>
+              <p>Update Time</p>
+            </div>
+            <div class="text-left">
+              <p>{metaData.title}</p>
+              <p>{metaData.announcer}</p>
+              <p>{metaData.save_time}</p>
+              <p>{metaData.update_time ? metaData.update_time : '-'}</p>
+            </div>
+          </div>
+
+          <div style={{ width: '125%' }}>
+            <PreviewTagBadge datas={metaData.teamMates} title="Teammates" />
+            <PreviewTagBadge datas={metaData.algo_tag} title="Algorithm Tag" />
+            <PreviewTagBadge datas={metaData.extra_tag} title="Extra Tag" />
+          </div>
         </div>
 
         <div class="justify-end card-actions">
-          <button
+          <TrashIcon
+            class="inline-block w-8 h-8 stroke-current mr-10"
             onClick={handleDelete}
-            class="btn btn-error sm:btn-sm md:btn-md lg:btn-sm"
-          >
-            삭제
-          </button>
+            style={{ cursor: 'pointer' }}
+          />
         </div>
       </div>
     </div>
