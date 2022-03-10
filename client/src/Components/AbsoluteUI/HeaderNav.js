@@ -8,7 +8,13 @@ import Swal from 'sweetalert2';
 import ReactTooltip from 'react-tooltip';
 import { VideoCameraIcon, StopIcon } from '@heroicons/react/outline';
 
-const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit}) => {
+const HeaderNav = ({
+  peerAudios,
+  handleSave,
+  startRecord,
+  stopRecord,
+  exit,
+}) => {
   const navigate = useNavigate();
   const { setDocGCount, setExitSave } = useContext(codeContext);
   const [isRecord, setIsRecord] = useState(false);
@@ -93,9 +99,12 @@ const HeaderNav = ({ peerAudios, handleSave, startRecord, stopRecord, exit}) => 
         </ul>
       </div>
       <div class="navbar-center lg:flex">
-        <a class="btn btn-ghost normal-case text-white font-sans text-3xl">
+        <span
+          class=""
+          style={{ fontFamily: 'Pacifico', fontSize: '30px', color: 'white' }}
+        >
           Aglio Olio
-        </a>
+        </span>
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">

@@ -85,13 +85,11 @@ function Preview() {
 
   return metaData && metaData !== 'error' ? (
     <div class="w-2/3 p-3 m-auto">
-      <figure
-        class="transition mt-10"
-      >
+      <figure class="transition mt-10">
         {metaData.type === 'image' ? (
           <img
-            class="object-scale-down m-auto"
-            style={{ width: '90%', cursor: 'pointer'}}
+            class="object-scale-down m-auto shadow-xl rounded-3xl"
+            style={{ width: '90%', cursor: 'pointer' }}
             src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
@@ -99,6 +97,7 @@ function Preview() {
         ) : (
           <ReactPlayer
             className="react-player"
+            class="shadow-xl rounded-3xl"
             url={metaData.image_tn_ref} // 플레이어 url
             width="90%" // 플레이어 크기 (가로)
             playing={false} // 자동 재생 on

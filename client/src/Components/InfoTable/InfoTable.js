@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import PictureIcon from '../Atoms/PictureIcon';
 import CameraIcon from '../Atoms/CameraIcon';
-
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoTable() {
   const { selectPreview, searchedData } = useContext(codeContext);
@@ -14,7 +13,10 @@ function InfoTable() {
 
   return (
     <div>
-      <div class="overflow-y-auto overflow-x-hidden m-auto" style={{height:'80vh'}}>
+      <div
+        class="overflow-y-auto overflow-x-hidden m-auto"
+        style={{ height: '80vh' }}
+      >
         <table class="table w-full">
           <thead>
             <tr>

@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useContext } from 'react';
 import './InfoCards.css';
 import { codeContext } from '../../Context/ContextProvider';
 import PictureIcon from '../Atoms/PictureIcon';

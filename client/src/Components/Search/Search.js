@@ -151,14 +151,13 @@ function Search() {
   }
 
   return (
-    <div class="p-3">
-      <div>
+    <div style={{position:"relative", top:"15px"}}>
         <input
           onChange={handleSearch}
           onKeyPress={handleKeyPress}
           type="text"
           placeholder="Search"
-          class="input input-bordered w-full max-w-xs"
+          class="input input-bordered w-full max-w-xs mr-2"
           ref={inputRef}
         ></input>
         <button
@@ -170,7 +169,6 @@ function Search() {
         <Dropdown title="Algorithm" item="algo_tag" />
         <Dropdown title="Announcer" item="announcer" />
         <Dropdown title="Extra Tag" item="extra_tag" />
-      </div>
       <div class="mx-2.5 mt-1">
         {keywords &&
           keywords.map((keyword, index) => {
