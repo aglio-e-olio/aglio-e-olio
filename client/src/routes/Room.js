@@ -340,7 +340,7 @@ const Room = () => {
     });
 
     socket.on('code response', (code) => {
-      handleCompileResult(code);
+      getCompileResult(code);
     });
   };
 

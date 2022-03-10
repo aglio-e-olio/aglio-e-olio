@@ -5,10 +5,12 @@ import io from 'socket.io-client';
 import ReactToolTip from 'react-tooltip';
 
 const CodeDrawer = ({ isOpen, setIsOpen, doc, provider, socket, isSelfStudy }) => {
-  const { codes, compileResult } = useContext(codeContext);
+  const { codes, extractCode, compileResult } = useContext(codeContext);
 
   function sendCode() {
-    socket.emit('code compile', { codes, isSelfStudy: isSelfStudy });
+    let text = doc.getText('codemirror')
+    let sendingData = text.toString();
+    socket.emit('code compile', { sendingData, isSelfStudy: isSelfStudy });
   }
 
   return (
