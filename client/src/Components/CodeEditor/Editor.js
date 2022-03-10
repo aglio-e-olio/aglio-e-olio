@@ -47,13 +47,13 @@ const CodeEditor = ({ doc, provider }) => {
         javascript(),
         keymap.of([indentWithTab]),
         yCollab(ytext, provider.awareness),
-        
       ],
     });
     const view = new EditorView({
       state,
       parent: editorRef.current
     });
+
 
     return () => {
       console.log('컴포넌트 사라짐.')

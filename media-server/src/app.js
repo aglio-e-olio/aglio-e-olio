@@ -338,7 +338,7 @@ io.on('connection', (socket) => {
       clientId: '47846de47896aadb1f698a6a38b3cc4d',
       clientSecret:
         'bed60c3f16b2d91101949996c5da18827216d6e4e94c5f1b13378ca8a3fbe309',
-      script: payload.codes,
+      script: payload.sendingData,
       stdin: '',
       language: 'python3',
       versionIndex: '3',
