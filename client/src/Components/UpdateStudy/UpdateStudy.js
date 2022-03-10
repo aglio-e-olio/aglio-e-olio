@@ -56,6 +56,13 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     { label: 'DFS', value: 'DFS' },
     { label: 'STACK', value: 'STACK' },
     { label: 'QUEUE', value: 'QUEUE' },
+    { label: 'Heap', value: 'Heap' },
+    { label: '완전탐색', value: '완전탐색' },
+    { label: 'Greedy', value: 'Greedy' },
+    { label: 'DP', value: 'DP' },
+    { label: '그래프', value: '그래프' },
+    { label: '정렬', value: '정렬' },
+    { label: '문자열', value: '문자열' },
   ]);
   const [announcerOptions, setAnnouncerOptions] = useState(announcer_array);
   const [extrasOptions, setExtrasOptions] = useState([]);
