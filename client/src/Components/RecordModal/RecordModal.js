@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import Modal from 'react-modal';
 import { codeContext } from '../../Context/ContextProvider';
 import CreatableSelect from 'react-select/creatable';
@@ -8,19 +8,46 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
+const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
   dotenv.config();
-  console.log(isOpen, 'isopen in recordmodal');
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  const { codes, urlSnapshot, email, persistUser, persistEmail } =
-    useContext(codeContext);
+  const [announcerOptions, setAnnouncerOptions] = useState([]);
 
-  //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  // console.log('SAVE 컴포넌트 안!');
+  const [algorithmOptions, setAlgorithmOptions] = useState([
+    { label: 'BFS', value: 'BFS' },
+    { label: 'DFS', value: 'DFS' },
+    { label: 'STACK', value: 'STACK' },
+    { label: 'QUEUE', value: 'QUEUE' },
+  ]);
+
+  const [extrasOptions, setExtrasOptions] = useState([]);
+
+  const { persistUser, persistEmail } = useContext(codeContext);
+
+  useEffect(() => {
+    const peersName = [];
+
+    if (peerAudios.size !== 0) {
+      peerAudios.forEach((value, key) => {
+        peersName.push({ label: value.name, value: value.name });
+      });
+    }
+    setAnnouncerOptions((prev) => (prev = peersName));
+
+    if (persistUser !== '') {
+      setAnnouncerOptions((prev) => [
+        ...prev,
+        { label: persistUser, value: persistUser },
+      ]);
+    }
+
+    return () => {
+    };
+  }, [peerAudios, persistUser]);
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -31,24 +58,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
     (inputValue) => setAnnouncer(inputValue),
     []
   );
-
-  //나중에 쓰일 듯.
-  const [announcerOptions, setAnnouncerOptions] = useState([
-    { label: '박현우', value: '박현우' },
-    { label: '최준영', value: '최준영' },
-    { label: '김도경', value: '김도경' },
-    { label: '조헌일', value: '조헌일' },
-    { label: '진승현', value: '진승현' },
-  ]);
-
-  const [algorithmOptions, setAlgorithmOptions] = useState([
-    { label: 'BFS', value: 'BFS' },
-    { label: 'DFS', value: 'DFS' },
-    { label: 'STACK', value: 'STACK' },
-    { label: 'QUEUE', value: 'QUEUE' },
-  ]);
-
-  const [extrasOptions, setExtrasOptions] = useState([]);
 
   const handleChangeAlgorithm = useCallback(
     (inputValue) => setAlgorithm(inputValue),
@@ -102,7 +111,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
   }
 
   const submitHandler = (e) => {
-    // console.log(videoUrl, 'videoUrl!!');
     e.preventDefault();
 
     const saveTime = getTime();
@@ -117,10 +125,10 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
       ),
       save_time: saveTime,
       canvas_data: null,
-      image_tn_ref: videoUrl, // data는 객체고 data.location에 링크 들어있다.
+      image_tn_ref: videoUrl, // videoURL링크 들어있다.
       user_email: persistEmail,
       nickname: persistUser,
-      // code_data : codes
+      video_flag: 'false', // 비디오 추가
     };
 
     const showLoading = function () {
@@ -139,24 +147,24 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
     axios
       .post('https://aglio-olio-api.shop/myroom/save', body)
       .then(function (res) {
-        // alert('post 성공');
         Swal.fire({
           position: 'center',
           icon: 'success',
           title: 'post 성공!',
           showConfirmButton: false,
-          timer : 2000
-        })
+          timer: 2000,
+          showLoaderOnConfirm: true,
+        });
+        onCancel();
       })
       .catch(function (err) {
-        // alert('post실패');
         Swal.fire({
           position: 'center',
           icon: 'error',
           title: 'post 실패!',
           showConfirmButton: false,
-          timer : 2000
-        })
+          timer: 2000,
+        });
       });
   };
 

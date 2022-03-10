@@ -57,6 +57,7 @@ export default function Canvas({
 
   useKeyboardEvents();
 
+
   // On pointer down, start a new current line
   const handlePointerDown = React.useCallback(
     (e) => {

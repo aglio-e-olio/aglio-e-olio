@@ -16,8 +16,9 @@ const HeaderNav = ({
   exit,
 }) => {
   const navigate = useNavigate();
-  const { setDocGCount, setExitSave } = useContext(codeContext);
-  const [isRecord, setIsRecord] = useState(false);
+  const { setDocGCount, setExitSave, setIsRecording, isRecording } =
+    useContext(codeContext);
+  // const [isRecord, setIsRecord] = useState(false);
 
   function endStudy() {
     Swal.fire({
@@ -46,13 +47,12 @@ const HeaderNav = ({
   }
 
   function handleStart() {
-    setIsRecord(true);
+    // setIsRecording(true);
     startRecord();
   }
 
   function handleStop() {
-    setIsRecord(false);
-    console.log(isRecord, 'isRecord?');
+    setIsRecording(false);
     stopRecord();
   }
 
@@ -109,7 +109,7 @@ const HeaderNav = ({
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">
           <li>
-            {isRecord ? (
+            {isRecording ? (
               <button
                 class="btn btn-ghost mx-3"
                 onClick={handleStop}
