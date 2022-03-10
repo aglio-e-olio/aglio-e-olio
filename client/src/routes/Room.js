@@ -77,8 +77,6 @@ const Room = () => {
   // const remoteAudiosRef = useRef();
   // const startAudioButtonRef = useRef();
   // const stopAudioButtonRef = useRef();
-  const startRecordButtonRef = useRef();
-  const stopRecordButtonRef = useRef();
   const deviceRef = useRef();
   const isRecordingRef = useRef(false);
 
@@ -365,8 +363,6 @@ const Room = () => {
         closeProducer(mediaType.screen, true);
         closeProducer(mediaType.allAudio, true);
         alert(data.error);
-        startRecordButtonRef.current.disabled = false;
-        stopRecordButtonRef.current.disabled = true;
         isRecordingRef.current = false;
       } else {
         setTimeout(() => {
