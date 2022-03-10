@@ -77,7 +77,7 @@ const Room = () => {
   // const remoteAudiosRef = useRef();
   // const startAudioButtonRef = useRef();
   // const stopAudioButtonRef = useRef();
-  const deviceRef = useRef();
+  const deviceRef = useRef(undefined);
   const isRecordingRef = useRef(false);
 
   const [peerAudios, setPeerAudios] = useState(new Map());
@@ -348,14 +348,26 @@ const Room = () => {
   const startRecord = async () => {
     console.log('startRecord()');
     isRecordingRef.current = true;
-    const success = await produce(mediaType.screen);
-    if (success === false) {
+    if (deviceRef.current === undefined) {
+      isRecordingRef.current = false;
+      setIsRecording(false);
+      alert("Device와 미디어서버와의 연결을 위해 잠시 후 다시 시도해주세요. 최대 10초 소요됩니다.");
+      return;
+    }
+    const successScreen = await produce(mediaType.screen);
+    if (successScreen === false) {
       isRecordingRef.current = false;
       setIsRecording(false);
       alert("녹화를 위해서 스크린 선택이 반드시 필요합니다.");
       return;
     }
-    await produce(mediaType.allAudio);
+    const successAudios = await produce(mediaType.allAudio);
+    if (successAudios === false) {
+      isRecordingRef.current = false;
+      setIsRecording(false);
+      alert("음성통화가 연결 중이거나 참여자 전원 음소거인 상태입니다. 확인 부탁드립니다.");
+      return;
+    }
 
     socket.emit('start-record', (data) => {
       if (data.error) {
@@ -431,10 +443,14 @@ const Room = () => {
     let stream;
     try {
       if (type === mediaType.allAudio) {
-        // audio Context API로 consumer들에 모은 stream 합치기
         if (consumers.size === 0 && !producerLabel.has(mediaType.audio)) {
-          return;
+          return new Promise(
+            function (resolve, reject) {
+              resolve(false);
+            }
+          );
         }
+        // audio Context API로 consumer들에 모은 stream 합치기
         const audioContext = new AudioContext();
         const acDest = audioContext.createMediaStreamDestination();
         for (const otherStream of consumers.values()) {
@@ -584,7 +600,14 @@ const Room = () => {
     }
 
     let producer_id = producerLabel.get(type);
-    console.log('Close producer', producer_id);
+    console.log(
+      'Close producer',
+      {
+        producer_id: producer_id,
+        type: type,
+        isRecording, isRecording
+      }
+    );
 
     await socket.request('producerClosed', {
       producer_id,
