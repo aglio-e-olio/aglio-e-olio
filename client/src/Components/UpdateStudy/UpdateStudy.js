@@ -13,6 +13,7 @@ import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { XIcon } from '@heroicons/react/outline';
 
 const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   dotenv.config();
@@ -220,11 +221,28 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     onCancel();
   };
 
+  const modalStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      height: '50%',
+      transform: 'translate(-50%, -50%)',
+      border: 'none',
+      borderRadius: '23px',
+    },
+  };
+
   return (
-    <ReactModal isOpen={isOpen}>
-      <div className="category" />
-      <div>저장 화면 입니다.</div>
-      <div className="category" />
+    <ReactModal isOpen={isOpen} style={modalStyles}>
+      <XIcon
+        class="inline-block w-5 h-5 stroke-current absolute right-5"
+        style={{ cursor: 'pointer' }}
+        onClick={handleClickCancel}
+      />
+      <div class="text-center text-2xl m-7">Update Your Study!</div>
       <form
         onSubmit={submitHandler}
         style={{ display: 'flex', flexDirection: 'column' }}
@@ -264,14 +282,11 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success bg-neutral">
-          저장
+        <button type="submit" class="btn btn-success bg-neutral border-none w-24 absolute right-5 bottom-20">
+          업데이트
         </button>
       </form>
       <div className="category" />
-      <button class="btn btn-error" onClick={handleClickCancel}>
-        취소
-      </button>
     </ReactModal>
   );
 };

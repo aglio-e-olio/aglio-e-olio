@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { codeContext } from '../../Context/ContextProvider';
 import Dropdown from '../Dropdown/Dropdown';
-import { XIcon } from '@heroicons/react/outline';
 
 function Search() {
   const [sortedData, setSortedData] = useState([]);
