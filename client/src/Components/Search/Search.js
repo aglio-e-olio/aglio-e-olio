@@ -151,7 +151,7 @@ function Search() {
   }
 
   return (
-    <div class='p-3'>
+    <div class="p-3">
       <div>
         <input
           onChange={handleSearch}
@@ -175,35 +175,37 @@ function Search() {
         {keywords &&
           keywords.map((keyword, index) => {
             const classes = [
-              'badge badge-info badge-outline gap-2 mx-2',
-              'badge badge-success gap-2 mx-2',
-              'badge badge-warning gap-2 mx-2',
-              'badge badge-error gap-2 mx-2',
+              'inline-flex items-center justify-center px-2 py-1 mr-2 mt-2 text-sm text-red-800 leading-none bg-red-300 rounded-full',
+              'inline-flex items-center justify-center px-2 py-1 mr-2 mt-2 text-sm text-blue-800 leading-none bg-blue-300 rounded-full',
+              'inline-flex items-center justify-center px-2 py-1 mr-2 mt-2 text-sm text-green-800 leading-none bg-green-300 rounded-full',
+              'inline-flex items-center justify-center px-2 py-1 mr-2 mt-2 text-sm text-yellow-800 leading-none bg-yellow-300 rounded-full',
             ];
             const badge_class = classes[index % classes.length];
             return (
-              <div
-                key={index}
-                onClick={handleKeywordBadge}
-                class={badge_class}
-                style={{ cursor: 'pointer' }}
-              >
-                {keyword.value}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  class="inline-block w-4 h-4 stroke-current"
-                  onClick={(e) => handleXClick(keyword.value)}
+              <>
+                <div
+                  key={index}
+                  onClick={handleKeywordBadge}
+                  class={badge_class}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </div>
+                  {keyword.value}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    class="inline-block w-4 h-4 stroke-current"
+                    onClick={(e) => handleXClick(keyword.value)}
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </div>
+              </>
             );
           })}
       </div>

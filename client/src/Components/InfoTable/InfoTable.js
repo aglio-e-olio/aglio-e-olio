@@ -14,7 +14,7 @@ function InfoTable() {
 
   return (
     <div>
-      <div class="overflow-x-auto h-screen m-auto">
+      <div class="overflow-y-auto overflow-x-hidden m-auto" style={{height:'80vh'}}>
         <table class="table w-full">
           <thead>
             <tr>

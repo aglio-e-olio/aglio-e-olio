@@ -16,7 +16,7 @@ function InfoCards() {
 
   return (
     <div>
-      <div class="overflow-auto h-screen card-wrapper">
+      <div class="overflow-auto h-screen card-wrapper" style={{height:'80vh'}}>
         {searchedData.map((value, index) => {
           return (
             <div
