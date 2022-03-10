@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useContext } from 'react';
 import './InfoCards.css';
 import { codeContext } from '../../Context/ContextProvider';
 import PictureIcon from '../Atoms/PictureIcon';
@@ -16,7 +15,7 @@ function InfoCards() {
 
   return (
     <div>
-      <div class="overflow-auto h-screen card-wrapper">
+      <div class="overflow-auto h-screen card-wrapper" style={{height:'80vh'}}>
         {searchedData.map((value, index) => {
           return (
             <div
