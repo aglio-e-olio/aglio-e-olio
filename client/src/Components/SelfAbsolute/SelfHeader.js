@@ -5,7 +5,7 @@ import { codeContext } from '../../Context/ContextProvider';
 
 const SelfHeader = ({ handleSave }) => {
   const navigate = useNavigate();
-  const { setDocGCount, setExitSave } = useContext(codeContext);
+  const { setDocGCount, setExitSave, getCompileResult } = useContext(codeContext);
 
   function endSelfStudy() {
     Swal.fire({
@@ -16,6 +16,7 @@ const SelfHeader = ({ handleSave }) => {
       confirmButtonText: 'Save',
       denyButtonText: `Don't save`,
     }).then((result) => {
+      getCompileResult('');
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         setExitSave(1);

@@ -16,7 +16,7 @@ const HeaderNav = ({
   exit,
 }) => {
   const navigate = useNavigate();
-  const { setDocGCount, setExitSave, setIsRecording, isRecording } =
+  const { setDocGCount, setExitSave, setIsRecording, isRecording, getCompileResult } =
     useContext(codeContext);
   // const [isRecord, setIsRecord] = useState(false);
 
@@ -29,6 +29,7 @@ const HeaderNav = ({
       confirmButtonText: 'Save',
       denyButtonText: `Don't save`,
     }).then((result) => {
+      getCompileResult('');
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         setExitSave(1);
