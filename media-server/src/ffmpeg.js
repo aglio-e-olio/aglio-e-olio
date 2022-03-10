@@ -20,7 +20,7 @@ const credentials = {
 const bucketRootPath = 'live-study-reocrd'
 
 module.exports = class FFmpeg {
-  constructor(rtpParameters) {
+  constructor(rtpParameters, callback) {
     this._rtpParameters = rtpParameters;
     this._process = undefined;
     this._mkdirProcess = undefined;
@@ -36,6 +36,9 @@ module.exports = class FFmpeg {
       uploadFolder: this._bucketFolderPath
     };
     this.m3u8Link = `https://${process.env.S3_BUCKET}.s3.ap-northeast-2.amazonaws.com/${this._bucketFolderPath}/playlist.m3u8`;
+    callback({
+      success: "녹화가 성공적으로 시작되었습니다.",
+    });
     this._createProcess();
   }
 

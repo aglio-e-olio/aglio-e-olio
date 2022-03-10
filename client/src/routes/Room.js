@@ -347,6 +347,10 @@ const Room = () => {
   //////// MAIN FUNCTIONS /////////////
   const startRecord = async () => {
     console.log('startRecord()');
+    if (isRecordingRef.current === true) {
+      alert("녹화 버튼을 두 번 연속 누르실 수 없습니다.");
+      return;
+    }
     isRecordingRef.current = true;
     if (deviceRef.current === undefined) {
       isRecordingRef.current = false;
@@ -377,6 +381,8 @@ const Room = () => {
         alert(data.error);
         isRecordingRef.current = false;
       } else {
+        console.log(data.success);
+        setIsRecording(true);
         setTimeout(() => {
           if (isRecordingRef.current === true) {
             stopRecord();
