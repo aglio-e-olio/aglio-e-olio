@@ -22,6 +22,13 @@ const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
     { label: 'DFS', value: 'DFS' },
     { label: 'STACK', value: 'STACK' },
     { label: 'QUEUE', value: 'QUEUE' },
+    { label: 'Heap', value: 'Heap' },
+    { label: '완전탐색', value: '완전탐색' },
+    { label: 'Greedy', value: 'Greedy' },
+    { label: '동적계획법', value: '동적계획법' },
+    { label: '그래프', value: '그래프' },
+    { label: '정렬', value: '정렬' },
+    { label: '문자열', value: '문자열' },
   ]);
 
   const [extrasOptions, setExtrasOptions] = useState([]);
