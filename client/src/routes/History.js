@@ -13,10 +13,6 @@ const History = () => {
   const navigate = useNavigate();
   const [view, setView] = useState('Table');
 
-  // function handleView() {
-  //   if
-  //   setIsTable((prev) => !prev);
-  // }
   return (
     <>
       <div class="bg-neutral relative" style={{ height: '150px' }}>
@@ -28,7 +24,6 @@ const History = () => {
             />
           </button>
           <span
-            class=""
             style={{ fontFamily: 'Pacifico', fontSize: '30px', color: 'white' }}
           >
             Aglio Olio
@@ -42,14 +37,14 @@ const History = () => {
         >
           <button
             type="button"
-            class="py-0.5 px-3 text-sm font-medium text-gray-900 bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+            class="py-0.5 px-3 text-sm font-medium text-gray-900 bg-white rounded-l-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:bg-gray-700 focus:text-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-white dark:focus:text-white"
             onClick={(e) => setView((prev) => e.target.innerText)}
           >
             Table
           </button>
           <button
             type="button"
-            class="py-0.5 px-3 text-sm font-medium text-gray-900 bg-white rounded-r-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white"
+            class="py-0.5 px-3 text-sm font-medium text-gray-900 bg-white rounded-r-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:bg-gray-700 focus:text-white dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-white dark:focus:text-white"
             onClick={(e) => setView((prev) => e.target.innerText)}
           >
             Cards

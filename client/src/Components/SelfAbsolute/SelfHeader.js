@@ -5,12 +5,12 @@ import { codeContext } from '../../Context/ContextProvider';
 
 const SelfHeader = ({ handleSave }) => {
   const navigate = useNavigate();
-  const { setDocGCount, setExitSave, getCompileResult } = useContext(codeContext);
+  const { setDocGCount, setExitSave, getCompileResult } =
+    useContext(codeContext);
 
   function endSelfStudy() {
     Swal.fire({
-      title:
-        '기록페이지로 이동합니다. 저장하지 않은 스냅샷은 사라집니다. 괜찮습니까?',
+      title: '셀프 스터디 룸으로 이동합니다.\n데이터를 저장해주세요!',
       showDenyButton: true,
       showCancelButton: true,
       confirmButtonText: 'Save',
@@ -23,10 +23,12 @@ const SelfHeader = ({ handleSave }) => {
         handleSave();
         // Swal.fire('Saved!', '', 'success')
       } else if (result.isDenied) {
-        Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then((result) => {
-          setDocGCount(0);
-          navigate(-1);
-        });
+        Swal.fire('변경사항이 기록되지 않습니다.', '', 'info').then(
+          (result) => {
+            setDocGCount(0);
+            navigate(-1);
+          }
+        );
       }
     });
   }
@@ -60,7 +62,11 @@ const SelfHeader = ({ handleSave }) => {
         </ul>
       </div>
       <div class="navbar-center lg:flex">
-        <a class="btn btn-ghost normal-case text-xl">AO</a>
+        <span
+          style={{ fontFamily: 'Pacifico', fontSize: '25px', color: 'white' }}
+        >
+          Aglio Olio
+        </span>
       </div>
       <div class="navbar-end">
         <ul class="menu menu-horizontal p-0">

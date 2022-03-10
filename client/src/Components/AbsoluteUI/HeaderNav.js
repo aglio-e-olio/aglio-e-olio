@@ -23,7 +23,8 @@ const HeaderNav = ({
   function endStudy() {
     Swal.fire({
       title:
-        '로비로 이동합니다. \n저장하지 않은 스터디 영상과 \n스냅샷은 사라집니다. \n괜찮습니까?',
+        '로비로 이동합니다.\n 데이터를 저장해주세요!',
+      fontSize: "5px",
       showDenyButton: true,
       showCancelButton: true,
       confirmButtonText: 'Save',
@@ -101,7 +102,6 @@ const HeaderNav = ({
       </div>
       <div class="navbar-center lg:flex">
         <span
-          class=""
           style={{ fontFamily: 'Pacifico', fontSize: '30px', color: 'white' }}
         >
           Aglio Olio

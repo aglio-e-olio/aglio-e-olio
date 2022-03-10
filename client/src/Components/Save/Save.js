@@ -13,6 +13,8 @@ import { v1 } from 'uuid';
 import dotenv from 'dotenv';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { XIcon } from '@heroicons/react/outline';
+
 const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
   dotenv.config();
 
@@ -226,11 +228,29 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
   const handleClickCancel = () => {
     onCancel();
   };
+
+  const modalStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      height: '50%',
+      transform: 'translate(-50%, -50%)',
+      border: 'none',
+      borderRadius: '23px',
+    },
+  };
+
   return (
-    <ReactModal isOpen={isOpen}>
-      <div className="category" />
-      <div>저장 화면 입니다.</div>
-      <div className="category" />
+    <ReactModal isOpen={isOpen} style={modalStyles}>
+      <XIcon
+        class="inline-block w-5 h-5 stroke-current absolute right-5"
+        style={{ cursor: 'pointer' }}
+        onClick={handleClickCancel}
+      />
+      <div class="text-center text-2xl m-7">Save Your Study!</div>
       <form
         onSubmit={submitHandler}
         style={{ display: 'flex', flexDirection: 'column' }}
@@ -238,7 +258,7 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
         <input
           type="text"
           placeholder="제목"
-          class="input input-bordered input-primary w-full max-w-xs"
+          class="input input-bordered w-full max-w-xs"
           value={title}
           onChange={titleHandler}
         ></input>
@@ -249,6 +269,7 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
           options={algorithmOptions}
           onChange={handleChangeAlgorithm}
           onCreateOption={handleCreateAlgorithm}
+          class="border-none"
           isMulti
         />
         <div className="category" />
@@ -270,14 +291,11 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success bg-neutral">
+        <button type="submit" class="btn btn-success bg-neutral border-none w-16 absolute right-5 bottom-20">
           저장
         </button>
       </form>
       <div className="category" />
-      <button class="btn btn-error" onClick={handleClickCancel}>
-        취소
-      </button>
     </ReactModal>
   );
 };
