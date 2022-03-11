@@ -89,7 +89,7 @@ function Preview() {
         {metaData.type === 'image' ? (
           <img
             class="object-scale-down m-auto shadow-xl rounded-3xl"
-            style={{ width: '800px', height:'600px', cursor: 'pointer', objectFit: 'contain' }}
+            style={{ width: '700px', height:'354px', cursor: 'pointer', objectFit: 'contain' }}
             src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
@@ -104,7 +104,7 @@ function Preview() {
             controls={true} // 플레이어 컨트롤 노출 여부
             light={false} // 플레이어 모드
             pip={true} // pip 모드 설정 여부
-            style={{ margin: 'auto', width: '800px', height:'600px', cursor: 'pointer', objectFit: 'contain' }}
+            style={{ margin: 'auto', width: '700px', height:'350px', cursor: 'pointer', objectFit: 'contain' }}
             config={{
               file: {
                 hlsOptions: {
