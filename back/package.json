@@ -9,6 +9,7 @@
     "express": "^4.17.1",
     "mongoose": "^6.2.3",
     "nodemon": "^2.0.15",
+    "httpolyglot": "^0.1.2",
     "socket.io": "^2.3.0"
   },
   "scripts": {
