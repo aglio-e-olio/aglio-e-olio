@@ -282,7 +282,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success bg-neutral border-none w-24 absolute right-5 bottom-20">
+        <button type="submit" class="btn btn-success bg-neutral border-none w-24 absolute right-5 bottom-16">
           업데이트
         </button>
       </form>

@@ -84,12 +84,12 @@ function Preview() {
   }
 
   return metaData && metaData !== 'error' ? (
-    <div class="w-2/3 p-3 m-auto">
+    <div class="w-2/3 h-5/12 p-3 m-auto">
       <figure class="transition mt-10">
         {metaData.type === 'image' ? (
           <img
             class="object-scale-down m-auto shadow-xl rounded-3xl"
-            style={{ width: '90%', cursor: 'pointer' }}
+            style={{ width: '700px', height:'354px', cursor: 'pointer', objectFit: 'contain' }}
             src={metaData.type && metaData.image_tn_ref}
             alt="thumbnail"
             onClick={goToSelfstudy}
@@ -99,13 +99,12 @@ function Preview() {
             className="react-player"
             class="shadow-xl rounded-3xl"
             url={metaData.image_tn_ref} // 플레이어 url
-            width="90%" // 플레이어 크기 (가로)
             playing={false} // 자동 재생 on
             muted={false} // 자동 재생 on
             controls={true} // 플레이어 컨트롤 노출 여부
             light={false} // 플레이어 모드
             pip={true} // pip 모드 설정 여부
-            style={{ margin: 'auto', cursor: 'pointer' }}
+            style={{ margin: 'auto', width: '700px', height:'350px', cursor: 'pointer', objectFit: 'contain' }}
             config={{
               file: {
                 hlsOptions: {
