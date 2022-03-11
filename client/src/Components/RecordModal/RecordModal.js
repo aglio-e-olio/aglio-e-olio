@@ -238,7 +238,7 @@ const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
         <div className="category" />
         <button
           type="submit"
-          class="btn btn-success bg-neutral border-none w-16 absolute right-5 bottom-20"
+          class="btn btn-success bg-neutral border-none w-16 absolute right-5 bottom-16"
         >
           저장
         </button>

@@ -289,8 +289,7 @@ const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
           placeholder="추가 태그"
           isMulti
         />
-        <div className="category" />
-        <button type="submit" class="btn btn-success bg-neutral border-none w-16 absolute right-5 bottom-20">
+        <button type="submit" class="btn btn-success bg-neutral border-none w-16 absolute right-5 bottom-16">
           저장
         </button>
       </form>
