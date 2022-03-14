@@ -49,10 +49,10 @@ postSchema.statics.create = async function(body){
     }
 
     // Title Error Case
+    
     if(!body.hasOwnProperty('title')|| body.title===""){
         body["title"] = "제목없음";
-    }
-     */
+    } */
 
     const new_post = new this(body);
     return await new_post.save();

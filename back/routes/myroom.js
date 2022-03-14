@@ -15,9 +15,10 @@ router.post('/redis_test', redis_test);
 
 
 router.post('/save', redis_save, async (req, res)=>{
+// router.post('/save', async (req, res)=>{
+    
     const body = req.body;
-
-    /**
+    /** 
     if (!body.hasOwnProperty('user_email') || !body.hasOwnProperty('save_time') ||
         !body.hasOwnProperty('type')){
             res.status(400).json({error : "Schema required Fail"});
@@ -42,7 +43,6 @@ router.post('/save', redis_save, async (req, res)=>{
         return; 
     }
     */
-
     // Post Save
     try{
         Post.create(body);

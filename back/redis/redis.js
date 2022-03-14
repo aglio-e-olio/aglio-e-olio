@@ -7,13 +7,12 @@ const Post = require('../models/post');
 const Mutex = require('async-mutex').Mutex;
 const mongoose = require('mongoose');
 const mutex = new Mutex();
-const { Worker } = require('worker_threads')
 const path = require('path')
 const workerpool = require('workerpool');
 const pool = workerpool.pool(path.resolve(__dirname, '../workerpool/worker.js'));
 
 
-const SAVE_COUNT = 1;
+const SAVE_COUNT =150;
 
 
 /* promisify */

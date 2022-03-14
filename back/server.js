@@ -45,12 +45,13 @@ app.use(
 app.use(morgan(combined, {stream: logger.stream}))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({
-  limit:'10mb'
+  limit:'50mb'
 }));
 
 /* routing */
-app.use('/api_test', require('./routes/api_test'));
 app.use('/myroom', require('./routes/myroom'));
+app.use('/api_test', require('./routes/api_test'));
+
 
 /**
 app.use(express.static(path.join(__dirname, '../client/build')));
