@@ -8,6 +8,7 @@ import SelfStudyRoom from './routes/SelfStudyRoom';
 import JoinRoom from './routes/JoinRoom';
 import { codeContext } from './Context/ContextProvider';
 import ReactToolTip from 'react-tooltip';
+import Login from './routes/Login';
 
 function App() {
   const { persistLogin, persistEmail } = useContext(codeContext);
@@ -17,13 +18,15 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<CreateRoom />} />
+          <Route 
+          path="/" 
+          element={login_info ? <CreateRoom /> : <Navigate replace to="/login" />} />
           <Route
             path="/room/:roomID"
             element={login_info ? <Room /> : <Navigate replace to="/join" />}
           />
           <Route path="/join" element={<JoinRoom />} />
-
+          <Route path="/login" element={<Login />} />
           <Route path="/history/:userID" element={<History />} />
           <Route
             path="/history/selfstudy/:userID"
