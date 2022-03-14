@@ -1,14 +1,8 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-// import CreateRoom from './routes/CreateRoom';
-// import Room from './routes/Room';
-// import History from './routes/History';
 import './App.css';
-// import SelfStudyRoom from './routes/SelfStudyRoom';
-// import JoinRoom from './routes/JoinRoom';
 import { codeContext } from './Context/ContextProvider';
 import ReactToolTip from 'react-tooltip';
-// import Login from './routes/Login';
 
 const CreateRoom = React.lazy(() => import('./routes/CreateRoom'));
 const Room = React.lazy(() => import('./routes/Room'));
