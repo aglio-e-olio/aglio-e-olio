@@ -26,8 +26,7 @@ const postSchema = new mongoose.Schema({
 })
 
 postSchema.statics.create = async function(body){
-    
-    // Array Type Error Case
+    /**
     if (!body.hasOwnProperty('algo_tag')){
         body['algo_tag']=[];
     }
@@ -53,6 +52,8 @@ postSchema.statics.create = async function(body){
     if(!body.hasOwnProperty('title')|| body.title===""){
         body["title"] = "제목없음";
     }
+     */
+
     const new_post = new this(body);
     return await new_post.save();
 }

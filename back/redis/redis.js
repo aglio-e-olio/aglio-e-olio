@@ -5,36 +5,22 @@ const { promisify } = require('util');
 const logger = require('../config/winston');
 const Post = require('../models/post');
 const Mutex = require('async-mutex').Mutex;
-
+const mongoose = require('mongoose');
 const mutex = new Mutex();
 const { Worker } = require('worker_threads')
 
 
-const SAVE_COUNT = 150;
+const SAVE_COUNT = 100;
 
 
 /* promisify */
-const getAsync = promisify(redisClient.get).bind(redisClient);
-const setAsync = promisify(redisClient.set).bind(redisClient);
-const rpushAsync = promisify(redisClient.rpush).bind(redisClient);
-const lrangeAsync = promisify(redisClient.lrange).bind(redisClient);
 const delAsync = promisify(redisClient.del).bind(redisClient);
-const incrAsync = promisify(redisClient.incr).bind(redisClient);
-const saddAsync = promisify(redisClient.sadd).bind(redisClient);
-
-exports.delAsync = delAsync;
-exports.setAsync = setAsync;
-
-const sismemberAsync = promisify(redisClient.sismember).bind(redisClient);
-
-/* Init count */
-redisClient.set("count", 0, function(err){
-    if(err){
-        logger.warn()
-    } else {
-        console.log("redis 'count' : 0 set done ");
-    }
-});
+const hgetAsync = promisify(redisClient.hget).bind(redisClient);
+const hsetAsync = promisify(redisClient.hset).bind(redisClient);
+const hlenAsync = promisify(redisClient.hlen).bind(redisClient);
+const hvalsAsync = promisify(redisClient.hvals).bind(redisClient);
+const hexistsAsync = promisify(redisClient.hexists).bind(redisClient);
+const hdelAsync = promisify(redisClient.hdel).bind(redisClient);
 
 
 function runWorker(workerData){
@@ -51,50 +37,7 @@ function runWorker(workerData){
 
 
 
-function roughSizeOfObject( object ) {
-
-    var objectList = [];
-    var stack = [ object ];
-    var bytes = 0;
-
-    while ( stack.length ) {
-        var value = stack.pop();
-
-        if ( typeof value === 'boolean' ) {
-            bytes += 4;
-        }
-        else if ( typeof value === 'string' ) {
-            bytes += value.length * 2;
-        }
-        else if ( typeof value === 'number' ) {
-            bytes += 8;
-        }
-        else if
-        (
-            typeof value === 'object'
-            && objectList.indexOf( value ) === -1
-        )
-        {
-            objectList.push( value );
-
-            for( var i in value ) {
-                stack.push( value[ i ] );
-            }
-        }
-    }
-    return bytes;
-}
-
-
-
-
-const redis_test = (req, res, next)=>{
-    redisClient.sismember("users", "a", function(err, data){
-        console.log(data);
-        console.log(typeof(data));
-
-        res.json({result : data});
-    })
+const redis_test = async (req, res)=>{
 
 }
 exports.redis_test = redis_test;
@@ -108,36 +51,39 @@ const redis_metadata = async (req, res, next)=>{
     }
 
     const user_email = req.query.user_email;
-
-    mutex.acquire();
-    const is_user = await sismemberAsync("users", user_email);
-
-    if(is_user){        
+    
+    await mutex.runExclusive(async()=>{
+        const is_user = await hexistsAsync("savelist", user_email);
         
-        const save_array = await lrangeAsync("save_list", 0, -1);
-        let array = [];
-        save_array.forEach(element => {
-            array.push(JSON.parse(element));
-        });
+        if(is_user){
+            const _id = mongoose.Types.ObjectId();
+            let redis_data = await hgetAsync('savelist', user_email);
+            redis_data = JSON.parse(redis_data);
+            redis_data['_id'] = _id;
 
-        Post.insertMany(array, async function(err, _){
-            if(err){
-                res.status(500).json({error : "error"});
-                mutex.release();
-                return;
-            } else{
-                await delAsync("users");
-                await delAsync('save_list');
-                mutex.release();
-                next();
-            }
-        })
-    }
-    else {
-        mutex.release();
-        next();
-    }
+            Post.find({user_email:user_email}).
+                select("-canvas_data -__v").
+                exec(async function(err, result){
+                    if(err){
+                        // DataBase Error
+                        res.status(500).json({error : "DataBase Error : Post.find error" });
+                        logger.error("DataBase Error : Post.find error");
+                        return;
+                    } 
+
+                    result.push(redis_data);
+                    res.status(200).json(result); 
+
+                    redisClient.hdel('savelist', user_email);
+                    Post.create(redis_data);
+                })
+        } 
+        else {
+            next();
+        }
+    })
 }
+exports.redis_metadata = redis_metadata;
 
 
 const redis_save = async (req, res, next) =>{
@@ -192,109 +138,29 @@ const redis_save = async (req, res, next) =>{
     if(!body.hasOwnProperty('title')|| body.title===""){
         body["title"] = "제목없음";
     }
-
     const user_email = body.user_email;
-    const save_string_data = JSON.stringify(body);
-    /**
-    redisClient.get('count', async function(err,count){
-        if(count>=SAVE_COUNT){
-            logger.verbose("mongodb save start");
-            redisClient.rpush("save_list", save_string_data, function(err){
-                if(err) return res.send('fail');
 
-                redisClient.lrange("save_list", 0,-1, async function(err, save_array){
-                    if(err) return res.send('fail');
-
-                    let array = [];
-                    save_array.forEach(element=>{
-                        array.push(JSON.parse(element));
-                    })
-                    logger.verbose(`array length : ${save_array.length}`);
-
-                    logger.verbose("post save start");
-                    Post.insertMany(array);
-                    logger.verbose("del users start");
-                    await delAsync("users");
-                    logger.verbose("del save_list start");
-                    await delAsync("save_list");
-                    logger.verbose("set count start");
-                    await setAsync("count", 0);
-
-                    logger.verbose("mogodb save end");
-                    res.status(200).json({result :"success"});
-                })
-            })
-        }
-
-
-        else {
-            logger.verbose("redis save start");
-            await Promise.all([
-                incrAsync("count"),
-                rpushAsync("save_list", save_string_data),
-                saddAsync("users", user_email)
-            ])
-            res.status(200).json({result : "success"});
-            logger.verbose("redis save end");
-        }
-    })
-
-     */
-    let flag = false;
-    
     await mutex.runExclusive(async()=>{
-        const count = await getAsync('count');
+        const is_user = await hexistsAsync("savelist", user_email);
+        if(is_user){
+            next();
+            return;
+        }
+
+        const count = await hlenAsync('savelist');
         if(count>=SAVE_COUNT){
-            flag = true;
-            logger.verbose("mongodb save start :: use_flag");
-            await rpushAsync("save_list", save_string_data);
-            const save_array = await lrangeAsync("save_list", 0, -1);
-
-        
-            // DB!!
-            runWorker(save_array);
-
-            logger.verbose("mongodb del(users) :: use_flag");
-            // redisClient.del("users");
-            await delAsync("users");
-            logger.verbose("mongodb del(save_list) :: use_flag");
-            // redisClient.del("save_list")
-            await delAsync("save_list");
-            logger.verbose("mongodb set(count) :: use_flag");
-            await setAsync("count", 0);
-            // redisClient.set("count", 0);
-
-            res.status(200).send("insert many success ");
-            logger.verbose("mongodb save end ::  use_flag");
+            const save_array = await hvalsAsync("savelist");
+            const workerData = {save_array : save_array, now_data : body}
+            runWorker(workerData);
+            redisClient.del('savelist');
+            res.status(200).send("insert many success");
             return;
         } else {
-            logger.verbose("redis save start :: use_flag");
-
-            // 여기 넣는 거는 완전히 되어야 할 듯
-            await Promise.all([
-                incrAsync("count"),
-                rpushAsync("save_list", save_string_data),
-                saddAsync("users", user_email)
-            ])
+            const save_string_data = JSON.stringify(body); 
+            redisClient.hset('savelist', user_email, save_string_data);
             res.status(200).json({result : "success"});
-            logger.verbose("redis save end :: use_flag");
             return;
         }
     })
-    
 }
 exports.redis_save = redis_save;
-
-
-
-
-
-const testFunction = async(req, res)=>{
-    const value = await redisClient.sendCommand(['get', 'heonil']);
-    console.log(value)
-    redisClient.keys('*', function(err, data){
-        console.log(data);
-    });
-    res.send("success");
-}
-exports.testFunction = testFunction;

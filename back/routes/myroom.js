@@ -3,73 +3,21 @@ const Post = require('../models/post');
 const mongoose = require('mongoose')
 const { ObjectId } = mongoose.Types;
 const logger = require('../config/winston');
-// const { mutex } = require('../lib/mutex');
-const { redis_test,  redis_save, setAsync, delAsync } = require('../redis/redis')
+const { redis_test, redis_metadata,  redis_save } = require('../redis/redis')
 
 router.post('/test', redis_save,  (req, res)=>{
     res.send("myroom.js code");
     return;
 })
 
-router.get('/test',  (req,res)=>{
-    let a;
-    logger.verbose(a);
-    a = 1;
-    res.send('a');
-})
-
-function for_loop2(){
-    for(let i = 0; i<10000000000; i++){
-
-    }
-}
-async function for_loop (){
-    return await for_loop2();
-}
-router.get('/1', async (req,res)=>{
-    await for_loop();
-    res.send('1')
-})
-
-router.get('/2', (req, res)=>{
-    res.send("Thank you");
-})
-
-/***
-router.post('/save_many', redis_save, (req, res)=>{
-
-    const save_array = req.save_array;
-    let array = [];
-    save_array.forEach(element => {
-        array.push(JSON.parse(element));
-    });
-
-    Post.insertMany(array, async function(err, result){
-        if(err){
-            res.status(500).json({error : "error"})
-            // mutex.release();
-            return;
-        } else{
-            res.status(200).send("insert many success");
-            await delAsync("users");
-            await delAsync("save_list");
-            await setAsync("count", 0);
-            // mutex.release();
-            return;
-        }
-    })    
-})
- */
-router.post('/save_many', redis_save)
+router.get('/redis_test', redis_test);
+router.post('/redis_test', redis_test);
 
 
-
-
-
-router.post('/save', async (req, res)=>{
+router.post('/save', redis_save, async (req, res)=>{
     const body = req.body;
 
-    // Error Handling
+    /**
     if (!body.hasOwnProperty('user_email') || !body.hasOwnProperty('save_time') ||
         !body.hasOwnProperty('type')){
             res.status(400).json({error : "Schema required Fail"});
@@ -81,7 +29,6 @@ router.post('/save', async (req, res)=>{
         logger.warn("type must be 'image' or 'video'");
         return;
     }
-    // thumbnail empty error
     if(body.type==="image"){
         if(!body.hasOwnProperty("image_tn_ref")){
             res.status(400).json({error:"Thumbnail doesn't come"});
@@ -89,20 +36,14 @@ router.post('/save', async (req, res)=>{
             return;
         }
     }
-    // user email empty error
     if(body.user_email===""){
         res.status(400).json({error : "user_email is empty"});
         logger.warn("user_email is empty");
         return; 
     }
-
-    await Post.create(body);
-
-    res.status(200).json({result :"success"});
-
+    */
 
     // Post Save
-    /**
     try{
         Post.create(body);
     }
@@ -112,10 +53,9 @@ router.post('/save', async (req, res)=>{
     } finally{
         res.status(200).json({result : "success"});
     }
-     */
 })
 
-router.put('/save', (req,res)=>{
+router.put('/save',  (req,res)=>{
     if(req.body._id===undefined){
         res.status(400).json({error : "There's no _id in request body"});
         logger.warn("There's no _id in request body");
@@ -175,7 +115,7 @@ router.delete('/delete/:_id', (req, res)=>{
             logger.error({error :"DataBase error : Post.findByIdAndDelete : ", err});
             return;
         } 
-        if(result ===null){
+        if(result === null){
             res.status(400).json({error : "There's no matching post id in Post Collection"});
             logger.warn("There's no matching post id in Post Collection");
             return;
@@ -186,12 +126,15 @@ router.delete('/delete/:_id', (req, res)=>{
     })
 })
 
-router.get('/metadata', (req, res)=>{
+router.get('/metadata',redis_metadata,(req, res)=>{
+    /**
     if(req.query.user_email === undefined){
         res.status(400).json({error : "MetaData request : user_email is not exists"});
         logger.warn("MetaData request : user_email is not exists");
         return;
     }
+     */
+
     const user_email = req.query.user_email;
     Post.find({user_email:user_email}).
         select("-canvas_data -__v").
@@ -212,7 +155,6 @@ router.get('/metadata', (req, res)=>{
                 return;
             }
         })
-
 })
 
 router.get("/selfstudy", (req, res)=>{
@@ -248,7 +190,6 @@ router.get("/selfstudy", (req, res)=>{
             } else{
                 res.status(200).json(result);
             }
-            
         })
 })
 

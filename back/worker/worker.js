@@ -3,6 +3,7 @@ const Post = require('../models/post')
 const mongoose = require("mongoose");
 
 const MONGO_URI = 'mongodb://localhost:27017/mongoose';
+
 mongoose.connect(MONGO_URI)
     .then(()=>{
         console.info("Mongoose connected successfully in worker.js")
@@ -10,47 +11,23 @@ mongoose.connect(MONGO_URI)
     .catch(err=>{
         console.error("Mongoose connected failed: " + error);
     })
-
-
-
-
+ 
 const run = async ()=>{
-    let array = [];        
-    workerData.forEach(element=>{
+    let array = [];
+    
+    workerData.save_array.forEach(element=>{
         array.push(JSON.parse(element));
     })
-    console.log('hi');
+    if(workerData.now_data){
+        array.push(workerData.now_data);
+    }
 
-    test_tag = [
-        {
-            title:"test2",
-            user_email:"test@gmail",
-            nickname:"heonil",
-            algo_tag :["1","2","3"],
-            extra_tag : ["2","3","4"],
-            announcer : 'announcer',
-            canvas_data :[1,2],
-            imgae_tn_ref :"String",
-            save_time:"save_time",
-            type:'image',
-            teamMates:[1,2,3]
-        },
-        {
-            title:"test2",
-            user_email:"test@gmail",
-            nickname:"heonil",
-            algo_tag :["1","2","3"],
-            extra_tag : ["2","3","4"],
-            announcer : 'announcer',
-            canvas_data :[1,2],
-            imgae_tn_ref :"String",
-            save_time:"save_time",
-            type:'image',
-            teamMates:[1,2,3]
-        }
-    ]
-    await Post.insertMany(test_tag).catch(e=>console.error(e));
-    parentPort.postMessage('pong');
+    console.log("workerData : ", workerData);
+    console.log("array : ", array);
+    
+
+    await Post.insertMany(array).catch(e=>console.error(e));
+    // mongoose.disconnect();
 }
 
 run().catch(err=>console.error(err));

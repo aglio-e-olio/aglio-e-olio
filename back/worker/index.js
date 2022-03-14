@@ -1,5 +1,5 @@
 const { stat } = require("fs");
-const {Worker} = require("worker_threads");
+const { Worker } = require("worker_threads");
 const { db } = require("../models/post");
 
 async function runService(){
