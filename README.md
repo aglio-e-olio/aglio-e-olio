@@ -1,6 +1,6 @@
 # **Aglio Olio**
 - 서비스 주소: https://aglio-e-olio.shop
-- 서비스 설명 및 데모 영상: https://www.youtube.com/watch?v=988hlRPo2N0&ab_channel=%EB%B0%95%ED%98%84%EC%9A%B0
+- 서비스 설명 및 데모 영상: [유튜브 바로가기](https://www.youtube.com/watch?v=988hlRPo2N0&ab_channel=%EB%B0%95%ED%98%84%EC%9A%B0)
 
 ## **소개**
 
