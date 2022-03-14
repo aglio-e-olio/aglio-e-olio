@@ -8,9 +8,12 @@ const Mutex = require('async-mutex').Mutex;
 const mongoose = require('mongoose');
 const mutex = new Mutex();
 const { Worker } = require('worker_threads')
+const path = require('path')
+const workerpool = require('workerpool');
+const pool = workerpool.pool(path.resolve(__dirname, '../workerpool/worker.js'));
 
 
-const SAVE_COUNT = 100;
+const SAVE_COUNT = 1;
 
 
 /* promisify */
@@ -23,17 +26,7 @@ const hexistsAsync = promisify(redisClient.hexists).bind(redisClient);
 const hdelAsync = promisify(redisClient.hdel).bind(redisClient);
 
 
-function runWorker(workerData){
-    return new Promise((resolve, reject)=>{
-        const worker = new Worker('./worker/worker.js', {workerData});
-        worker.on('message', resolve);
-        worker.on('error', reject);
-        worker.on('exit', (code)=>{
-            if(code !==0 )reject(new Error(`Worker sttoped with exit code ${code}`));
-            console.log('worker exit')
-        })
-    })
-}
+
 
 
 
@@ -150,8 +143,8 @@ const redis_save = async (req, res, next) =>{
         const count = await hlenAsync('savelist');
         if(count>=SAVE_COUNT){
             const save_array = await hvalsAsync("savelist");
-            const workerData = {save_array : save_array, now_data : body}
-            runWorker(workerData);
+            // worker pool
+            pool.exec('batch_save', [save_array, body]).catch(e=>console.error(e));
             redisClient.del('savelist');
             res.status(200).send("insert many success");
             return;
