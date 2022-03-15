@@ -7,30 +7,43 @@ const Post = require('../models/post');
 const Mutex = require('async-mutex').Mutex;
 const mongoose = require('mongoose');
 const mutex = new Mutex();
+exports.mutex = mutex;
 const path = require('path')
 const workerpool = require('workerpool');
 const pool = workerpool.pool(path.resolve(__dirname, '../workerpool/worker.js'));
 
 
-const SAVE_COUNT =150;
+const SAVE_COUNT = 1;
+const META_COUNT = 10;
+exports.META_COUNT = META_COUNT;
 
 
 /* promisify */
 const delAsync = promisify(redisClient.del).bind(redisClient);
+const getAsync = promisify(redisClient.get).bind(redisClient);
+const setAsync = promisify(redisClient.set).bind(redisClient);
 const hgetAsync = promisify(redisClient.hget).bind(redisClient);
 const hsetAsync = promisify(redisClient.hset).bind(redisClient);
 const hlenAsync = promisify(redisClient.hlen).bind(redisClient);
 const hvalsAsync = promisify(redisClient.hvals).bind(redisClient);
 const hexistsAsync = promisify(redisClient.hexists).bind(redisClient);
 const hdelAsync = promisify(redisClient.hdel).bind(redisClient);
-
-
+const zscoreAsync = promisify(redisClient.zscore).bind(redisClient);
+const zcardAsync = promisify(redisClient.zcard).bind(redisClient);
+const zpopminAsync = promisify(redisClient.zpopmin).bind(redisClient);
+exports.zscoreAsync = zscoreAsync;
+exports.getAsync = getAsync;
+exports.setAsync = setAsync;
+exports.zcardAsync = zcardAsync;
+exports.zpopminAsync = zpopminAsync;
 
 
 
 
 const redis_test = async (req, res)=>{
-
+    const a = await zpopminAsync('meta');
+    console.log(a);
+    res.send("hi");
 }
 exports.redis_test = redis_test;
 
@@ -45,7 +58,7 @@ const redis_metadata = async (req, res, next)=>{
     const user_email = req.query.user_email;
     
     await mutex.runExclusive(async()=>{
-        const is_user = await hexistsAsync("savelist", user_email);
+        const is_user = await hexistsAsync("savelist", user_email); // 여기 있으면 metadata는 무조건 삭제 되어 있는 상태니까
         
         if(is_user){
             const _id = mongoose.Types.ObjectId();
@@ -133,6 +146,13 @@ const redis_save = async (req, res, next) =>{
     const user_email = body.user_email;
 
     await mutex.runExclusive(async()=>{
+
+        const is_user_meta = await zscoreAsync("meta", user_email);
+        if(is_user_meta){
+            redisClient.del(user_email);
+            redisClient.zrem("meta", user_email);
+        }
+
         const is_user = await hexistsAsync("savelist", user_email);
         if(is_user){
             next();
@@ -142,7 +162,6 @@ const redis_save = async (req, res, next) =>{
         const count = await hlenAsync('savelist');
         if(count>=SAVE_COUNT){
             const save_array = await hvalsAsync("savelist");
-            // worker pool
             pool.exec('batch_save', [save_array, body]).catch(e=>console.error(e));
             redisClient.del('savelist');
             res.status(200).send("insert many success");

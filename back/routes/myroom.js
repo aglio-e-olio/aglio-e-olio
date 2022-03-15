@@ -3,7 +3,7 @@ const Post = require('../models/post');
 const mongoose = require('mongoose')
 const { ObjectId } = mongoose.Types;
 const logger = require('../config/winston');
-const { redis_test, redis_metadata,  redis_save } = require('../redis/redis')
+const { redis_test, redis_metadata,  redis_save, redisClient, zscoreAsync, mutex, getAsync, setAsync, zcardAsync, META_COUNT, zpopminAsync } = require('../redis/redis')
 
 router.post('/test', redis_save,  (req, res)=>{
     res.send("myroom.js code");
@@ -126,7 +126,7 @@ router.delete('/delete/:_id', (req, res)=>{
     })
 })
 
-router.get('/metadata',redis_metadata,(req, res)=>{
+router.get('/metadata',redis_metadata, async (req, res)=>{
     /**
     if(req.query.user_email === undefined){
         res.status(400).json({error : "MetaData request : user_email is not exists"});
@@ -135,11 +135,26 @@ router.get('/metadata',redis_metadata,(req, res)=>{
     }
      */
 
+
+    
+
     const user_email = req.query.user_email;
+    mutex.runExclusive(async()=>{
+        // Check metadata is cached
+    const is_meta = await zscoreAsync('meta', user_email);
+    if(is_meta){
+        let data = await getAsync(user_email);
+        res.status(200).json(JSON.parse(data));
+        redisClient.zrem('meta', user_email);
+        redisClient.zadd('meta', Date.now(), user_email);
+        return;
+    } 
+
+    
     Post.find({user_email:user_email}).
         select("-canvas_data -__v").
         // sort(""). 
-        exec(function(err, result){
+        exec(async function(err, result){
             if(err){
                 // DataBase Error
                 res.status(500).json({error : "DataBase Error : Post.find error" });
@@ -152,9 +167,24 @@ router.get('/metadata',redis_metadata,(req, res)=>{
                 return;
             } else{
                 res.status(200).json(result);
+
+                const count = await zcardAsync('meta');
+                if (count>META_COUNT){
+                    // LRU를 쓸 것이니까
+                    redisClient.set(user_email, JSON.stringify(result));
+                    redisClient.zadd('meta', Date.now(), user_email);
+
+                    // pop!
+                    const pop_email = await zpopminAsync('meta');
+                    redisClient.del(pop_email[0]);
+                } else {
+                    redisClient.set(user_email, JSON.stringify(result));
+                    redisClient.zadd('meta', Date.now(), user_email);
+                }
                 return;
             }
         })
+    })
 })
 
 router.get("/selfstudy", (req, res)=>{
