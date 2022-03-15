@@ -13,8 +13,8 @@ const workerpool = require('workerpool');
 const pool = workerpool.pool(path.resolve(__dirname, '../workerpool/worker.js'));
 
 
-const SAVE_COUNT = 1;
-const META_COUNT = 10;
+const SAVE_COUNT = 3;
+const META_COUNT = 5;
 exports.META_COUNT = META_COUNT;
 
 

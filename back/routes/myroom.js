@@ -14,8 +14,8 @@ router.get('/redis_test', redis_test);
 router.post('/redis_test', redis_test);
 
 
-router.post('/save', redis_save, async (req, res)=>{
-// router.post('/save', async (req, res)=>{
+// router.post('/save', redis_save, async (req, res)=>{
+router.post('/save', async (req, res)=>{
     
     const body = req.body;
     /** 
@@ -126,6 +126,7 @@ router.delete('/delete/:_id', (req, res)=>{
     })
 })
 
+// router.get('/metadata', async (req, res)=>{
 router.get('/metadata',redis_metadata, async (req, res)=>{
     /**
     if(req.query.user_email === undefined){
@@ -135,10 +136,32 @@ router.get('/metadata',redis_metadata, async (req, res)=>{
     }
      */
 
-
-    
-
     const user_email = req.query.user_email;
+    // 기본 버전
+    /** 
+    Post.find({user_email:user_email}).
+        select("-canvas_data -__v").
+        exec(async function(err, result){
+            if(err){
+                // DataBase Error
+                res.status(500).json({error : "DataBase Error : Post.find error" });
+                logger.error("DataBase Error : Post.find error");
+                return;
+            }
+            if(result.length===0){
+                res.status(400).json({error : "There is no user_email in Post Collection"});
+                logger.warn("There is no user_email in Post Collection");
+                return;
+            } else{
+                res.status(200).json(result);
+                return;
+            }
+        })
+
+    return;
+    */
+
+    // const user_email = req.query.user_email;
     mutex.runExclusive(async()=>{
         // Check metadata is cached
     const is_meta = await zscoreAsync('meta', user_email);
