@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import Modal from 'react-modal';
 import { codeContext } from '../../Context/ContextProvider';
 import CreatableSelect from 'react-select/creatable';
@@ -6,19 +6,55 @@ import AsyncCreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import dotenv from 'dotenv';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import { XIcon } from '@heroicons/react/outline';
 
-const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
+const RecordModal = ({ isOpen, onCancel, videoUrl, peerAudios }) => {
   dotenv.config();
-  console.log(isOpen, 'isopen in recordmodal');
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
 
-  const { codes, urlSnapshot, email, persistUser, persistEmail } = useContext(codeContext);
+  const [announcerOptions, setAnnouncerOptions] = useState([]);
 
-  //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  console.log('SAVE 컴포넌트 안!');
+  const [algorithmOptions, setAlgorithmOptions] = useState([
+    { label: 'BFS', value: 'BFS' },
+    { label: 'DFS', value: 'DFS' },
+    { label: 'STACK', value: 'STACK' },
+    { label: 'QUEUE', value: 'QUEUE' },
+    { label: 'Heap', value: 'Heap' },
+    { label: '완전탐색', value: '완전탐색' },
+    { label: 'Greedy', value: 'Greedy' },
+    { label: 'DP', value: 'DP' },
+    { label: '그래프', value: '그래프' },
+    { label: '정렬', value: '정렬' },
+    { label: '문자열', value: '문자열' },
+  ]);
+
+  const [extrasOptions, setExtrasOptions] = useState([]);
+
+  const { persistUser, persistEmail } = useContext(codeContext);
+
+  useEffect(() => {
+    const peersName = [];
+
+    if (peerAudios.size !== 0) {
+      peerAudios.forEach((value, key) => {
+        peersName.push({ label: value.name, value: value.name });
+      });
+    }
+    setAnnouncerOptions((prev) => (prev = peersName));
+
+    if (persistUser !== '') {
+      setAnnouncerOptions((prev) => [
+        ...prev,
+        { label: persistUser, value: persistUser },
+      ]);
+    }
+
+    return () => {};
+  }, [peerAudios, persistUser]);
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -29,24 +65,6 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
     (inputValue) => setAnnouncer(inputValue),
     []
   );
-
-  //나중에 쓰일 듯.
-  const [announcerOptions, setAnnouncerOptions] = useState([
-    { label: '박현우', value: '박현우' },
-    { label: '최준영', value: '최준영' },
-    { label: '김도경', value: '김도경' },
-    { label: '조헌일', value: '조헌일' },
-    { label: '진승현', value: '진승현' },
-  ]);
-
-  const [algorithmOptions, setAlgorithmOptions] = useState([
-    { label: 'BFS', value: 'BFS' },
-    { label: 'DFS', value: 'DFS' },
-    { label: 'STACK', value: 'STACK' },
-    { label: 'QUEUE', value: 'QUEUE' },
-  ]);
-
-  const [extrasOptions, setExtrasOptions] = useState([]);
 
   const handleChangeAlgorithm = useCallback(
     (inputValue) => setAlgorithm(inputValue),
@@ -87,42 +105,98 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
     onCancel();
   };
 
+  function getTime() {
+    const t = new Date();
+    const date = ('0' + t.getDate()).slice(-2);
+    const month = ('0' + (t.getMonth() + 1)).slice(-2);
+    const year = t.getFullYear();
+    const hours = ('0' + t.getHours()).slice(-2);
+    const minutes = ('0' + t.getMinutes()).slice(-2);
+    const seconds = ('0' + t.getSeconds()).slice(-2);
+    const time = `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+    return time;
+  }
+
   const submitHandler = (e) => {
-    console.log(videoUrl, 'videoUrl!!');
     e.preventDefault();
-    let saveTime = new Date();
+
+    const saveTime = getTime();
     let body = {
       title: title,
       algo_tag: algorithm.map((algo) => algo.value),
       announcer: announcer.value,
       extra_tag: extras.map((extra) => extra.value),
-      type: "video",
-      teemMates: announcerOptions.map(
+      type: 'video',
+      teamMates: announcerOptions.map(
         (announcerOption) => announcerOption.value
       ),
       save_time: saveTime,
       canvas_data: null,
-      image_tn_ref: videoUrl, // data는 객체고 data.location에 링크 들어있다.
+      image_tn_ref: videoUrl, // videoURL링크 들어있다.
       user_email: persistEmail,
       nickname: persistUser,
-      // code_data : codes
+      video_flag: 'false', // 비디오 추가
     };
+
+    const showLoading = function () {
+      Swal.fire({
+        title: '영상 저장중입니다',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+    };
+
+    showLoading();
 
     axios
       .post('https://aglio-olio-api.shop/myroom/save', body)
       .then(function (res) {
-        alert('post 성공');
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: 'post 성공!',
+          showConfirmButton: false,
+          timer: 2000,
+          showLoaderOnConfirm: true,
+        });
+        onCancel();
       })
       .catch(function (err) {
-        alert('post실패');
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'post 실패!',
+          showConfirmButton: false,
+          timer: 2000,
+        });
       });
   };
 
+  const modalStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      height: '50%',
+      transform: 'translate(-50%, -50%)',
+      border: 'none',
+      borderRadius: '23px',
+    },
+  };
+
   return (
-    <Modal isOpen={isOpen}>
-      <div className="category" />
-      <div>녹화 저장 화면 입니다.</div>
-      <div className="category" />
+    <Modal isOpen={isOpen} style={modalStyles}>
+      <XIcon
+        class="inline-block w-5 h-5 stroke-current absolute right-5"
+        style={{ cursor: 'pointer' }}
+        onClick={handleClickCancel}
+      />
+      <div class="text-center text-2xl m-7">Save Your Record!</div>
       <form
         onSubmit={submitHandler}
         style={{ display: 'flex', flexDirection: 'column' }}
@@ -130,7 +204,7 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
         <input
           type="text"
           placeholder="제목"
-          class="input input-bordered input-primary w-full max-w-xs"
+          class="input input-bordered w-full max-w-xs"
           value={title}
           onChange={titleHandler}
         ></input>
@@ -162,14 +236,14 @@ const RecordModal = ({ isOpen, onCancel, videoUrl }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success bg-neutral">
+        <button
+          type="submit"
+          class="btn btn-success bg-neutral border-none w-16 absolute right-5 bottom-16"
+        >
           저장
         </button>
       </form>
       <div className="category" />
-      <button class="btn btn-error" onClick={handleClickCancel}>
-        취소
-      </button>
     </Modal>
   );
 };

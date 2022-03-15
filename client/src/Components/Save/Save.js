@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import ReactModal from 'react-modal';
 import './Save.css';
 import axios from 'axios';
@@ -11,18 +11,63 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
-const Save = ({ isOpen, onCancel, yLines, doc }) => {
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { XIcon } from '@heroicons/react/outline';
+
+const Save = ({ isOpen, onCancel, yLines, doc, peerAudios, exit }) => {
   dotenv.config();
 
   const [title, setTitle] = useState('');
   const [announcer, setAnnouncer] = useState();
   const [algorithm, setAlgorithm] = useState([]);
   const [extras, setExtras] = useState([]);
+  const navigate = useNavigate();
+  const [announcerOptions, setAnnouncerOptions] = useState([]);
 
-  const { codes, urlSnapshot, email, persistUser, persistEmail } = useContext(codeContext);
+  const [algorithmOptions, setAlgorithmOptions] = useState([
+    { label: 'BFS', value: 'BFS' },
+    { label: 'DFS', value: 'DFS' },
+    { label: 'STACK', value: 'STACK' },
+    { label: 'QUEUE', value: 'QUEUE' },
+    { label: 'Heap', value: 'Heap' },
+    { label: '완전탐색', value: '완전탐색' },
+    { label: 'Greedy', value: 'Greedy' },
+    { label: 'DP', value: 'DP' },
+    { label: '그래프', value: '그래프' },
+    { label: '정렬', value: '정렬' },
+    { label: '문자열', value: '문자열' },
+  ]);
 
-  //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  console.log('SAVE 컴포넌트 안!');
+  const [extrasOptions, setExtrasOptions] = useState([]);
+
+  const { urlSnapshot, persistUser, persistEmail, exitSave } =
+    useContext(codeContext);
+
+  useEffect(() => {
+    // console.log('save컴포넌트 안 persistUser는', persistUser);
+    // console.log('save컴포넌트 안 peers는', peerAudios);
+    const peersName = [];
+
+    if (peerAudios.size !== 0) {
+      peerAudios.forEach((value, key) => {
+        peersName.push({ label: value.name, value: value.name });
+      });
+    }
+    // console.log('peersName은?', peersName);
+    setAnnouncerOptions((prev) => (prev = peersName));
+
+    if (persistUser !== '') {
+      setAnnouncerOptions((prev) => [
+        ...prev,
+        { label: persistUser, value: persistUser },
+      ]);
+    }
+
+    return () => {
+      // console.log('save컴포넌트 사라짐');
+    };
+  }, [peerAudios, persistUser]);
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -33,24 +78,6 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     (inputValue) => setAnnouncer(inputValue),
     []
   );
-
-  //나중에 쓰일 듯.
-  const [announcerOptions, setAnnouncerOptions] = useState([
-    { label: '박현우', value: '박현우' },
-    { label: '최준영', value: '최준영' },
-    { label: '김도경', value: '김도경' },
-    { label: '조헌일', value: '조헌일' },
-    { label: '진승현', value: '진승현' },
-  ]);
-
-  const [algorithmOptions, setAlgorithmOptions] = useState([
-    { label: 'BFS', value: 'BFS' },
-    { label: 'DFS', value: 'DFS' },
-    { label: 'STACK', value: 'STACK' },
-    { label: 'QUEUE', value: 'QUEUE' },
-  ]);
-
-  const [extrasOptions, setExtrasOptions] = useState([]);
 
   const handleChangeAlgorithm = useCallback(
     (inputValue) => setAlgorithm(inputValue),
@@ -87,6 +114,18 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
       );
     }, 3000);
 
+  function getTime() {
+    const t = new Date();
+    const date = ('0' + t.getDate()).slice(-2);
+    const month = ('0' + (t.getMonth() + 1)).slice(-2);
+    const year = t.getFullYear();
+    const hours = ('0' + t.getHours()).slice(-2);
+    const minutes = ('0' + t.getMinutes()).slice(-2);
+    const seconds = ('0' + t.getSeconds()).slice(-2);
+    const time = `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+    return time;
+  }
+
   // 저장 버튼 클릭시
   const submitHandler = (e) => {
     const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
@@ -117,18 +156,19 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
     );
 
     if (!(title && algorithm && announcer)) {
-      alert('빈칸을 입력해 주세요.');
+      Swal.fire('빈칸을 입력해 주세요');
       return;
     } else {
       uploadFile(file, config)
         .then((data) => {
-          let saveTime = new Date();
+          const saveTime = getTime();
+
           let body = {
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            type: "image",
+            type: 'image',
             teamMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
@@ -138,17 +178,45 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
             user_email: persistEmail,
             nickname: persistUser,
           };
+          const showLoading = function () {
+            Swal.fire({
+              title: '저장중입니다',
+              allowOutsideClick: false,
+              showConfirmButton: false,
+              willOpen: () => {
+                Swal.showLoading();
+              },
+            });
+          };
+
+          showLoading();
 
           axios
             .post('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
-              alert('post 성공');
-              // onCancel();
+              Swal.fire({
+                position: 'top',
+                icon: 'success',
+                title: '저장 성공',
+                showConfirmButton: false,
+                timer: 2000,
+                showLoaderOnConfirm: true,
+              });
+              if (exitSave === 1) {
+                exit();
+                navigate('/');
+              }
+              onCancel();
             })
             .catch(function (err) {
               console.error(err);
-              alert('post 실패');
-              // onCancel();
+              Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: '저장 실패',
+                showConfirmButton: false,
+                timer: 2000,
+              });
             });
         })
         .catch((err) => console.error(err));
@@ -159,11 +227,29 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
   const handleClickCancel = () => {
     onCancel();
   };
+
+  const modalStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      height: '50%',
+      transform: 'translate(-50%, -50%)',
+      border: 'none',
+      borderRadius: '23px',
+    },
+  };
+
   return (
-    <ReactModal isOpen={isOpen}>
-      <div className="category" />
-      <div>저장 화면 입니다.</div>
-      <div className="category" />
+    <ReactModal isOpen={isOpen} style={modalStyles}>
+      <XIcon
+        class="inline-block w-5 h-5 stroke-current absolute right-5"
+        style={{ cursor: 'pointer' }}
+        onClick={handleClickCancel}
+      />
+      <div class="text-center text-2xl m-7">Save Your Study!</div>
       <form
         onSubmit={submitHandler}
         style={{ display: 'flex', flexDirection: 'column' }}
@@ -171,7 +257,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
         <input
           type="text"
           placeholder="제목"
-          class="input input-bordered input-primary w-full max-w-xs"
+          class="input input-bordered w-full max-w-xs"
           value={title}
           onChange={titleHandler}
         ></input>
@@ -182,6 +268,7 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
           options={algorithmOptions}
           onChange={handleChangeAlgorithm}
           onCreateOption={handleCreateAlgorithm}
+          class="border-none"
           isMulti
         />
         <div className="category" />
@@ -202,15 +289,11 @@ const Save = ({ isOpen, onCancel, yLines, doc }) => {
           placeholder="추가 태그"
           isMulti
         />
-        <div className="category" />
-        <button type="submit" class="btn btn-success bg-neutral">
+        <button type="submit" class="btn btn-success bg-neutral border-none w-16 absolute right-5 bottom-16">
           저장
         </button>
       </form>
       <div className="category" />
-      <button class="btn btn-error" onClick={handleClickCancel}>
-        취소
-      </button>
     </ReactModal>
   );
 };

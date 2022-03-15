@@ -8,11 +8,14 @@ import LobbyCreate from '../Components/Atoms/LobbyCreate';
 import LobbyHistory from '../Components/Atoms/LobbyHistory';
 
 const CreateRoom = (props) => {
-  const { persistUser, persistLogin } = useContext(codeContext);
+  const { persistUser, persistLogin, setExitSave, setDocGCount } =
+    useContext(codeContext);
   const login_info = localStorage.getItem('persistLogin');
 
   const navigate = useNavigate();
   function create() {
+    setDocGCount(0);
+    setExitSave(0);
     const id = uuid();
     navigate(`/room/${id}`);
   }
@@ -25,9 +28,17 @@ const CreateRoom = (props) => {
   return (
     <div>
       {login_info ? (
-        <div class="flex h-screen divide-x divide-solid">
-          <LobbyCreate clickAction={create} buttonName={'CreateRoom'} />
-          <LobbyHistory clickAction={history} buttonName={'History'} />
+        <div>
+          <div
+            class="absolute m-10"
+            style={{ fontFamily: 'Pacifico', fontSize: '40px', color: 'white' }}
+          >
+            Aglio Olio
+          </div>
+          <div class="flex h-screen divide-x divide-solid divide-gray-500">
+            <LobbyCreate clickAction={create} buttonName={'Create Room'} />
+            <LobbyHistory clickAction={history} buttonName={'Enter Room'} />
+          </div>
         </div>
       ) : (
         <div class="hero min-h-screen bg-base-200">

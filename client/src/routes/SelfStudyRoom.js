@@ -16,6 +16,7 @@ import UpdateStudy from '../Components/UpdateStudy/UpdateStudy';
 import { WebrtcProvider } from 'y-webrtc';
 import { v1 as uuid } from 'uuid';
 import axios from 'axios';
+import SelfAbsolute from '../Components/SelfAbsolute/SelfAbsolute';
 
 let i = 0;
 let doc;
@@ -25,22 +26,36 @@ let yLines;
 let undoManager;
 let data;
 
+// Media-server
+const socket = io.connect('https://aglio-olio.shop', {
+  withCredentials: false,
+});
+
 const SelfStudyRoom = () => {
   const socketRef = useRef();
   const [isOpen, setOpen] = useState(false);
-  const { codes, compileResult, getCompileResult, getUrl, selectedPreviewKey } =
-    useContext(codeContext);
+  const [allData, setAllData] = useState({});
+  const {
+    codes,
+    compileResult,
+    getCompileResult,
+    getUrl,
+    selectedPreviewKey,
+    docGenerateCount,
+    setDocGCount,
+  } = useContext(codeContext);
   //   const { roomID } = useParams();
   const roomID = uuid();
+  const [isEraser, setIsEraser] = useState(false);
 
-  if (i === 0) {
+  if (docGenerateCount === 0) {
     doc = new Y.Doc();
     provider = new WebrtcProvider(roomID, doc);
     awareness = provider.awareness;
     yLines = doc.getArray('lines~9');
     undoManager = new Y.UndoManager(yLines);
+    setDocGCount(1);
   }
-  i++;
 
   const handleSave = () => {
     // 여기서 모달 열어줌
@@ -51,8 +66,8 @@ const SelfStudyRoom = () => {
   const onCapture = async () => {
     let snapshotUrl = '';
     console.log('onCapture');
-    await html2canvas(document.body)
-      .then(async (canvas) => {
+    await html2canvas(document.getElementById("onCapture"))
+      .then((canvas) => {
         snapshotUrl = canvas.toDataURL('image/png');
         getUrl(snapshotUrl);
       })
@@ -65,28 +80,24 @@ const SelfStudyRoom = () => {
     setOpen(false);
   };
 
-  function sendCode() {
-    socketRef.current.emit('code compile', { codes, roomID });
-  }
-
   function handleCompileResult(code) {
     getCompileResult(code);
   }
 
   useEffect(() => {
-    socketRef.current = io.connect('/');
+    // socketRef.current = io.connect('https://aglio-olio.shop');
 
-    socketRef.current.on('code response', (code) => {
+    socket.on('code response', (code) => {
       handleCompileResult(code);
     });
 
     axios({
       method: 'GET',
-      url: 'https://aglio-olio-api.shop/myroom/preview', // url 변경 해야함
-      params: { post_id: selectedPreviewKey },
+      url: 'https://aglio-olio-api.shop/myroom/selfstudy',
+      params: { _id: selectedPreviewKey },
     })
       .then((res) => {
-        data = res.data
+        setAllData(res.data);
         const encodedDoc = res.data.canvas_data;
         const docToUint8 = Uint8Array.from(Object.values(encodedDoc[0]));
         Y.applyUpdateV2(doc, docToUint8);
@@ -96,34 +107,38 @@ const SelfStudyRoom = () => {
 
   return (
     <div>
-      <div>
-        <button className="run-button" onClick={sendCode}>
-          Run
-        </button>
-        <button
-          class="btn btn-success cursor-pointer absolute top-0 right-40"
-          onClick={handleSave}
-        >
-          저장 모달 열기
-        </button>
-        {data && <UpdateStudy isOpen={isOpen} onCancel={handleSaveCancel} doc={doc} data={data}/>}
+      <div class="fixed top-0 left-0 right-0 bottom-0 " id='onCapture'>
+        <SelfAbsolute
+          // peers={peers}
+          handleSave={handleSave}
+          doc={doc}
+          provider={provider}
+          awareness={awareness}
+          yLines={yLines}
+          undoManager={undoManager}
+          setIsEraser={setIsEraser}
+          socket={socket}
+        />
         <Canvas
           doc={doc}
           provider={provider}
           awareness={awareness}
           yLines={yLines}
           undoManager={undoManager}
+          isEraser={isEraser}
         />
-        <CodeEditor doc={doc} provider={provider} />
       </div>
       <div>
-        <textarea
-          className="code-result"
-          value={compileResult}
-          placeholder={
-            '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
-          }
-        />
+        {isOpen && (
+          <UpdateStudy
+            isOpen={isOpen}
+            onCancel={handleSaveCancel}
+            doc={doc}
+            data={allData}
+          />
+        )}
+
+        {/* <Record /> */}
       </div>
     </div>
   );

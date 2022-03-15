@@ -12,7 +12,7 @@ const CodeEditorWrapper = ({ doc, provider }) => {
           className="code-result"
           value={compileResult}
           placeholder={
-            '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
+            '코드 결과 출력 창입니다. \n현재 Python만 지원중입니다.'
           }
         />
       </div>

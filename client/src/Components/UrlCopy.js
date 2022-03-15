@@ -1,7 +1,9 @@
 import React from 'react';
+import UrlCopyIcon from './Atoms/UrlCopyIcon';
+import Swal from 'sweetalert2'
+import ReactTooltip from "react-tooltip";
 
 function UrlCopy() {
-  console.log('UrlCopy 안');
   const doCopy = (text) => {
     // 흐음 1.
     if (navigator.clipboard) {
@@ -9,15 +11,33 @@ function UrlCopy() {
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          alert('클립보드에 복사되었습니다.');
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: '클립보드에 복사되었습니다!',
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
         .catch(() => {
-          alert('복사를 다시 시도해주세요.');
+          Swal.fire({
+            position: 'top-end',
+            icon: 'error',
+            title: '다시 복사를 시도하세요',
+            showConfirmButton: false,
+            timer: 1500
+          })
         });
     } else {
       // 흐름 2.
       if (!document.queryCommandSupported('copy')) {
-        return alert('복사하기가 지원되지 않는 브라우저입니다.');
+        return Swal.fire({
+          position: 'top-end',
+          icon: 'error',
+          title: '복사를 지원하지 않는 브라우저 입니다.',
+          showConfirmButton: false,
+          timer: 1500
+        })
       }
 
       // 흐름 3.
@@ -37,31 +57,21 @@ function UrlCopy() {
       document.execCommand('copy');
       // 흐름 6.
       document.body.removeChild(textarea);
-      alert('클립보드에 복사되었습니다.');
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: '클립보드에 복사되었습니다!',
+        showConfirmButton: false,
+        timer: 1500
+      })
     }
   };
 
   const url = window.document.location.href;
 
   return (
-    <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)}>
-      <svg
-        width="32px"
-        height="32px"
-        viewBox="0 2 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-labelledby="clipIconTitle"
-        stroke="#ffffff"
-        stroke-width="1.5"
-        stroke-linecap="square"
-        stroke-linejoin="miter"
-        fill="none"
-        color="#ffffff"
-      >
-        {' '}
-        <title id="clipIconTitle">Attachment (paper clip)</title>{' '}
-        <path d="M7.93517 13.7796L15.1617 6.55304C16.0392 5.67631 17.4657 5.67631 18.3432 6.55304C19.2206 7.43052 19.2206 8.85774 18.3432 9.73522L8.40091 19.5477C6.9362 21.0124 4.56325 21.0124 3.09854 19.5477C1.63382 18.0837 1.63382 15.7093 3.09854 14.2453L12.9335 4.53784C14.984 2.48739 18.3094 2.48739 20.3569 4.53784C22.4088 6.58904 22.4088 9.91146 20.3584 11.9619L13.239 19.082" />{' '}
-      </svg>
+    <button class="btn btn-ghost mx-3" onClick={() => doCopy(url)} data-tip ="URL을 복사합니다.">
+      <UrlCopyIcon />
     </button>
   );
 }

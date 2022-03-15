@@ -1,29 +1,28 @@
 import React from 'react';
 
 const RightSideNav = ({ setIsOpen }) => {
+  function handleClick() {
+    setIsOpen(true);
+  }
+
   return (
-    <ul class="menu bg-neutral hover:bg-neutral-focus cursor-pointer rounded-box absolute top-1/3 right-0 w-8">
-      <li>
+    <ul class="menu z-50 bg-ghost cursor-pointer rounded-box absolute top-1/3 right-0 w-8">
+      <button class="btn btn-ghost btn-xs w-8 h-24" onClick={handleClick} data-tip ="코드 편집기를 엽니다">
         <svg
-          role="img"
           xmlns="http://www.w3.org/2000/svg"
-          width="32px"
-          height="32px"
-          viewBox="0 0 24 24"
-          aria-labelledby="chevronLeftIconTitle"
-          stroke="#ffffff"
-          stroke-width="1.5"
-          stroke-linecap="square"
-          stroke-linejoin="miter"
+          className="h-6 w-6"
           fill="none"
-          color="#ffffff"
-          onClick={() => setIsOpen(true)}
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={4}
         >
-          {' '}
-          <title id="chevronLeftIconTitle">Chevron Left</title>{' '}
-          <polyline points="14 18 8 12 14 6 14 6" />{' '}
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+          />
         </svg>
-      </li>
+      </button>
     </ul>
   );
 };

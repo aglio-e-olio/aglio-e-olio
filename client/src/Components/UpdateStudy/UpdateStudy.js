@@ -11,59 +11,62 @@ import { codeContext } from '../../Context/ContextProvider';
 import { uploadFile } from 'react-s3';
 import { v1 } from 'uuid';
 import dotenv from 'dotenv';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import { XIcon } from '@heroicons/react/outline';
 
 const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   dotenv.config();
 
-  const [title, setTitle] = useState(metaData.title);
-  const [announcer, setAnnouncer] = useState(metaData.announcer);
-
+  const [title, setTitle] = useState(data.title);
+  const [announcer, setAnnouncer] = useState(data.announcer);
+  const navigate = useNavigate();
   const [metaData, setMetaData] = useState([]);
+  const {
+    exitSave,
+    urlSnapshot,
+    persistEmail,
+    persistUser,
+    selectedPreviewKey,
+    setDocGCount,
+  } = useContext(codeContext);
 
-  const getData = async (selectedPreviewKey) => {
-    try {
-      const res = await axios({
-        method: "GET",
-        url: 'https://aglio-olio-api.shop/myroom/preview',
-        params: { post_id: selectedPreviewKey },
-      })
-      setMetaData(prev => prev = res.data)
-    } catch(err) {
-      console.error(err)
+  function makeArray(array, data, key) {
+    if (data && data[key]) {
+      data[key].map((tag) => {
+        let obj = {};
+        obj.label = tag;
+        obj.value = tag;
+        array.push(obj);
+      });
     }
+    return array;
   }
- 
-  useEffect(() => {
-    getData(selectedPreviewKey)
-  }, [])
 
-  let algo_array = [];
-  if (metaData && metaData.algo_tag) {
-    metaData.algo_tag.map((tag) => {
-      let algo_object = {};
-      algo_object.label = tag.tag;
-      algo_object.value = tag.tag;
-      algo_array.push(algo_object);
-    });
-  }
-  const [algorithm, setAlgorithm] = useState(algo_array && [...algo_array]);
-
-  let extra_array = [];
-  if (metaData && metaData.extra_tag) {
-    metaData.extra_tag.map((tag) => {
-      let extra_object = {};
-      extra_object.label = tag;
-      extra_object.value = tag;
-      extra_array.push(extra_object);
-    });
-  }
-  const [extras, setExtras] = useState(extra_array && [...extra_array]);
-
-  const { codes, urlSnapshot, persistEmail, persistUser, selectedPreviewKey } =
-    useContext(codeContext);
+  let algo_array = makeArray([], data, 'algo_tag');
+  let extra_array = makeArray([], data, 'extra_tag');
+  let announcer_array = makeArray([], data, 'teamMates');
+  const [algorithm, setAlgorithm] = useState(algo_array);
+  const [extras, setExtras] = useState(extra_array);
 
   //여기서 모달창이 계속 렌더링 되는 이유 해결하기!
-  console.log('SAVE 컴포넌트 안!');
+  // console.log('SAVE 컴포넌트 안!');
+
+  const [algorithmOptions, setAlgorithmOptions] = useState([
+    { label: 'BFS', value: 'BFS' },
+    { label: 'DFS', value: 'DFS' },
+    { label: 'STACK', value: 'STACK' },
+    { label: 'QUEUE', value: 'QUEUE' },
+    { label: 'Heap', value: 'Heap' },
+    { label: '완전탐색', value: '완전탐색' },
+    { label: 'Greedy', value: 'Greedy' },
+    { label: 'DP', value: 'DP' },
+    { label: '그래프', value: '그래프' },
+    { label: '정렬', value: '정렬' },
+    { label: '문자열', value: '문자열' },
+  ]);
+  const [announcerOptions, setAnnouncerOptions] = useState(announcer_array);
+  const [extrasOptions, setExtrasOptions] = useState([]);
 
   const titleHandler = (e) => {
     e.preventDefault();
@@ -74,24 +77,6 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     (inputValue) => setAnnouncer(inputValue),
     []
   );
-
-  //나중에 쓰일 듯.
-  const [announcerOptions, setAnnouncerOptions] = useState([
-    { label: '박현우', value: '박현우' },
-    { label: '최준영', value: '최준영' },
-    { label: '김도경', value: '김도경' },
-    { label: '조헌일', value: '조헌일' },
-    { label: '진승현', value: '진승현' },
-  ]);
-
-  const [algorithmOptions, setAlgorithmOptions] = useState([
-    { label: 'BFS', value: 'BFS' },
-    { label: 'DFS', value: 'DFS' },
-    { label: 'STACK', value: 'STACK' },
-    { label: 'QUEUE', value: 'QUEUE' },
-  ]);
-
-  const [extrasOptions, setExtrasOptions] = useState([]);
 
   const handleChangeAlgorithm = useCallback(setAlgorithm, []);
   const handleChangeExtras = useCallback(setExtras, []);
@@ -150,41 +135,81 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
       `image/${v1().toString().replace('-', '')}.png`
     );
 
+    function getTime() {
+      const t = new Date();
+      const date = ('0' + t.getDate()).slice(-2);
+      const month = ('0' + (t.getMonth() + 1)).slice(-2);
+      const year = t.getFullYear();
+      const hours = ('0' + t.getHours()).slice(-2);
+      const minutes = ('0' + t.getMinutes()).slice(-2);
+      const seconds = ('0' + t.getSeconds()).slice(-2);
+      const time = `${year}/${month}/${date} ${hours}:${minutes}:${seconds}`;
+      return time;
+    }
+
     if (!(title && algorithm && announcer)) {
-      alert('빈칸을 입력해 주세요.');
+      Swal.fire('빈칸을 입력해 주세요');
       return;
     } else {
       uploadFile(file, config)
         .then((data) => {
-          let updateTime = new Date();
+          const updateTime = getTime();
+
           let body = {
-            post_id: selectedPreviewKey,
+            _id: selectedPreviewKey,
             title: title,
             algo_tag: algorithm.map((algo) => algo.value),
             announcer: announcer.value,
             extra_tag: extras.map((extra) => extra.value),
-            type: "image",
-            teemMates: announcerOptions.map(
+            type: 'image',
+            teamMates: announcerOptions.map(
               (announcerOption) => announcerOption.value
             ),
             update_time: updateTime,
             canvas_data: ydocCanvasData,
-            image_tn_ref: metaData.location, // data는 객체고 data.location에 링크 들어있다.
+            image_tn_ref: data.location, // data는 객체고 data.location에 링크 들어있다.
             user_email: persistEmail,
             nickname: persistUser,
           };
 
+          const showLoading = function () {
+            Swal.fire({
+              title: '업데이트 중입니다',
+              allowOutsideClick: false,
+              showConfirmButton: false,
+              willOpen: () => {
+                Swal.showLoading();
+              },
+            });
+          };
+
+          showLoading();
+
           axios
             .put('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
-              console.log(res);
-              alert('post 성공');
-              // onCancel();
+              Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: '업데이트 성공!',
+                showConfirmButton: false,
+                timer: 2000,
+              });
+              if (exitSave === 1) {
+                setDocGCount(0);
+                navigate(-1);
+              }
+              onCancel();
             })
             .catch(function (err) {
               console.error(err);
-              alert('post 실패');
-              // onCancel();
+              Swal.fire({
+                position: 'top',
+                icon: 'error',
+                title: '업데이트 실패',
+                showConfirmButton: false,
+                timer: 2000,
+              });
             });
         })
         .catch((err) => console.error(err));
@@ -196,11 +221,28 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
     onCancel();
   };
 
+  const modalStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      height: '50%',
+      transform: 'translate(-50%, -50%)',
+      border: 'none',
+      borderRadius: '23px',
+    },
+  };
+
   return (
-    <ReactModal isOpen={isOpen}>
-      <div className="category" />
-      <div>저장 화면 입니다.</div>
-      <div className="category" />
+    <ReactModal isOpen={isOpen} style={modalStyles}>
+      <XIcon
+        class="inline-block w-5 h-5 stroke-current absolute right-5"
+        style={{ cursor: 'pointer' }}
+        onClick={handleClickCancel}
+      />
+      <div class="text-center text-2xl m-7">Update Your Study!</div>
       <form
         onSubmit={submitHandler}
         style={{ display: 'flex', flexDirection: 'column' }}
@@ -240,14 +282,11 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success bg-neutral">
-          저장
+        <button type="submit" class="btn btn-success bg-neutral border-none w-24 absolute right-5 bottom-16">
+          업데이트
         </button>
       </form>
       <div className="category" />
-      <button class="btn btn-error" onClick={handleClickCancel}>
-        취소
-      </button>
     </ReactModal>
   );
 };

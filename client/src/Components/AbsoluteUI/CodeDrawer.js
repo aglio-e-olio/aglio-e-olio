@@ -2,72 +2,66 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import CodeEditor from '../CodeEditor/Editor';
 import io from 'socket.io-client';
+import ReactToolTip from 'react-tooltip';
 
-const CodeDrawer = ({ isOpen, setIsOpen, doc, provider }) => {
-  const { codes, roomInfo, compileResult } = useContext(codeContext);
-  const socketRef = useRef();
-
-  useEffect(() => {
-    socketRef.current = io.connect('/');
-  }, []);
+const CodeDrawer = ({ isOpen, setIsOpen, doc, provider, socket, isSelfStudy }) => {
+  const { codes, extractCode, compileResult } = useContext(codeContext);
 
   function sendCode() {
-    socketRef.current.emit('code compile', { codes, roomInfo });
+    let text = doc.getText('codemirror')
+    let sendingData = text.toString();
+    socket.emit('code compile', { sendingData, isSelfStudy: isSelfStudy });
   }
 
   return (
-    <main
+    <section
       className={
-        ' fixed top-20 overflow-hidden z-10 bg-gray-900 bg-opacity-0 inset-0 transform ease-in-out ' +
-        (isOpen
-          ? ' transition-opacity opacity-100 duration-500 translate-x-0  '
-          : ' transition-all delay-500 opacity-0 translate-x-full  ')
+        ' rounded-box w-screen max-w-lg top-20 right-0 absolute bg-white bg-opacity-80 h-3/4 shadow-xl delay-400 duration-500 ease-in-out transition-all transform  ' +
+        (isOpen ? ' translate-x-0 z-50' : ' translate-x-full')
       }
     >
-      <section
-        className={
-          ' w-screen max-w-lg right-0 absolute bg-white h-full shadow-xl delay-400 duration-500 ease-in-out transition-all transform  ' +
-          (isOpen ? ' translate-x-0 ' : ' translate-x-full ')
-        }
-      >
-        <article className="relative w-screen max-w-lg pb-10 flex flex-col space-y-6 overflow-y-scroll h-full">
-          <button
-            class="btn btn-secondary btn-xs w-8 top-1/3 left-0 fixed z-30"
-            onClick={() => setIsOpen(false)}
-          >
+      <article className="indicator relative w-screen max-w-lg pb-10 flex flex-col space-y-6 overflow-y-scroll h-full">
+        <button
+          class="btn btn-ghost btn-xs w-8 top-1/3 -left-8 h-24 fixed z-30"
+          onClick={() => setIsOpen(false)}
+          data-tip ="코드편집기를 닫습니다"
+        >
+          {isOpen ? (
             <svg
-              role="img"
               xmlns="http://www.w3.org/2000/svg"
-              width="100%"
-              height="100%"
-              viewBox="0 0 24 24"
-              aria-labelledby="chevronRightIconTitle"
-              stroke="#ffffff"
-              stroke-width="5"
-              stroke-linecap="square"
-              stroke-linejoin="miter"
+              className="h-6 w-6"
               fill="none"
-              color="#ffffff"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={4}
             >
-              {' '}
-              <title id="chevronRightIconTitle">Chevron Right</title>{' '}
-              <polyline points="10 6 16 12 10 18 10 18" />{' '}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 5l7 7-7 7M5 5l7 7-7 7"
+              />
             </svg>
-          </button>
-          <button class="btn fixed bottom-20 right-4 z-30" onClick={sendCode}>
-            Run
-          </button>
-          <CodeEditor doc={doc} provider={provider} />
-          <textarea
-            className="w-full border-solid border-2 fixed bottom-2"
-            value={compileResult}
-            placeholder={
-              '코드 결과 출력 창입니다. \n현재 Javascript만 지원중입니다.'
-            }
-          />
-        </article>
-      </section>
-    </main>
+          ) : (
+            <svg></svg>
+          )}
+        </button>
+        <button
+          class="tab tab-lifted tab-active fixed -bottom-2 right-4 z-30"
+          onClick={sendCode}
+          data-tip = "코드를 실행합니다"
+        >
+          Run
+        </button>
+        <CodeEditor doc={doc} provider={provider} />
+        <textarea
+          className="textarea textarea-info w-full fixed -bottom-20"
+          value={compileResult}
+          placeholder={
+            '코드 결과 출력 창입니다. \n현재 Python만 지원중입니다.'
+          }
+        />
+      </article>
+    </section>
   );
 };
 
