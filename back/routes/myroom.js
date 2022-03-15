@@ -43,6 +43,7 @@ router.post('/save', async (req, res)=>{
         return; 
     }
     */
+
     // Post Save
     try{
         Post.create(body);
@@ -164,49 +165,49 @@ router.get('/metadata',redis_metadata, async (req, res)=>{
     // const user_email = req.query.user_email;
     mutex.runExclusive(async()=>{
         // Check metadata is cached
-    const is_meta = await zscoreAsync('meta', user_email);
-    if(is_meta){
-        let data = await getAsync(user_email);
-        res.status(200).json(JSON.parse(data));
-        redisClient.zrem('meta', user_email);
-        redisClient.zadd('meta', Date.now(), user_email);
-        return;
-    } 
+        const is_meta = await zscoreAsync('meta', user_email);
+        if(is_meta){
+            let data = await getAsync(user_email);
+            res.status(200).json(JSON.parse(data));
+            redisClient.zrem('meta', user_email);
+            redisClient.zadd('meta', Date.now(), user_email);
+            return;
+        } 
 
-    
-    Post.find({user_email:user_email}).
-        select("-canvas_data -__v").
-        // sort(""). 
-        exec(async function(err, result){
-            if(err){
-                // DataBase Error
-                res.status(500).json({error : "DataBase Error : Post.find error" });
-                logger.error("DataBase Error : Post.find error");
-                return;
-            }
-            if(result.length===0){
-                res.status(400).json({error : "There is no user_email in Post Collection"});
-                logger.warn("There is no user_email in Post Collection");
-                return;
-            } else{
-                res.status(200).json(result);
-
-                const count = await zcardAsync('meta');
-                if (count>META_COUNT){
-                    // LRU를 쓸 것이니까
-                    redisClient.set(user_email, JSON.stringify(result));
-                    redisClient.zadd('meta', Date.now(), user_email);
-
-                    // pop!
-                    const pop_email = await zpopminAsync('meta');
-                    redisClient.del(pop_email[0]);
-                } else {
-                    redisClient.set(user_email, JSON.stringify(result));
-                    redisClient.zadd('meta', Date.now(), user_email);
+        
+        Post.find({user_email:user_email}).
+            select("-canvas_data -__v").
+            // sort(""). 
+            exec(async function(err, result){
+                if(err){
+                    // DataBase Error
+                    res.status(500).json({error : "DataBase Error : Post.find error" });
+                    logger.error("DataBase Error : Post.find error");
+                    return;
                 }
-                return;
-            }
-        })
+                if(result.length===0){
+                    res.status(400).json({error : "There is no user_email in Post Collection"});
+                    logger.warn("There is no user_email in Post Collection");
+                    return;
+                } else{
+                    res.status(200).json(result);
+
+                    const count = await zcardAsync('meta');
+                    if (count>META_COUNT){
+                        // LRU를 쓸 것이니까
+                        redisClient.set(user_email, JSON.stringify(result));
+                        redisClient.zadd('meta', Date.now(), user_email);
+
+                        // pop!
+                        const pop_email = await zpopminAsync('meta');
+                        redisClient.del(pop_email[0]);
+                    } else {
+                        redisClient.set(user_email, JSON.stringify(result));
+                        redisClient.zadd('meta', Date.now(), user_email);
+                    }
+                    return;
+                }
+            })
     })
 })
 
