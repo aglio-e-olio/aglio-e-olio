@@ -41,7 +41,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 /* routing */
-app.use('/myroom', require('../routes/myroom'));
+// app.use('/myroom', require('../routes/myroom')); // heroku 떄문에 주석 달았음
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.get('*', (req, res) => {
