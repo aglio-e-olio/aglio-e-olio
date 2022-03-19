@@ -53,25 +53,29 @@ module.exports = class FFmpeg {
     if (this._process.stderr) {
       this._process.stderr.setEncoding('utf-8');
 
-      this._process.stderr.on('data', data =>
-        console.log('ffmpeg::process::data [data:%o]', data)
+      this._process.stderr.on('data', data => {
+        // console.log('ffmpeg::process::data [data:%o]', data)
+      }
       );
     }
 
     if (this._process.stdout) {
       this._process.stdout.setEncoding('utf-8');
 
-      this._process.stdout.on('data', data =>
-        console.log('ffmpeg::process::data [data:%o]', data)
+      this._process.stdout.on('data', data => {
+        // console.log('ffmpeg::process::data [data:%o]', data)
+      }
       );
     }
 
-    this._process.on('message', message =>
-      console.log('ffmpeg::process::message [message:%o]', message)
+    this._process.on('message', message => {
+      // console.log('ffmpeg::process::message [message:%o]', message)
+    }
     );
 
-    this._process.on('error', error =>
+    this._process.on('error', error => {
       console.error('ffmpeg::process::error [error:%o]', error)
+    }
     );
 
     this._process.once('close', () => {

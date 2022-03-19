@@ -209,14 +209,17 @@ io.on('connection', (socket) => {
   socket.on('consume', async ({ consumerTransportId, producerId, rtpCapabilities, peerId }, callback) => {
     //TODO null handling
     let params = await roomList.get(socket.room_id).consume(socket.id, consumerTransportId, producerId, rtpCapabilities, peerId)
-
-    console.log('Consuming', {
-      name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`,
-      producer_id: `${producerId}`,
-      consumer_id: `${params.consumerId}`
-    })
-
-    callback(params)
+    if (params === undefined) {
+      console.error("peer를 consume 하려는 순간 해당 peer exit.")
+    } else {
+      console.log('Consuming', {
+        name: `${roomList.get(socket.room_id) && roomList.get(socket.room_id).getPeers().get(socket.id).name}`,
+        producer_id: `${producerId}`,
+        consumer_id: `${params.consumerId}`
+      })
+  
+      callback(params)
+    }
   })
 
   socket.on('resume', async (data, callback) => {
@@ -337,7 +340,7 @@ io.on('connection', (socket) => {
       // put your own client id and client secret of jdoodle
       clientId: '47846de47896aadb1f698a6a38b3cc4d',
       clientSecret:
-        'bed60c3f16b2d91101949996c5da18827216d6e4e94c5f1b13378ca8a3fbe309',
+        'b1af59ba34b216497bedc5050163f0c4f2102451af27a94ce70d235777b601b',
       script: payload.sendingData,
       stdin: '',
       language: 'python3',
@@ -352,7 +355,11 @@ io.on('connection', (socket) => {
       }).then((res) => {
         socket.emit('code response', res.data.output);
         if (!payload.isSelfStudy) {
-          room.broadCast(socket.id, 'code response', res.data.output);
+          if (room !== undefined) {
+            room.broadCast(socket.id, 'code response', res.data.output);
+          } else {
+            console.error("code response에서 room이 undefined인 경우")
+          }
         }
         console.log({
           compileResult: res.data.output,
