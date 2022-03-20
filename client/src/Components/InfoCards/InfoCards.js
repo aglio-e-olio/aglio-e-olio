@@ -3,6 +3,7 @@ import './InfoCards.css';
 import { codeContext } from '../../Context/ContextProvider';
 import PictureIcon from '../Atoms/PictureIcon';
 import CameraIcon from '../Atoms/CameraIcon';
+import DataMapBadge from '../Atoms/DataMapBadge';
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoCards() {
@@ -15,7 +16,10 @@ function InfoCards() {
 
   return (
     <div>
-      <div class="overflow-auto h-screen card-wrapper" style={{height:'80vh'}}>
+      <div
+        class="overflow-auto h-screen card-wrapper"
+        style={{ height: '80vh' }}
+      >
         {searchedData.map((value, index) => {
           return (
             <div
@@ -29,14 +33,7 @@ function InfoCards() {
                 <p>{value.announcer}</p>
                 <p>{value.save_time}</p>
                 <div class="justify-end card-actions">
-                  {value.algo_tag &&
-                    value.algo_tag.map((tag, index) => {
-                      return (
-                        <span key={index} class="badge badge-outline">
-                          {tag}
-                        </span> // tag 안에 _id와 value 넣음
-                      );
-                    })}
+                  {value.algo_tag && <DataMapBadge data={value.algo_tag} />}
                 </div>
               </div>
             </div>
