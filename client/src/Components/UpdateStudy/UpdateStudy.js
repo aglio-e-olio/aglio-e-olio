@@ -111,7 +111,6 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   const submitHandler = (e) => {
     const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
     console.log('submit 발생');
-    console.log('업데이트 여부 확인', isUpdate);
     e.preventDefault();
 
     const config = {
@@ -186,7 +185,6 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
           };
 
           showLoading();
-
           if (isUpdate) {
             axios
               .put('https://aglio-olio-api.shop/myroom/save', body)
@@ -214,35 +212,38 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
                   timer: 2000,
                 });
               });
-          }
-          else {
+          } else {
+            delete body['_id'];
+            body['update_time'] = '-';
+            body['save_time'] = updateTime;
+
             axios
-            .post('https://aglio-olio-api.shop/myroom/save', body)
-            .then(function (res) {
-              Swal.fire({
-                position: 'top',
-                icon: 'success',
-                title: '새 데이터 저장 성공!',
-                showConfirmButton: false,
-                timer: 2000,
-                showLoaderOnConfirm: true,
+              .post('https://aglio-olio-api.shop/myroom/new_data_save', body)
+              .then(function (res) {
+                Swal.fire({
+                  position: 'top',
+                  icon: 'success',
+                  title: '새 데이터 저장 성공!',
+                  showConfirmButton: false,
+                  timer: 2000,
+                  showLoaderOnConfirm: true,
+                });
+                if (exitSave === 1) {
+                  setDocGCount(0);
+                  navigate(-1);
+                }
+                onCancel();
+              })
+              .catch(function (err) {
+                console.error(err);
+                Swal.fire({
+                  position: 'top',
+                  icon: 'error',
+                  title: '새 데이터 저장 실패',
+                  showConfirmButton: false,
+                  timer: 2000,
+                });
               });
-              if (exitSave === 1) {
-                setDocGCount(0);
-                navigate(-1);
-              }
-              onCancel();
-            })
-            .catch(function (err) {
-              console.error(err);
-              Swal.fire({
-                position: 'top',
-                icon: 'error',
-                title: '새 데이터 저장 실패',
-                showConfirmButton: false,
-                timer: 2000,
-              });
-            });
           }
         })
         .catch((err) => console.error(err));
@@ -266,7 +267,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
       right: 'auto',
       bottom: 'auto',
       marginRight: '-50%',
-      height: '50%',
+      height: '55%',
       transform: 'translate(-50%, -50%)',
       border: 'none',
       borderRadius: '23px',
