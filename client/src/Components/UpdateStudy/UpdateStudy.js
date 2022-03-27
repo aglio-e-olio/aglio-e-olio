@@ -21,6 +21,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   const [title, setTitle] = useState(data.title);
   const [announcer, setAnnouncer] = useState(data.announcer);
   const navigate = useNavigate();
+  const [isUpdate, setUpdate] = useState();
   const [metaData, setMetaData] = useState([]);
   const {
     exitSave,
@@ -110,6 +111,7 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   const submitHandler = (e) => {
     const ydocCanvasData = Y.encodeStateAsUpdateV2(doc);
     console.log('submit 발생');
+    console.log('업데이트 여부 확인', isUpdate);
     e.preventDefault();
 
     const config = {
@@ -185,15 +187,45 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
 
           showLoading();
 
-          axios
-            .put('https://aglio-olio-api.shop/myroom/save', body)
+          if (isUpdate) {
+            axios
+              .put('https://aglio-olio-api.shop/myroom/save', body)
+              .then(function (res) {
+                Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: '업데이트 성공!',
+                  showConfirmButton: false,
+                  timer: 2000,
+                });
+                if (exitSave === 1) {
+                  setDocGCount(0);
+                  navigate(-1);
+                }
+                onCancel();
+              })
+              .catch(function (err) {
+                console.error(err);
+                Swal.fire({
+                  position: 'top',
+                  icon: 'error',
+                  title: '업데이트 실패',
+                  showConfirmButton: false,
+                  timer: 2000,
+                });
+              });
+          }
+          else {
+            axios
+            .post('https://aglio-olio-api.shop/myroom/save', body)
             .then(function (res) {
               Swal.fire({
-                position: 'center',
+                position: 'top',
                 icon: 'success',
-                title: '업데이트 성공!',
+                title: '새 데이터 저장 성공!',
                 showConfirmButton: false,
                 timer: 2000,
+                showLoaderOnConfirm: true,
               });
               if (exitSave === 1) {
                 setDocGCount(0);
@@ -206,11 +238,12 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
               Swal.fire({
                 position: 'top',
                 icon: 'error',
-                title: '업데이트 실패',
+                title: '새 데이터 저장 실패',
                 showConfirmButton: false,
                 timer: 2000,
               });
             });
+          }
         })
         .catch((err) => console.error(err));
     }
@@ -220,6 +253,11 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
   const handleClickCancel = () => {
     onCancel();
   };
+
+  function onBtnClick(e) {
+    if (e.target.innerText === '업데이트') setUpdate(true);
+    else setUpdate(false);
+  }
 
   const modalStyles = {
     content: {
@@ -282,9 +320,23 @@ const UpdateStudy = ({ isOpen, onCancel, doc, data }) => {
           isMulti
         />
         <div className="category" />
-        <button type="submit" class="btn btn-success bg-neutral border-none w-24 absolute right-5 bottom-16">
-          업데이트
-        </button>
+        <div class>
+          <button
+            type="submit"
+            class="btn btn-success bg-neutral border-none w-24 float-right right-5 bottom-16 mx-2.5"
+            onClick={onBtnClick}
+          >
+            업데이트
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-success bg-neutral border-none w-28 float-right right-5 bottom-16 mx-2.5"
+            onClick={onBtnClick}
+          >
+            새로 만들기
+          </button>
+        </div>
       </form>
       <div className="category" />
     </ReactModal>
