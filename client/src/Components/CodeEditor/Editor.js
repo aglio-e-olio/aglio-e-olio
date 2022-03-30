@@ -31,10 +31,8 @@ const CodeEditor = ({ doc, provider }) => {
   const { extractCode, persistUser } = useContext(codeContext);
 
   useEffect(() => {
-    console.log('컴포넌트 나타남.')
     const ytext = doc.getText('codemirror');
     const codeUserColor = provider.awareness.getLocalState('color');
-    console.log('codeUserColor는', codeUserColor, typeof (codeUserColor));
     provider.awareness.setLocalStateField('user', {
       name: persistUser,
       color: codeUserColor.color,
@@ -57,7 +55,6 @@ const CodeEditor = ({ doc, provider }) => {
 
 
     return () => {
-      console.log('컴포넌트 사라짐.')
       view.destroy();
     }
 
