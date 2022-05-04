@@ -2,6 +2,13 @@ import React, { useContext } from 'react';
 import { codeContext } from '../../Context/ContextProvider';
 import PictureIcon from '../Atoms/PictureIcon';
 import CameraIcon from '../Atoms/CameraIcon';
+import {
+  List,
+  AutoSizer,
+  CellMeasurer,
+  CellMeasurerCache,
+} from 'react-virtualized';
+
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoTable() {
   const { selectPreview, searchedData } = useContext(codeContext);
@@ -11,9 +18,43 @@ function InfoTable() {
     selectPreview(value._id);
   }
 
+  function rowRenderer({key, index, style}) {
+    const value = searchedData[index];
+
+    return <div key={key} style={style}>{value.announcer}</div>;
+  }
+
   return (
     <div>
-      <div
+      {/* <AutoSizer>
+        {({ width, height }) => (
+          <List
+            width={width}
+            height={height}
+            rowHeight={50}
+            rowCount={searchedData.length}
+            rowRenderer={({ key, index, style, parent }) => {
+              const value = searchedData[index];
+
+              return <div>{value.announcer}</div>;
+            }}
+          />
+        )}
+      </AutoSizer> */}
+      <div style={{width: "100%", height: "100vh"}}>
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              height={height}
+              rowCount={searchedData.length}
+              rowHeight={20}
+              rowRenderer={rowRenderer}
+              width={width}
+            />
+          )}
+        </AutoSizer>
+      </div>
+      {/* <div
         class="overflow-y-auto overflow-x-hidden m-auto"
         style={{ height: '80vh' }}
       >
@@ -26,26 +67,43 @@ function InfoTable() {
               <th>Save Time</th>
             </tr>
           </thead>
-          <tbody>
-            {searchedData.map((value, index) => {
-              return (
-                <tr
-                  class="hover"
-                  onClick={() => handleTableClick(value)}
-                  key={index}
-                >
-                  <th></th>
-                  <td>
-                    {value.type === 'image' ? <PictureIcon /> : <CameraIcon />}
-                  </td>
-                  <td>{value.title}</td>
-                  <td>{value.save_time}</td>
-                </tr>
-              );
-            })}
+          <tbody style={{width: "100%", height: "100vh"}}>
+            <AutoSizer>
+              {({ width, height }) => (
+                <List
+                  width={width}
+                  height={height}
+                  rowHeight={50}
+                  rowCount={searchedData.length}
+                  rowRenderer={({ key, index, style, parent }) => {
+                    const value = searchedData[index];
+
+                    return (
+                      <tr
+                        class="hover"
+                        onClick={() => handleTableClick(value)}
+                        key={key}
+                        style={style}
+                      >
+                        <th></th>
+                        <td>
+                          {value.type === 'image' ? (
+                            <PictureIcon />
+                          ) : (
+                            <CameraIcon />
+                          )}
+                        </td>
+                        <td>{value.title}</td>
+                        <td>{value.save_time}</td>
+                      </tr>
+                    );
+                  }}
+                />
+              )}
+            </AutoSizer>
           </tbody>
         </table>
-      </div>
+      </div> */}
     </div>
   );
 }
