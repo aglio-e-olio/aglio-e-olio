@@ -53,7 +53,7 @@ const History = () => {
       </div>
       <SplitPane
         split="vertical"
-        minSize="550px"
+        minSize="450px"
         style={{ overflow: 'hidden', height: '80vh' }}
       >
         <div>{view === 'Table' ? <InfoTable /> : <InfoCards />}</div>
