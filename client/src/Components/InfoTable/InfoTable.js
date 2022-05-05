@@ -39,7 +39,6 @@ function InfoTable() {
           class="hover"
           onClick={() => handleTableClick(value)}
           key={key}
-          style={style}
         >
           <th></th>
           <td>{value.type === 'image' ? <PictureIcon /> : <CameraIcon />}</td>
