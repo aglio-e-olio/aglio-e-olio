@@ -26,35 +26,7 @@ function InfoTable() {
 
   return (
     <div>
-      {/* <AutoSizer>
-        {({ width, height }) => (
-          <List
-            width={width}
-            height={height}
-            rowHeight={50}
-            rowCount={searchedData.length}
-            rowRenderer={({ key, index, style, parent }) => {
-              const value = searchedData[index];
-
-              return <div>{value.announcer}</div>;
-            }}
-          />
-        )}
-      </AutoSizer> */}
-      <div style={{width: "100%", height: "100vh"}}>
-        <AutoSizer>
-          {({ height, width }) => (
-            <List
-              height={height}
-              rowCount={searchedData.length}
-              rowHeight={20}
-              rowRenderer={rowRenderer}
-              width={width}
-            />
-          )}
-        </AutoSizer>
-      </div>
-      {/* <div
+      <div
         class="overflow-y-auto overflow-x-hidden m-auto"
         style={{ height: '80vh' }}
       >
@@ -103,7 +75,7 @@ function InfoTable() {
             </AutoSizer>
           </tbody>
         </table>
-      </div> */}
+      </div>
     </div>
   );
 }
