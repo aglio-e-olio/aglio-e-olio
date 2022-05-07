@@ -20,6 +20,7 @@
     "axios": "^0.26.0",
     "daisyui": "^1.25.1",
     "dotenv": "^16.0.0",
+    "express": "^4.17.1",
     "hark": "^1.2.3",
     "html2canvas": "^1.4.1",
     "json-size": "^1.0.0",
@@ -37,6 +38,8 @@
     "react-split-pane": "^0.1.92",
     "react-toastify": "^8.2.0",
     "react-tooltip": "^4.2.21",
+    "react-virtualized": "^9.22.3",
+    "react-window": "^1.8.7",
     "simple-peer": "^9.11.0",
     "socket.io-client": "^4.4.1",
     "styled-components": "^5.3.3",
@@ -45,8 +48,7 @@
     "uuid": "^8.2.0",
     "y-codemirror.next": "^0.1.1",
     "y-webrtc": "^10.2.2",
-    "yjs": "^13.5.27",
-    "express": "^4.17.1"
+    "yjs": "^13.5.27"
   },
   "scripts": {
     "start": "craco start",
