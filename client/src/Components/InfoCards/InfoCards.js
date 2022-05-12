@@ -36,6 +36,7 @@ function InfoCards() {
         parent={parent}
         columnIndex={0}
         rowIndex={index}
+        style={style}
       >
         <div key={key} style={style}>
           <div
