@@ -1,0 +1,19 @@
+.ReactVirtualized__Table__headerRow {
+  background-color: #3D4451;
+  color: white;
+  border-radius: 0 0 10px 10px;
+}
+
+.ReactVirtualized__Table__row {
+  cursor: pointer;
+}
+
+.ReactVirtualized__Table__row:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.ReactVirtualized__Table__row div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -10,6 +10,7 @@ import {
   Column,
 } from 'react-virtualized';
 import 'react-virtualized/styles.css';
+import './InfoTable.css'
 
 /* props로 아무것도 안 줬을 때의 컴포넌트도 따로 만들어야 할 듯. */
 function InfoTable() {
@@ -29,28 +30,6 @@ function InfoTable() {
 
   function handleTableMouseOver() {
     
-  }
-
-
-  function rowRenderer({ key, index, style, parent }) {
-    const value = searchedData[index];
-
-    return (
-      <CellMeasurer
-        key={key}
-        cache={cacheRef.current}
-        parent={parent}
-        columnIndex={0}
-        rowIndex={index}
-      >
-        <tr class="hover" onClick={() => handleTableClick(value)} key={key}>
-          <th></th>
-          <td>{value.type === 'image' ? <PictureIcon /> : <CameraIcon />}</td>
-          <td>{value.title}</td>
-          <td>{value.save_time}</td>
-        </tr>
-      </CellMeasurer>
-    );
   }
 
   const TypeCell = ({ cellData }) => (
